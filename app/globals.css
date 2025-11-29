@@ -1,0 +1,76 @@
+@import "tailwindcss";
+
+@theme {
+  --color-background: var(--background);
+  --color-panel: var(--panel);
+  --color-primary: var(--primary);
+  --color-primary-dim: var(--primary-dim);
+  --color-accent: var(--accent);
+  --color-text: var(--text);
+  --color-muted: var(--muted);
+  --color-glass: var(--glass);
+  
+  --font-inter: var(--font-inter);
+  --font-orbitron: var(--font-orbitron);
+
+  --animate-pulse-slow: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --animate-glow: glow 2s ease-in-out infinite alternate;
+  --animate-grid: grid 20s linear infinite;
+}
+
+:root {
+  --background: #000000;
+  --panel: #0d0d0f;
+  --primary: #00ff95;
+  --primary-dim: #0f5e3a;
+  --accent: #02e2ff;
+  --text: #e7e7e7;
+  --muted: #818181;
+  --glass: rgba(255, 255, 255, 0.04);
+}
+
+@layer base {
+  body {
+    background-color: var(--background);
+    color: var(--text);
+    font-family: var(--font-inter), sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-orbitron), sans-serif;
+  }
+}
+
+@keyframes glow {
+  from {
+    box-shadow: 0 0 5px var(--primary-dim), 0 0 10px var(--primary-dim);
+  }
+  to {
+    box-shadow: 0 0 10px var(--primary), 0 0 20px var(--primary);
+  }
+}
+
+@keyframes grid {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(40px);
+  }
+}
+
+.glass-panel {
+  background: var(--glass);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.neon-border {
+  border: 1px solid var(--primary);
+  box-shadow: 0 0 5px var(--primary-dim);
+}
+
+.neon-text {
+  color: var(--primary);
+  text-shadow: 0 0 5px var(--primary-dim);
+}

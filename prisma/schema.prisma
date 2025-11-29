@@ -1,0 +1,129 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String     @id @default(cuid())
+  email         String     @unique
+  username      String     @unique
+  passwordHash  String
+  discordHandle String?    @unique
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  auditLogs     AuditLog[]
+
+  // Squad Relation
+  squadId String?
+  squad   Squad?  @relation(fields: [squadId], references: [id])
+
+  // Stats
+  totalXp      Int @default(0)
+  totalMinutes Int @default(0)
+  streakDays   Int @default(0)
+
+  // Role & Status
+  isAdmin     Boolean   @default(false)
+  bannedUntil DateTime?
+
+  // Relations
+  sessions        Session[]
+  xpTransactions  XPTransaction[]
+  missionProgress MissionProgress[]
+}
+
+model Squad {
+  id          String          @id @default(cuid())
+  name        String          @unique
+  description String          @default("")
+  slogan      String?
+  bannerUrl   String?
+  createdAt   DateTime        @default(now())
+  members     User[]
+  winners     MonthlyWinner[]
+  // computed fields handled in API: weeklyHours, monthlyXp, memberCount
+}
+
+model Session {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  startTs     DateTime
+  endTs       DateTime
+  durationMin Int
+  completed   Boolean  @default(true)
+  source      String // "web" | "bot" | "manual"
+  subjectTag  String?
+  needsReview Boolean  @default(false) // Anti-cheat flag
+  createdAt   DateTime @default(now())
+}
+
+model Mission {
+  id          String            @id @default(cuid())
+  title       String
+  description String
+  criteria    String
+  type        String // "DAILY" | "WEEKLY" | "LONG_TERM"
+  difficulty  String // "EASY" | "MEDIUM" | "HARD"
+  xpReward    Int
+  active      Boolean           @default(true)
+  createdAt   DateTime          @default(now())
+  progresses  MissionProgress[]
+}
+
+model MissionProgress {
+  id          String    @id @default(cuid())
+  userId      String
+  missionId   String
+  startedAt   DateTime  @default(now())
+  completed   Boolean   @default(false)
+  completedAt DateTime?
+  progress    Int       @default(0)
+  user        User      @relation(fields: [userId], references: [id])
+  mission     Mission   @relation(fields: [missionId], references: [id])
+
+  @@unique([userId, missionId])
+}
+
+model XPTransaction {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  amount      Int // positive for earn, negative for admin adjustments
+  source      String // "session" | "mission" | "admin" | "bonus"
+  referenceId String? // optional id linking to Session or MissionProgress
+  createdAt   DateTime @default(now())
+  note        String?
+
+  @@index([createdAt])
+  @@index([userId])
+}
+
+model MonthlyWinner {
+  id        String   @id @default(cuid())
+  month     String // "YYYY-MM"
+  squadId   String
+  squad     Squad    @relation(fields: [squadId], references: [id])
+  totalXp   Int
+  createdAt DateTime @default(now())
+
+  @@unique([month, squadId])
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  adminId   String
+  adminName String
+  action    String
+  details   String
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+}
