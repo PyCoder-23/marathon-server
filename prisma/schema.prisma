@@ -67,7 +67,7 @@ model Session {
 
 model Mission {
   id          String            @id @default(cuid())
-  title       String            @unique
+  title       String
   description String
   criteria    String
   type        String // "DAILY" | "WEEKLY" | "LONG_TERM"
