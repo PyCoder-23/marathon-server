@@ -71,8 +71,10 @@ async function main() {
     ];
 
     for (const m of missionsData) {
-        await prisma.mission.create({
-            data: m,
+        await prisma.mission.upsert({
+            where: { title: m.title },
+            update: {},
+            create: m,
         });
     }
     console.log("Missions seeded.");
