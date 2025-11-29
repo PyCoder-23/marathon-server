@@ -43,6 +43,7 @@ export async function middleware(request: NextRequest) {
 
         return NextResponse.next();
     } catch (error) {
+        console.error("Middleware token verification failed:", error);
         // Invalid token, redirect to login
         const url = new URL("/login", request.url);
         url.searchParams.set("redirect", pathname);
