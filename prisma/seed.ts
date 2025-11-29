@@ -9,7 +9,7 @@ async function main() {
     // 1. Create Squads
     const squadsData = [
         { name: "Alpha Team", slogan: "The elite vanguard." },
-        { name: "Beta Battalion", slogan: "Strength in numbers." },
+        { name: "Byte Blasters", slogan: "Strength in numbers." },
         { name: "Omega Ops", slogan: "The final word." },
         { name: "Delta Force", slogan: "Swift and silent." },
     ];
@@ -80,7 +80,7 @@ async function main() {
     // 4. Create Demo Users
     const demoUsers = [
         { username: "CyberNinja", email: "ninja@test.com", squad: "Alpha Team" },
-        { username: "NeonRunner", email: "runner@test.com", squad: "Beta Battalion" },
+        { username: "NeonRunner", email: "runner@test.com", squad: "Byte Blasters" },
         { username: "CodeWraith", email: "wraith@test.com", squad: "Omega Ops" },
         { username: "DataDrifter", email: "drifter@test.com", squad: "Delta Force" },
     ];
