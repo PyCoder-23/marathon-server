@@ -2,8 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { jwtVerify } from "jose";
 
-const JWT_SECRET = process.env.JWT_SECRET || "dev-only-secret-key-min-32-chars-long";
-const ENCODED_SECRET = new TextEncoder().encode(JWT_SECRET);
+import { ENCODED_SECRET } from "@/lib/auth-config";
 
 // Routes that require authentication
 const protectedRoutes = ["/dashboard", "/missions", "/squads", "/leaderboard"];
