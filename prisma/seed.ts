@@ -51,6 +51,15 @@ async function main() {
             active: true
         },
         {
+            title: "Consistency Builder",
+            description: "Complete at least 2 sessions today.",
+            criteria: "Complete 2 sessions",
+            type: "DAILY",
+            difficulty: "EASY",
+            xpReward: 75,
+            active: true
+        },
+        {
             title: "Deep Focus",
             description: "Complete 4 sessions in one day.",
             criteria: "Complete 4 sessions",
@@ -60,12 +69,66 @@ async function main() {
             active: true
         },
         {
-            title: "Weekend Warrior",
-            description: "Study for 5 hours on a Saturday.",
+            title: "Marathon Runner",
+            description: "Study for 5 hours in a single day.",
             criteria: "Study for 300 minutes",
+            type: "DAILY",
+            difficulty: "HARD",
+            xpReward: 250,
+            active: true
+        },
+        {
+            title: "Weekly Grind",
+            description: "Complete 20 sessions this week.",
+            criteria: "Complete 20 sessions",
             type: "WEEKLY",
             difficulty: "MEDIUM",
             xpReward: 150,
+            active: true
+        },
+        {
+            title: "Time Master",
+            description: "Study for 15 hours this week.",
+            criteria: "Study for 900 minutes",
+            type: "WEEKLY",
+            difficulty: "MEDIUM",
+            xpReward: 180,
+            active: true
+        },
+        {
+            title: "Dedication",
+            description: "Study every day for 7 days straight.",
+            criteria: "7 day streak",
+            type: "WEEKLY",
+            difficulty: "HARD",
+            xpReward: 300,
+            active: true
+        },
+        {
+            title: "Century Club",
+            description: "Complete 100 total sessions.",
+            criteria: "Complete 100 sessions",
+            type: "LONG_TERM",
+            difficulty: "MEDIUM",
+            xpReward: 500,
+            active: true
+        },
+        {
+            title: "Knowledge Seeker",
+            description: "Accumulate 100 hours of study time.",
+            criteria: "Study for 6000 minutes",
+            type: "LONG_TERM",
+            difficulty: "HARD",
+            xpReward: 1000,
+            active: true
+        },
+        {
+            title: "Unstoppable",
+            description: "Maintain a 30-day study streak.",
+            criteria: "30 day streak",
+            type: "LONG_TERM",
+            difficulty: "HARD",
+            xpReward: 750,
             active: true
         },
     ];
