@@ -42,21 +42,29 @@ export async function GET() {
             const dayEnd = new Date(dayStart);
             dayEnd.setDate(dayEnd.getDate() + 1);
 
-            const daySessions = await prisma.session.findMany({
-                where: {
-                    userId,
-                    startTs: {
-                        gte: dayStart,
-                        lt: dayEnd,
+            const [daySessions, dayXpTransactions] = await Promise.all([
+                prisma.session.findMany({
+                    where: {
+                        userId,
+                        startTs: { gte: dayStart, lt: dayEnd },
+                        completed: true,
                     },
-                    completed: true,
-                },
-            });
+                }),
+                prisma.xPTransaction.findMany({
+                    where: {
+                        userId,
+                        createdAt: { gte: dayStart, lt: dayEnd },
+                    },
+                })
+            ]);
 
             const dayMinutes = daySessions.reduce((sum, s) => sum + s.durationMin, 0);
+            const dayXp = dayXpTransactions.reduce((sum, t) => sum + t.amount, 0);
+
             weeklyActivity.push({
                 date: dayStart.toISOString().split('T')[0],
                 hours: dayMinutes / 60,
+                xp: dayXp,
                 pomodoros: daySessions.length,
             });
         }

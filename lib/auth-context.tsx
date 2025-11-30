@@ -12,6 +12,7 @@ interface User {
     totalMinutes: number;
     streakDays: number;
     squadId: string | null;
+    image: string | null;
 }
 
 interface AuthContextType {

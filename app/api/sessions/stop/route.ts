@@ -34,6 +34,16 @@ export async function POST(req: Request) {
         const durationMs = endTs.getTime() - session.startTs.getTime();
         const durationMin = Math.floor(durationMs / 60000);
 
+        // Check minimum duration (25 mins)
+        const MIN_DURATION = 25;
+        const isValidSession = durationMin >= MIN_DURATION;
+
+        // Calculate XP: 20 XP per full 25-minute block
+        // y = largest multiple of 25 <= durationMin
+        // XP = (y / 25) * 20
+        const blocks = Math.floor(durationMin / 25);
+        const xpEarned = isValidSession ? blocks * 20 : 0;
+
         // Update session
         const updatedSession = await prisma.session.update({
             where: { id: sessionId },
@@ -44,69 +54,74 @@ export async function POST(req: Request) {
             },
         });
 
-        // Calculate XP (1 XP per minute)
-        const xpEarned = durationMin;
-
-        // Create XP transaction
-        await prisma.xPTransaction.create({
-            data: {
-                userId: payload.userId,
-                amount: xpEarned,
-                source: "session",
-                referenceId: sessionId,
-                note: `Study session: ${durationMin} minutes`,
-            },
-        });
-
-        // Update user stats
-        await prisma.user.update({
-            where: { id: payload.userId },
-            data: {
-                totalXp: { increment: xpEarned },
-                totalMinutes: { increment: durationMin },
-            },
-        });
-
-        // Check and update streak
-        const user = await prisma.user.findUnique({
-            where: { id: payload.userId },
-            include: {
-                sessions: {
-                    where: { completed: true },
-                    orderBy: { startTs: 'desc' },
-                    take: 10, // Get recent sessions to check streak
-                }
-            }
-        });
-
-        if (user) {
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-
-            const yesterday = new Date(today);
-            yesterday.setDate(yesterday.getDate() - 1);
-
-            // Check if user studied yesterday
-            const studiedYesterday = user.sessions.some((s: any) => {
-                const sessionDate = new Date(s.startTs);
-                sessionDate.setHours(0, 0, 0, 0);
-                return sessionDate.getTime() === yesterday.getTime();
-            });
-
-            // Check if this is the first session today
-            const sessionsToday = user.sessions.filter((s: any) => {
-                const sessionDate = new Date(s.startTs);
-                sessionDate.setHours(0, 0, 0, 0);
-                return sessionDate.getTime() === today.getTime();
-            });
-
-            // Update streak: increment if studied yesterday, reset to 1 if not
-            if (sessionsToday.length === 1) { // Only update on first session of the day
-                const newStreak = studiedYesterday ? user.streakDays + 1 : 1;
-                await prisma.user.update({
-                    where: { id: payload.userId },
-                    data: { streakDays: newStreak },
+        // Only update user stats and streak if session is valid
+        if (isValidSession) {
+            // Create XP transaction
+            if (xpEarned > 0) {
+                await prisma.xPTransaction.create({
+                    data: {
+                        userId: payload.userId,
+                        amount: xpEarned,
+                        source: "session",
+                        referenceId: sessionId,
+                        note: `Study session: ${durationMin} minutes (${blocks} blocks)`,
+                    },
                 });
+            }
+
+            // Update user stats
+            await prisma.user.update({
+                where: { id: payload.userId },
+                data: {
+                    totalXp: { increment: xpEarned },
+                    totalMinutes: { increment: durationMin },
+                },
+            });
+
+            // Check and update streak
+            const user = await prisma.user.findUnique({
+                where: { id: payload.userId },
+                include: {
+                    sessions: {
+                        where: {
+                            completed: true,
+                            durationMin: { gte: MIN_DURATION } // Only count valid sessions for streak
+                        },
+                        orderBy: { startTs: 'desc' },
+                        take: 10,
+                    }
+                }
+            });
+
+            if (user) {
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+
+                const yesterday = new Date(today);
+                yesterday.setDate(yesterday.getDate() - 1);
+
+                // Check if user studied yesterday
+                const studiedYesterday = user.sessions.some((s: any) => {
+                    const sessionDate = new Date(s.startTs);
+                    sessionDate.setHours(0, 0, 0, 0);
+                    return sessionDate.getTime() === yesterday.getTime();
+                });
+
+                // Check if this is the first session today
+                const sessionsToday = user.sessions.filter((s: any) => {
+                    const sessionDate = new Date(s.startTs);
+                    sessionDate.setHours(0, 0, 0, 0);
+                    return sessionDate.getTime() === today.getTime();
+                });
+
+                // Update streak: increment if studied yesterday, reset to 1 if not
+                if (sessionsToday.length === 1) { // Only update on first session of the day
+                    const newStreak = studiedYesterday ? user.streakDays + 1 : 1;
+                    await prisma.user.update({
+                        where: { id: payload.userId },
+                        data: { streakDays: newStreak },
+                    });
+                }
             }
         }
 

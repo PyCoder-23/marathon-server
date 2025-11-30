@@ -145,9 +145,9 @@ export default function DashboardPage() {
                     </CardHeader>
                     <CardContent>
                         <div className="h-[200px] flex items-end justify-between gap-2 px-2">
-                            {stats?.weekly.map((day, i) => {
-                                const maxHeight = Math.max(...(stats.weekly.map(d => d.hours) || [1]));
-                                const heightPercent = maxHeight > 0 ? (day.hours / maxHeight) * 100 : 0;
+                            {stats?.weekly.map((day: any, i) => {
+                                const maxXp = Math.max(...(stats.weekly.map((d: any) => d.xp) || [100]));
+                                const heightPercent = maxXp > 0 ? (day.xp / maxXp) * 100 : 0;
 
                                 return (
                                     <div key={i} className="flex flex-col items-center gap-2 w-full group">
@@ -155,8 +155,8 @@ export default function DashboardPage() {
                                             className="w-full bg-primary/20 hover:bg-primary/50 transition-all rounded-t-sm relative group-hover:shadow-[0_0_15px_rgba(0,255,149,0.3)]"
                                             style={{ height: `${Math.max(heightPercent, 2)}%` }}
                                         >
-                                            <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-black text-xs px-2 py-1 rounded border border-white/10 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                                                {day.hours.toFixed(1)}h
+                                            <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-black text-xs px-2 py-1 rounded border border-white/10 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
+                                                {day.xp} XP
                                             </div>
                                         </div>
                                         <span className="text-xs text-muted">

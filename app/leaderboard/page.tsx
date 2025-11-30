@@ -69,6 +69,7 @@ export default function LeaderboardPage() {
                 ) : (
                     <>
                         {/* Podium */}
+                        {/* Podium */}
                         {topThree.length > 0 && (
                             <div className="flex flex-col md:flex-row justify-center items-end gap-4 md:gap-8 mb-12 min-h-[250px]">
                                 {/* 2nd Place */}
@@ -81,9 +82,9 @@ export default function LeaderboardPage() {
                                             <p className="font-bold text-white truncate max-w-[150px]">{topThree[1].username}</p>
                                             <p className="text-sm text-primary font-mono">{topThree[1].totalXp.toLocaleString()} XP</p>
                                         </div>
-                                        <div className="w-full h-32 bg-gradient-to-t from-gray-900/80 to-gray-800/20 border-t-4 border-gray-400 rounded-t-lg flex items-center justify-center relative">
-                                            <Medal className="w-8 h-8 text-gray-400" />
-                                            <div className="absolute bottom-2 text-4xl font-bold text-white/10">2</div>
+                                        <div className="w-full h-32 bg-gradient-to-t from-gray-900/80 to-gray-800/20 border-t-4 border-gray-400 rounded-t-lg flex flex-col items-center justify-end pb-4 relative">
+                                            <Medal className="w-8 h-8 text-gray-400 mb-2" />
+                                            <div className="text-4xl font-bold text-white/20">2</div>
                                         </div>
                                     </div>
                                 )}
@@ -99,9 +100,9 @@ export default function LeaderboardPage() {
                                             <p className="font-bold text-white text-lg truncate max-w-[150px]">{topThree[0].username}</p>
                                             <p className="text-sm text-primary font-mono">{topThree[0].totalXp.toLocaleString()} XP</p>
                                         </div>
-                                        <div className="w-full h-40 bg-gradient-to-t from-yellow-900/40 to-yellow-500/10 border-t-4 border-yellow-500 rounded-t-lg flex items-center justify-center relative shadow-[0_0_30px_rgba(234,179,8,0.1)]">
-                                            <Trophy className="w-10 h-10 text-yellow-500" />
-                                            <div className="absolute bottom-2 text-5xl font-bold text-white/10">1</div>
+                                        <div className="w-full h-40 bg-gradient-to-t from-yellow-900/40 to-yellow-500/10 border-t-4 border-yellow-500 rounded-t-lg flex flex-col items-center justify-end pb-4 relative shadow-[0_0_30px_rgba(234,179,8,0.1)]">
+                                            <Trophy className="w-10 h-10 text-yellow-500 mb-2" />
+                                            <div className="text-5xl font-bold text-white/20">1</div>
                                         </div>
                                     </div>
                                 )}
@@ -116,9 +117,9 @@ export default function LeaderboardPage() {
                                             <p className="font-bold text-white truncate max-w-[150px]">{topThree[2].username}</p>
                                             <p className="text-sm text-primary font-mono">{topThree[2].totalXp.toLocaleString()} XP</p>
                                         </div>
-                                        <div className="w-full h-24 bg-gradient-to-t from-orange-900/40 to-orange-700/10 border-t-4 border-orange-700 rounded-t-lg flex items-center justify-center relative">
-                                            <Medal className="w-8 h-8 text-orange-700" />
-                                            <div className="absolute bottom-2 text-4xl font-bold text-white/10">3</div>
+                                        <div className="w-full h-24 bg-gradient-to-t from-orange-900/40 to-orange-700/10 border-t-4 border-orange-700 rounded-t-lg flex flex-col items-center justify-end pb-4 relative">
+                                            <Medal className="w-8 h-8 text-orange-700 mb-2" />
+                                            <div className="text-4xl font-bold text-white/20">3</div>
                                         </div>
                                     </div>
                                 )}

@@ -6,19 +6,17 @@ export async function POST(req: Request) {
     try {
         const adminPayload = await requireAdmin();
         const body = await req.json();
-        const { userId, durationDays, reason } = body;
+        const { userId, totalXp, totalMinutes } = body;
 
-        if (!userId || !durationDays) {
-            return errorResponse("User ID and duration are required", 400);
+        if (!userId) {
+            return errorResponse("User ID is required", 400);
         }
-
-        const bannedUntil = new Date();
-        bannedUntil.setDate(bannedUntil.getDate() + parseInt(durationDays));
 
         const user = await prisma.user.update({
             where: { id: userId },
             data: {
-                bannedUntil,
+                totalXp: totalXp !== undefined ? parseInt(totalXp) : undefined,
+                totalMinutes: totalMinutes !== undefined ? parseInt(totalMinutes) : undefined,
             },
         });
 
@@ -27,8 +25,8 @@ export async function POST(req: Request) {
             data: {
                 adminId: adminPayload.userId,
                 adminName: adminPayload.username || "Admin",
-                action: "BAN_USER",
-                details: `Banned user ${user.username} for ${durationDays} days. Reason: ${reason}`,
+                action: "UPDATE_USER_STATS",
+                details: `Updated user ${user.username} (XP: ${totalXp}, Min: ${totalMinutes})`,
                 userId: userId,
             },
         });
@@ -36,7 +34,7 @@ export async function POST(req: Request) {
         return successResponse({ user });
     } catch (error: any) {
         if (error.message.includes("Forbidden")) return errorResponse("Forbidden", 403);
-        console.error("Ban user error:", error);
+        console.error("Update user error:", error);
         return errorResponse("Internal server error", 500);
     }
 }

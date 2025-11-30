@@ -4,9 +4,17 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { Menu, X, LogOut, User } from "lucide-react";
+import { Menu, X, LogOut, User, Shield } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/lib/auth-context";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const navItems = [
     { name: "Dashboard", href: "/dashboard" },
@@ -53,21 +61,46 @@ export function Navbar() {
                 <div className="hidden md:flex items-center gap-4">
                     {user ? (
                         <>
-                            <div className="flex items-center gap-2 text-sm">
-                                <User className="w-4 h-4 text-primary" />
-                                <span className="text-white font-medium">{user.username}</span>
-                                <span className="text-muted">•</span>
-                                <span className="text-primary font-mono">{user.totalXp} XP</span>
-                            </div>
-                            <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => logout()}
-                                className="text-muted hover:text-white"
-                            >
-                                <LogOut className="w-4 h-4 mr-2" />
-                                Logout
-                            </Button>
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button variant="ghost" className="flex items-center gap-2 pl-2 pr-4 hover:bg-white/5">
+                                        <div className="w-8 h-8 rounded-full bg-primary/20 border border-primary/50 flex items-center justify-center overflow-hidden">
+                                            {user.image ? (
+                                                <img src={user.image} alt={user.username} className="w-full h-full object-cover" />
+                                            ) : (
+                                                <User className="w-4 h-4 text-primary" />
+                                            )}
+                                        </div>
+                                        <div className="flex flex-col items-start text-xs">
+                                            <span className="text-white font-medium">{user.username}</span>
+                                            <span className="text-primary font-mono">{user.totalXp} XP</span>
+                                        </div>
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end" className="w-56 bg-black border-white/10 text-white">
+                                    <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                                    <DropdownMenuSeparator className="bg-white/10" />
+                                    <Link href="/settings">
+                                        <DropdownMenuItem className="cursor-pointer">
+                                            <User className="mr-2 h-4 w-4" />
+                                            <span>Profile & Settings</span>
+                                        </DropdownMenuItem>
+                                    </Link>
+                                    {user.isAdmin && (
+                                        <Link href="/admin">
+                                            <DropdownMenuItem className="cursor-pointer">
+                                                <Shield className="mr-2 h-4 w-4 text-yellow-500" />
+                                                <span>Admin Command</span>
+                                            </DropdownMenuItem>
+                                        </Link>
+                                    )}
+                                    <DropdownMenuSeparator className="bg-white/10" />
+                                    <DropdownMenuItem className="cursor-pointer text-red-500 focus:text-red-500" onClick={() => logout()}>
+                                        <LogOut className="mr-2 h-4 w-4" />
+                                        <span>Logout</span>
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
                         </>
                     ) : (
                         <>

@@ -32,6 +32,7 @@ model User {
   // Role & Status
   isAdmin     Boolean   @default(false)
   bannedUntil DateTime?
+  image       String?
 
   // Relations
   sessions        Session[]
@@ -125,7 +126,7 @@ model AuditLog {
   adminName String
   action    String
   details   String
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
   createdAt DateTime @default(now())
 }
