@@ -34,12 +34,6 @@ export async function checkMissionCompletion(userId: string, missionId: string) 
         const minutesMatch = criteria.match(/(\d+) minutes/);
         const requiredMinutes = minutesMatch ? parseInt(minutesMatch[1]) : 0;
 
-        // Check if ANY single session meets this, or total time? 
-        // Usually "Study for X minutes" implies total or single session depending on context.
-        // Let's assume total accumulated time for now if it's a "total" mission, 
-        // or single session if it's a "focus" mission.
-
-        // For simplicity: Check total minutes today for daily missions
         if (mission.type === "DAILY") {
             const today = new Date();
             today.setHours(0, 0, 0, 0);
@@ -48,6 +42,20 @@ export async function checkMissionCompletion(userId: string, missionId: string) 
                 .reduce((acc: number, s: any) => acc + s.durationMin, 0);
 
             if (todayMinutes >= requiredMinutes) completed = true;
+        } else if (mission.type === "WEEKLY") {
+            const weekAgo = new Date();
+            weekAgo.setDate(weekAgo.getDate() - 7);
+            const weekMinutes = user.sessions
+                .filter((s: any) => s.startTs >= weekAgo)
+                .reduce((acc: number, s: any) => acc + s.durationMin, 0);
+
+            if (weekMinutes >= requiredMinutes) completed = true;
+        } else if (mission.type === "LONG_TERM") {
+            // Total accumulated time
+            const totalMinutes = user.sessions
+                .reduce((acc: number, s: any) => acc + s.durationMin, 0);
+
+            if (totalMinutes >= requiredMinutes) completed = true;
         }
     }
 
@@ -61,7 +69,24 @@ export async function checkMissionCompletion(userId: string, missionId: string) 
             today.setHours(0, 0, 0, 0);
             const todaySessions = user.sessions.filter((s: any) => s.startTs >= today).length;
             if (todaySessions >= requiredCount) completed = true;
+        } else if (mission.type === "WEEKLY") {
+            const weekAgo = new Date();
+            weekAgo.setDate(weekAgo.getDate() - 7);
+            const weekSessions = user.sessions.filter((s: any) => s.startTs >= weekAgo).length;
+            if (weekSessions >= requiredCount) completed = true;
+        } else if (mission.type === "LONG_TERM") {
+            // Total sessions ever
+            const totalSessions = user.sessions.length;
+            if (totalSessions >= requiredCount) completed = true;
         }
+    }
+
+    if (criteria.includes("streak")) {
+        // e.g. "7 day streak" or "30 day streak"
+        const streakMatch = criteria.match(/(\d+) day streak/);
+        const requiredStreak = streakMatch ? parseInt(streakMatch[1]) : 0;
+
+        if (user.streakDays >= requiredStreak) completed = true;
     }
 
     return completed;

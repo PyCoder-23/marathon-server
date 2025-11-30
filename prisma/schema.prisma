@@ -76,6 +76,8 @@ model Mission {
   active      Boolean           @default(true)
   createdAt   DateTime          @default(now())
   progresses  MissionProgress[]
+
+  @@unique([title, criteria])
 }
 
 model MissionProgress {
