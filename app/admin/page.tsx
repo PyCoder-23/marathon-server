@@ -12,6 +12,7 @@ import { Search, MoreHorizontal, Shield, ShieldAlert, Ban, Trash2, Edit } from "
 import { useState, useEffect } from "react";
 import { api } from "@/lib/api-client";
 import { useToast } from "@/components/ui/toast-context";
+import { useAuth } from "@/lib/auth-context";
 
 interface User {
     id: string;
@@ -32,6 +33,7 @@ export default function AdminDashboard() {
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const { toast } = useToast();
+    const { user, refreshUser } = useAuth();
 
     // Edit State
     const [editingUser, setEditingUser] = useState<User | null>(null);
@@ -90,6 +92,12 @@ export default function AdminDashboard() {
                 totalMinutes: editMinutes
             });
             toast({ title: "User updated", description: "User stats have been updated." });
+
+            // Refresh global user state if updating self
+            if (user && editingUser.id === user.id) {
+                await refreshUser();
+            }
+
             setEditingUser(null);
             fetchUsers();
         } catch (error) {

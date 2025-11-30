@@ -216,8 +216,8 @@ export default function DashboardPage() {
                 {/* Quick Actions - 12 cols */}
                 <div className="md:col-span-12 grid grid-cols-2 md:grid-cols-4 gap-4">
                     <Link href="/missions" className="contents">
-                        <Button variant="outline" className="h-auto py-4 flex flex-col gap-2 border-white/10 hover:border-accent/50 hover:bg-accent/5">
-                            <Target className="w-6 h-6 text-accent" />
+                        <Button variant="outline" className="h-auto py-4 flex flex-col gap-2 border-white/10 hover:border-cyan-400/50 hover:bg-cyan-400/5">
+                            <Target className="w-6 h-6 text-cyan-400" />
                             <span>View Missions</span>
                         </Button>
                     </Link>

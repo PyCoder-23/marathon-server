@@ -91,15 +91,15 @@ export default function Home() {
             </CardContent>
           </Card>
 
-          <Card className="border-accent/20 hover:border-accent/50 transition-colors">
+          <Card className="border-cyan-400/20 hover:border-cyan-400/50 transition-colors">
             <CardHeader>
-              <CardTitle className="text-accent">Squads</CardTitle>
+              <CardTitle className="text-cyan-400">Squads</CardTitle>
               <CardDescription>Compete with your team</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="flex items-center justify-between">
                 <span className="text-2xl font-bold">Rank #1</span>
-                <span className="text-accent text-sm">Top 1%</span>
+                <span className="text-cyan-400 text-sm">Top 1%</span>
               </div>
             </CardContent>
           </Card>

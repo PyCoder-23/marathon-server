@@ -118,7 +118,7 @@ export default function LeaderboardPage() {
                                             <p className="text-sm text-primary font-mono">{topThree[2].totalXp.toLocaleString()} XP</p>
                                         </div>
                                         <div className="w-full h-24 bg-gradient-to-t from-orange-900/40 to-orange-700/10 border-t-4 border-orange-700 rounded-t-lg flex flex-col items-center justify-end pb-4 relative">
-                                            <Medal className="w-8 h-8 text-orange-700 mb-2" />
+                                            <Medal className="w-8 h-8 text-orange-700 mb-0" />
                                             <div className="text-4xl font-bold text-white/20">3</div>
                                         </div>
                                     </div>
