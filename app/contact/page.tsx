@@ -1,8 +1,13 @@
+"use client";
+
 import React from "react";
 import Link from "next/link";
 import { Mail, MessageSquare } from "lucide-react";
+import { useAuth } from "@/lib/auth-context";
 
 export default function ContactPage() {
+    const { user } = useAuth();
+
     return (
         <div className="container mx-auto px-4 py-12 max-w-4xl">
             <h1 className="text-4xl font-bold mb-8 text-primary font-orbitron">Contact Us</h1>
@@ -19,10 +24,10 @@ export default function ContactPage() {
                         For general inquiries, support, or partnership opportunities, please send us an email.
                     </p>
                     <a
-                        href="mailto:harleen.mit@gmail.com"
+                        href="mailto:marathonxserver@gmail.com"
                         className="inline-block bg-primary hover:bg-primary/90 text-background font-bold py-3 px-6 rounded-lg transition-colors"
                     >
-                        harleen.mit@gmail.com
+                        marathonxserver@gmail.com
                     </a>
                 </div>
 
@@ -36,9 +41,20 @@ export default function ContactPage() {
                     <p className="text-gray-300 mb-6">
                         Connect with the community, get real-time support, and participate in events on our Discord server.
                     </p>
-                    <p className="text-sm text-gray-400 italic">
-                        (Link available after joining the server)
-                    </p>
+                    {user ? (
+                        <a
+                            href="https://discord.com/invite/R2xGRqQA4J"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-block bg-[#5865F2] hover:bg-[#4752C4] text-white font-bold py-3 px-6 rounded-lg transition-colors"
+                        >
+                            Join Server
+                        </a>
+                    ) : (
+                        <p className="text-sm text-gray-500 italic">
+                            Link available after sign up
+                        </p>
+                    )}
                 </div>
             </div>
         </div>

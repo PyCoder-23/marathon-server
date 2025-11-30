@@ -17,7 +17,7 @@ export async function POST(req: Request) {
         });
 
         if (existingSession) {
-            return errorResponse("You already have an active session", 400);
+            return errorResponse("You already have an active session. Please stop it before starting a new one.", 400);
         }
 
         // Create new session

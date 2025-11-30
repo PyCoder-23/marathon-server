@@ -4,12 +4,12 @@ export default function AboutPage() {
   return (
     <div className="container mx-auto px-4 py-12 max-w-4xl">
       <h1 className="text-4xl font-bold mb-8 text-primary font-orbitron">About Marathon</h1>
-      
+
       <div className="space-y-6 text-lg text-gray-300">
         <p>
-          Welcome to <span className="text-secondary font-bold">Marathon</span>, the futuristic training camp for disciplined students.
+          Welcome to <span className="text-white font-bold">Marathon</span>, the futuristic training camp for disciplined students.
         </p>
-        
+
         <p>
           We believe that consistency is the key to mastery. In a world of distractions, Marathon provides a structured, gamified environment where you can focus on your goals, track your progress, and compete with like-minded individuals.
         </p>

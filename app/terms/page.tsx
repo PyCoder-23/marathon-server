@@ -39,7 +39,7 @@ export default function TermsPage() {
 
                 <h2 className="text-2xl font-bold mt-8 mb-4 text-white">Contact Us</h2>
                 <p>
-                    If you have any questions about these Terms, please contact us at <a href="mailto:harleen.mit@gmail.com" className="text-primary hover:underline">harleen.mit@gmail.com</a>.
+                    If you have any questions about these Terms, please contact us at <a href="mailto:marathonxserver@gmail.com" className="text-primary hover:underline">marathonxserver@gmail.com</a>.
                 </p>
             </div>
         </div>
