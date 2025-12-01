@@ -8,10 +8,10 @@ async function main() {
 
     // 1. Create Squads
     const squadsData = [
-        { name: "Alpha Team", slogan: "The elite vanguard." },
-        { name: "Byte Blasters", slogan: "Strength in numbers." },
-        { name: "Omega Ops", slogan: "The final word." },
-        { name: "Delta Force", slogan: "Swift and silent." },
+        { name: "Alpha Team", slogan: "Lead the pack. Set the pace. Own the grind." },
+        { name: "Byte Blasters", slogan: "Code. Grind. Blast through every limit" },
+        { name: "Omega Ops", slogan: "Calm minds, sharp moves, unstoppable ops." },
+        { name: "Delta Force", slogan: "Precision in chaos, power in unity." },
     ];
 
     for (const s of squadsData) {
@@ -60,12 +60,39 @@ async function main() {
             active: true
         },
         {
+            title: "Triple Threat",
+            description: "Complete 3 sessions in one day.",
+            criteria: "Complete 3 sessions",
+            type: "DAILY",
+            difficulty: "MEDIUM",
+            xpReward: 150,
+            active: true
+        },
+        {
             title: "Deep Focus",
             description: "Complete 4 sessions in one day.",
             criteria: "Complete 4 sessions",
             type: "DAILY",
             difficulty: "HARD",
             xpReward: 200,
+            active: true
+        },
+        {
+            title: "Power Hour",
+            description: "Study for 60 minutes in a single day.",
+            criteria: "Study for 60 minutes",
+            type: "DAILY",
+            difficulty: "EASY",
+            xpReward: 100,
+            active: true
+        },
+        {
+            title: "Focus Master",
+            description: "Study for 2 hours in a single day.",
+            criteria: "Study for 120 minutes",
+            type: "DAILY",
+            difficulty: "MEDIUM",
+            xpReward: 180,
             active: true
         },
         {
@@ -78,12 +105,30 @@ async function main() {
             active: true
         },
         {
+            title: "Weekly Warmup",
+            description: "Complete 5 sessions this week.",
+            criteria: "Complete 5 sessions",
+            type: "WEEKLY",
+            difficulty: "EASY",
+            xpReward: 100,
+            active: true
+        },
+        {
             title: "Weekly Grind",
             description: "Complete 20 sessions this week.",
             criteria: "Complete 20 sessions",
             type: "WEEKLY",
             difficulty: "MEDIUM",
             xpReward: 150,
+            active: true
+        },
+        {
+            title: "Study Buff",
+            description: "Study for 5 hours this week.",
+            criteria: "Study for 300 minutes",
+            type: "WEEKLY",
+            difficulty: "EASY",
+            xpReward: 120,
             active: true
         },
         {
@@ -101,6 +146,15 @@ async function main() {
             criteria: "7 day streak",
             type: "WEEKLY",
             difficulty: "HARD",
+            xpReward: 300,
+            active: true
+        },
+        {
+            title: "Session Master",
+            description: "Complete 50 total sessions.",
+            criteria: "Complete 50 sessions",
+            type: "LONG_TERM",
+            difficulty: "MEDIUM",
             xpReward: 300,
             active: true
         },
@@ -129,33 +183,6 @@ async function main() {
             type: "LONG_TERM",
             difficulty: "HARD",
             xpReward: 750,
-            active: true
-        },
-        {
-            title: "Weekend Warrior",
-            description: "Complete 5 sessions on a weekend.",
-            criteria: "Complete 5 sessions",
-            type: "WEEKLY",
-            difficulty: "MEDIUM",
-            xpReward: 200,
-            active: true
-        },
-        {
-            title: "Early Bird",
-            description: "Complete a session before 8 AM.",
-            criteria: "Complete 1 session",
-            type: "DAILY",
-            difficulty: "MEDIUM",
-            xpReward: 100,
-            active: true
-        },
-        {
-            title: "Night Owl",
-            description: "Complete a session after 10 PM.",
-            criteria: "Complete 1 session",
-            type: "DAILY",
-            difficulty: "MEDIUM",
-            xpReward: 100,
             active: true
         },
     ];

@@ -71,40 +71,17 @@ export async function checkMissionCompletion(userId: string, missionId: string) 
             const today = new Date();
             today.setHours(0, 0, 0, 0);
 
-            // Time-based checks for daily missions
-            if (criteria.includes("before 8 am")) {
-                const morningSessions = validSessions.filter((s: any) => {
-                    const d = new Date(s.startTs);
-                    return d >= today && d.getHours() < 8;
-                }).length;
-                if (morningSessions >= requiredCount) completed = true;
-            } else if (criteria.includes("after 10 pm")) {
-                const nightSessions = validSessions.filter((s: any) => {
-                    const d = new Date(s.startTs);
-                    return d >= today && d.getHours() >= 22;
-                }).length;
-                if (nightSessions >= requiredCount) completed = true;
-            } else {
-                // Normal daily count
-                const todaySessions = validSessions.filter((s: any) => s.startTs >= today).length;
-                if (todaySessions >= requiredCount) completed = true;
-            }
+            // Normal daily count
+            const todaySessions = validSessions.filter((s: any) => s.startTs >= today).length;
+            if (todaySessions >= requiredCount) completed = true;
+
         } else if (mission.type === "WEEKLY") {
             const weekAgo = new Date();
             weekAgo.setDate(weekAgo.getDate() - 7);
 
-            if (criteria.includes("weekend")) {
-                // Check for sessions on Sat (6) or Sun (0)
-                const weekendSessions = validSessions.filter((s: any) => {
-                    const d = new Date(s.startTs);
-                    const day = d.getDay();
-                    return d >= weekAgo && (day === 0 || day === 6);
-                }).length;
-                if (weekendSessions >= requiredCount) completed = true;
-            } else {
-                const weekSessions = validSessions.filter((s: any) => s.startTs >= weekAgo).length;
-                if (weekSessions >= requiredCount) completed = true;
-            }
+            const weekSessions = validSessions.filter((s: any) => s.startTs >= weekAgo).length;
+            if (weekSessions >= requiredCount) completed = true;
+
         } else if (mission.type === "LONG_TERM") {
             // Total sessions ever
             const totalSessions = validSessions.length;

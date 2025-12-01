@@ -25,12 +25,39 @@ async function addMissions() {
             active: true
         },
         {
+            title: "Triple Threat",
+            description: "Complete 3 sessions in one day.",
+            criteria: "Complete 3 sessions",
+            type: "DAILY",
+            difficulty: "MEDIUM",
+            xpReward: 150,
+            active: true
+        },
+        {
             title: "Deep Focus",
             description: "Complete 4 sessions in one day.",
             criteria: "Complete 4 sessions",
             type: "DAILY",
             difficulty: "HARD",
             xpReward: 200,
+            active: true
+        },
+        {
+            title: "Power Hour",
+            description: "Study for 60 minutes in a single day.",
+            criteria: "Study for 60 minutes",
+            type: "DAILY",
+            difficulty: "EASY",
+            xpReward: 100,
+            active: true
+        },
+        {
+            title: "Focus Master",
+            description: "Study for 2 hours in a single day.",
+            criteria: "Study for 120 minutes",
+            type: "DAILY",
+            difficulty: "MEDIUM",
+            xpReward: 180,
             active: true
         },
         {
@@ -43,12 +70,30 @@ async function addMissions() {
             active: true
         },
         {
+            title: "Weekly Warmup",
+            description: "Complete 5 sessions this week.",
+            criteria: "Complete 5 sessions",
+            type: "WEEKLY",
+            difficulty: "EASY",
+            xpReward: 100,
+            active: true
+        },
+        {
             title: "Weekly Grind",
             description: "Complete 20 sessions this week.",
             criteria: "Complete 20 sessions",
             type: "WEEKLY",
             difficulty: "MEDIUM",
             xpReward: 150,
+            active: true
+        },
+        {
+            title: "Study Buff",
+            description: "Study for 5 hours this week.",
+            criteria: "Study for 300 minutes",
+            type: "WEEKLY",
+            difficulty: "EASY",
+            xpReward: 120,
             active: true
         },
         {
@@ -66,6 +111,15 @@ async function addMissions() {
             criteria: "7 day streak",
             type: "WEEKLY",
             difficulty: "HARD",
+            xpReward: 300,
+            active: true
+        },
+        {
+            title: "Session Master",
+            description: "Complete 50 total sessions.",
+            criteria: "Complete 50 sessions",
+            type: "LONG_TERM",
+            difficulty: "MEDIUM",
             xpReward: 300,
             active: true
         },
