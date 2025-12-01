@@ -6,6 +6,7 @@ import { Users, Trophy, Timer, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api-client";
+import { SquadRankBadge } from "@/components/squad-rank-badge";
 
 interface Squad {
     id: string;
@@ -78,9 +79,12 @@ export default function SquadsPage() {
 
                                 {/* Info */}
                                 <div className="flex-1 text-center md:text-left space-y-2">
-                                    <h3 className="text-2xl font-bold text-white group-hover:text-primary transition-colors">
-                                        {squad.name}
-                                    </h3>
+                                    <div>
+                                        <SquadRankBadge rank={squad.rank} squadName={squad.name} />
+                                        <h3 className="text-2xl font-bold text-white group-hover:text-primary transition-colors">
+                                            {squad.name}
+                                        </h3>
+                                    </div>
                                     <p className="text-muted max-w-xl">
                                         {squad.description}
                                     </p>

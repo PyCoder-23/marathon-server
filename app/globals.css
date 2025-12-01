@@ -101,6 +101,16 @@
   }
 }
 
+@keyframes shimmer {
+  0% {
+    background-position: -200% center;
+  }
+
+  100% {
+    background-position: 200% center;
+  }
+}
+
 .glass-panel {
   background: var(--glass);
   backdrop-filter: blur(10px);
