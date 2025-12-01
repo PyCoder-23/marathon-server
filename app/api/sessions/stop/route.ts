@@ -124,17 +124,28 @@ export async function POST(req: Request) {
                     });
                 }
             }
+
+            // Check mission progress - ONLY for valid sessions
+            const { checkAllActiveMissions } = await import("@/lib/mission-checker");
+            const completedMissions = await checkAllActiveMissions(payload.userId);
+
+            return successResponse({
+                session: updatedSession,
+                xpEarned,
+                durationMin,
+                isValidSession,
+                completedMissions: completedMissions.map(m => ({ id: m.id, title: m.title, xpReward: m.xpReward })),
+            });
         }
 
-        // Check mission progress
-        const { checkAllActiveMissions } = await import("@/lib/mission-checker");
-        const completedMissions = await checkAllActiveMissions(payload.userId);
-
+        // Session was too short - return without checking missions
         return successResponse({
             session: updatedSession,
-            xpEarned,
+            xpEarned: 0,
             durationMin,
-            completedMissions: completedMissions.map(m => ({ id: m.id, title: m.title, xpReward: m.xpReward })),
+            isValidSession: false,
+            completedMissions: [],
+            message: "Session too short. Minimum 25 minutes required for XP and mission progress."
         });
     } catch (error: any) {
         if (error.message === "Unauthorized") {

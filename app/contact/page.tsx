@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { Mail, MessageSquare } from "lucide-react";
+import { Mail, MessageSquare, Linkedin, Youtube } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 
 export default function ContactPage() {
@@ -55,6 +55,46 @@ export default function ContactPage() {
                             Link available after sign up
                         </p>
                     )}
+                </div>
+
+                <div className="bg-card/50 p-8 rounded-xl border border-white/10 backdrop-blur-sm">
+                    <div className="flex items-center gap-4 mb-6">
+                        <div className="p-3 bg-[#0A66C2]/20 rounded-lg">
+                            <Linkedin className="w-8 h-8 text-[#0A66C2]" />
+                        </div>
+                        <h2 className="text-2xl font-bold text-white">LinkedIn</h2>
+                    </div>
+                    <p className="text-gray-300 mb-6">
+                        Follow us on LinkedIn for updates, announcements, and professional networking opportunities.
+                    </p>
+                    <a
+                        href="https://www.linkedin.com/company/marathon-server/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-block bg-[#0A66C2] hover:bg-[#004182] text-white font-bold py-3 px-6 rounded-lg transition-colors"
+                    >
+                        Follow Us
+                    </a>
+                </div>
+
+                <div className="bg-card/50 p-8 rounded-xl border border-white/10 backdrop-blur-sm">
+                    <div className="flex items-center gap-4 mb-6">
+                        <div className="p-3 bg-[#FF0000]/20 rounded-lg">
+                            <Youtube className="w-8 h-8 text-[#FF0000]" />
+                        </div>
+                        <h2 className="text-2xl font-bold text-white">YouTube</h2>
+                    </div>
+                    <p className="text-gray-300 mb-6">
+                        Subscribe to our YouTube channel for tutorials, updates, and community highlights.
+                    </p>
+                    <a
+                        href="https://www.youtube.com/@marathon-server"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-block bg-[#FF0000] hover:bg-[#CC0000] text-white font-bold py-3 px-6 rounded-lg transition-colors"
+                    >
+                        Subscribe
+                    </a>
                 </div>
             </div>
         </div>
