@@ -45,6 +45,7 @@ export async function POST(req: Request) {
         const xpEarned = isValidSession ? blocks * 20 : 0;
 
         // Update session
+        // We mark it as completed so it's no longer active, but we can filter invalid sessions later
         const updatedSession = await prisma.session.update({
             where: { id: sessionId },
             data: {

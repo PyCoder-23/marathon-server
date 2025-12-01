@@ -72,6 +72,13 @@ export function SessionTimer() {
     async function handleStop() {
         if (!sessionId) return;
 
+        const durationMin = Math.floor(seconds / 60);
+        if (durationMin < 25) {
+            if (!confirm("25 mins are not completed. If you end now, you won't receive any progress. Are you sure?")) {
+                return;
+            }
+        }
+
         try {
             const data = await api.post("/api/sessions/stop", { sessionId });
             setIsRunning(false);
@@ -96,6 +103,9 @@ export function SessionTimer() {
         return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
     }
 
+    const nextXpDrop = 25 - (Math.floor(seconds / 60) % 25);
+    const potentialXp = Math.floor(Math.floor(seconds / 60) / 25) * 20;
+
     return (
         <Card className="border-primary/20 bg-black/40">
             <CardHeader>
@@ -111,8 +121,13 @@ export function SessionTimer() {
                         {formatTime(seconds)}
                     </div>
                     <p className="text-sm text-muted">
-                        {Math.floor(seconds / 60)} minutes • {seconds} XP potential
+                        {Math.floor(seconds / 60)} minutes • {potentialXp} XP earned
                     </p>
+                    {isRunning && (
+                        <p className="text-xs text-primary/80 mt-1">
+                            Next 20 XP in {nextXpDrop} mins
+                        </p>
+                    )}
                 </div>
 
                 {/* Subject Tag Input */}

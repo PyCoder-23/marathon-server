@@ -1,0 +1,330 @@
+═══════════════════════════════════════════════════════════════════════════
+                        MARATHON SERVER - USER GUIDE
+═══════════════════════════════════════════════════════════════════════════
+
+Welcome to Marathon Server - a futuristic training camp for disciplined 
+students! This guide will help you navigate and use all the features of 
+the platform.
+
+═══════════════════════════════════════════════════════════════════════════
+TABLE OF CONTENTS
+═══════════════════════════════════════════════════════════════════════════
+
+1. Getting Started
+2. Dashboard Overview
+3. Study Sessions & Timer
+4. Missions System
+5. Squads & Team Competition
+6. Leaderboard
+7. Admin Panel (Admin Users Only)
+8. XP & Progression System
+
+═══════════════════════════════════════════════════════════════════════════
+1. GETTING STARTED
+═══════════════════════════════════════════════════════════════════════════
+
+CREATING AN ACCOUNT:
+• Navigate to the homepage
+• Click "Join Camp" or "Sign Up" on Login Page
+• Provide your email, username, and password
+• Add your Discord handle for integration
+
+LOGGING IN:
+• Click "Login"
+• Enter your credentials
+• You'll be redirected to your Command Center (Dashboard)
+
+═══════════════════════════════════════════════════════════════════════════
+2. DASHBOARD OVERVIEW (Command Center)
+═══════════════════════════════════════════════════════════════════════════
+
+Your dashboard displays:
+
+DAILY PROGRESS PANEL:
+• Hours studied today
+• Daily goal (default: 6.0 hours)
+• Progress bar showing completion percentage
+• Pomodoro count (25-minute sessions completed)
+• Current streak (consecutive days of study)
+
+WEEKLY ACTIVITY GRAPH:
+• Bar chart showing XP earned each day of the week
+• Hover over bars to see exact XP amounts
+• Helps track consistency and patterns
+
+STUDY SESSION TIMER:
+• Start/stop study sessions
+• Real-time timer display
+• XP tracking (see Section 3 for details)
+
+SQUAD STATUS:
+• Shows your current squad (if joined)
+• Squad name and slogan
+• Quick link to squad details
+
+QUICK ACTIONS:
+• View Missions - Navigate to mission board
+• Browse Squads - Explore available squads
+• Leaderboard - Check global rankings
+• History - (Coming soon)
+
+═══════════════════════════════════════════════════════════════════════════
+3. STUDY SESSIONS & TIMER
+═══════════════════════════════════════════════════════════════════════════
+
+HOW TO START A SESSION:
+1. Click "Start Session" on the dashboard
+2. (Optional) Add a subject tag (e.g., "Mathematics", "Physics")
+3. Click "Begin" to start the timer
+
+TIMER FEATURES:
+• Real-time countdown display (HH:MM:SS format)
+• Shows total minutes elapsed
+• Displays current XP earned
+• Shows time until next XP drop (every 25 minutes)
+
+XP EARNING RULES:
+• You earn 20 XP for every 25 minutes of study
+• Sessions MUST be at least 25 minutes to count
+• If you stop before 25 minutes, you get a warning
+• Stopping early = NO XP, NO progress on missions
+
+STOPPING A SESSION:
+• Click "Stop Session" when done
+• If under 25 minutes: confirmation popup appears
+• If confirmed early: no rewards given
+• If 25+ minutes: XP is awarded and displayed
+• Your total XP updates automatically in the top-right corner
+
+PERSISTENT SESSIONS:
+• If you close the browser, your session continues
+• When you return, the timer resumes from where it left off
+• Only one active session allowed at a time
+
+═══════════════════════════════════════════════════════════════════════════
+4. MISSIONS SYSTEM
+═══════════════════════════════════════════════════════════════════════════
+
+Navigate to the Mission Board to view and complete objectives.
+
+MISSION TYPES:
+• DAILY - Resets every day, quick objectives
+• WEEKLY - Resets every week, moderate challenges
+• LONG_TERM - Extended goals, higher rewards
+
+DIFFICULTY LEVELS:
+• EASY (Green) - Simple tasks, lower XP
+• MEDIUM (Yellow) - Moderate challenges, medium XP
+• HARD (Red) - Difficult objectives, high XP
+
+HOW TO COMPLETE MISSIONS:
+1. Browse available missions (filter by type using tabs)
+2. Click "Accept Mission" to start tracking
+3. Complete the required criteria (e.g., study X hours, complete Y sessions)
+4. Click "Check Progress" to verify completion
+5. If criteria met: XP is awarded automatically
+6. If not met: you'll see a message to keep training
+
+MISSION CARD INFORMATION:
+• Title and description of the objective
+• XP reward amount (shown with star icon)
+• Difficulty badge (color-coded)
+• Mission type icon (Timer/Trophy/Target)
+• Current status (Available/In Progress/Completed)
+
+═══════════════════════════════════════════════════════════════════════════
+5. SQUADS & TEAM COMPETITION
+═══════════════════════════════════════════════════════════════════════════
+
+Squads are teams that compete for collective glory.
+
+BROWSING SQUADS:
+• Navigate to the Squads page
+• View all available squads ranked by performance
+• Each squad shows:
+  - Rank number
+  - Squad name and description
+  - Member count
+  - Total squad XP
+  - Average XP per member
+
+SQUAD BENEFITS:
+• Contribute to your team's total XP
+• Compete on squad leaderboards
+• Monthly squad competitions
+• Team camaraderie and motivation
+
+VIEWING SQUAD DETAILS:
+• Click on your squad from the dashboard
+• See all members and their contributions
+• View squad statistics and rankings
+• Track squad progress
+
+═══════════════════════════════════════════════════════════════════════════
+6. LEADERBOARD
+═══════════════════════════════════════════════════════════════════════════
+
+The Global Rankings show top performers across the platform.
+
+LEADERBOARD PERIODS:
+• Weekly - Top performers this week
+• Monthly - Top performers this month
+• All-Time - Lifetime rankings
+
+TOP 3 PODIUM:
+• 1st Place (Gold) - Crown icon, largest podium
+• 2nd Place (Silver) - Medal icon, medium podium
+• 3rd Place (Bronze) - Medal icon, smallest podium
+
+LEADERBOARD INFORMATION:
+• Rank number
+• Username
+• Squad affiliation
+• Total XP earned
+• Total study hours
+• Your position is highlighted (if on the list)
+
+HOW RANKINGS WORK:
+• Sorted by total XP (highest to lowest)
+• XP is earned through study sessions and missions
+• Updates in real-time as users earn XP
+• Switch between periods to see different rankings
+
+═══════════════════════════════════════════════════════════════════════════
+7. ADMIN PANEL (Admin Users Only)
+═══════════════════════════════════════════════════════════════════════════
+
+If you have admin privileges, you can access the Admin Command panel.
+
+USER MANAGEMENT:
+• Search for users by username or email
+• View all user statistics and status
+• See squad affiliations
+• Check ban status
+
+ADMIN ACTIONS:
+• Edit Stats - Manually adjust user XP, minutes, or squad
+• Ban User - Temporarily ban for 7 days
+• Delete User - Permanently remove account (irreversible)
+
+EDITING USER STATS:
+1. Click the menu (three dots) next to a user
+2. Select "Edit Stats"
+3. Modify Total XP, Total Minutes, or Squad
+4. Click "Save Changes"
+5. Changes reflect immediately (including in top-right XP display)
+
+USER TABLE COLUMNS:
+• User - Username, email, admin badge (shield icon)
+• Squad - Current squad membership
+• Stats - Total XP and study hours
+• Status - Active or Banned
+• Actions - Dropdown menu for admin operations
+
+═══════════════════════════════════════════════════════════════════════════
+8. XP & PROGRESSION SYSTEM
+═══════════════════════════════════════════════════════════════════════════
+
+XP (Experience Points) is the core progression metric.
+
+HOW TO EARN XP:
+• Study Sessions: 20 XP per 25 minutes (minimum)
+• Mission Completion: Varies by difficulty (shown on mission card)
+• Admin Bonuses: Manually awarded by administrators
+
+XP SOURCES:
+• "session" - Earned from completed study sessions
+• "mission" - Earned from completing mission objectives
+• "admin" - Manually adjusted by administrators
+• "bonus" - Special rewards
+
+VIEWING YOUR XP:
+• Top-right corner of every page (next to username)
+• Dashboard daily progress panel
+• Weekly activity graph
+• Leaderboard rankings
+
+STREAK SYSTEM:
+• Study at least once per day to maintain your streak
+• Streaks are displayed on the dashboard
+• Missing a day resets your streak to 0
+• Streaks encourage daily consistency
+
+TOTAL TIME TRACKING:
+• All valid sessions (25+ minutes) count toward total time
+• Displayed in hours on dashboard and leaderboard
+• Used for mission criteria and statistics
+
+═══════════════════════════════════════════════════════════════════════════
+TIPS FOR SUCCESS
+═══════════════════════════════════════════════════════════════════════════
+
+1. CONSISTENCY IS KEY
+   • Study daily to maintain your streak
+   • Aim for at least 25-minute sessions to earn XP
+   • Complete daily missions for bonus XP
+
+2. WORK FOR YOUR SQUAD
+   • Team competition adds motivation
+   • Contribute to collective goals
+   • Learn from high-performing squad members
+
+3. TRACK YOUR PROGRESS
+   • Check the weekly activity graph regularly
+   • Identify patterns and optimize study times
+   • Set personal goals beyond the daily 6-hour target
+
+4. COMPLETE MISSIONS
+   • Missions provide bonus XP beyond sessions
+   • Start with EASY missions to build momentum
+   • Focus on DAILY missions for quick wins
+
+5. USE SUBJECT TAGS
+   • Tag your sessions by subject
+   • Helps you track which subjects you study most
+   • Useful for balanced study planning
+
+6. AVOID EARLY STOPS
+   • Always complete at least 25 minutes
+   • Stopping early wastes your time (no XP awarded)
+   • Plan your sessions to avoid interruptions
+
+═══════════════════════════════════════════════════════════════════════════
+TROUBLESHOOTING
+═══════════════════════════════════════════════════════════════════════════
+
+TIMER NOT STARTING:
+• Ensure you're logged in
+• Check that you don't have another active session
+• Refresh the page and try again
+
+XP NOT UPDATING:
+• Wait a few seconds for the update to propagate
+• Refresh the page to see latest XP
+• Check that your session was at least 25 minutes
+
+MISSION NOT COMPLETING:
+• Verify you've met all criteria (e.g., time of day, day of week)
+• Ensure sessions were valid (25+ minutes)
+• Click "Check Progress" to manually verify
+
+CAN'T JOIN SQUAD:
+• You can only be in one squad at a time
+• Leave your current squad before joining another
+• Contact an admin if issues persist
+
+═══════════════════════════════════════════════════════════════════════════
+CONTACT & SUPPORT
+═══════════════════════════════════════════════════════════════════════════
+
+For technical issues or questions:
+• Contact your platform administrator
+• Check for updates and announcements
+• Report bugs or suggest features
+
+═══════════════════════════════════════════════════════════════════════════
+
+                    Train Your Consistency. Stay Focused.
+                         Welcome to Marathon Server!
+
+═══════════════════════════════════════════════════════════════════════════

@@ -36,7 +36,7 @@ export default function SquadDetailPage() {
     const { user, refreshUser } = useAuth();
     const [squad, setSquad] = useState<SquadDetails | null>(null);
     const [loading, setLoading] = useState(true);
-    const [joining, setJoining] = useState(false);
+
 
     useEffect(() => {
         if (params.id) {
@@ -55,20 +55,7 @@ export default function SquadDetailPage() {
         }
     }
 
-    async function handleJoinSquad() {
-        if (!squad) return;
-        setJoining(true);
-        try {
-            await api.post("/api/squads/join", { squadId: squad.id });
-            await refreshUser(); // Update user context
-            alert(`Successfully joined ${squad.name}!`);
-            router.push("/dashboard");
-        } catch (error: any) {
-            alert(error.message || "Failed to join squad");
-        } finally {
-            setJoining(false);
-        }
-    }
+    // Joining logic removed as per requirements
 
     if (loading) {
         return (
@@ -142,13 +129,9 @@ export default function SquadDetailPage() {
                             <p className="text-2xl font-bold text-white">{Math.floor(squad.totalMinutes / 60).toLocaleString()}</p>
                         </div>
                         {!isMember && (
-                            <Button
-                                className="w-full shadow-[0_0_20px_rgba(0,255,149,0.2)] mt-2"
-                                onClick={handleJoinSquad}
-                                disabled={joining}
-                            >
-                                {joining ? "Joining..." : "Join Squad"}
-                            </Button>
+                            <div className="w-full mt-2 p-3 bg-white/5 rounded border border-white/10 text-center text-sm text-muted">
+                                You are in a different squad
+                            </div>
                         )}
                         {isMember && (
                             <Button variant="outline" className="w-full border-primary/50 text-primary cursor-default hover:bg-primary/10">

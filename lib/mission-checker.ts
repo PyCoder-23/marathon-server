@@ -29,6 +29,9 @@ export async function checkMissionCompletion(userId: string, missionId: string) 
     const criteria = mission.criteria.toLowerCase();
     let completed = false;
 
+    // Filter for valid sessions (>= 25 mins)
+    const validSessions = user.sessions.filter((s: any) => s.durationMin >= 25);
+
     if (criteria.includes("study for") && criteria.includes("minutes")) {
         // e.g. "Study for 60 minutes"
         const minutesMatch = criteria.match(/(\d+) minutes/);
@@ -37,7 +40,7 @@ export async function checkMissionCompletion(userId: string, missionId: string) 
         if (mission.type === "DAILY") {
             const today = new Date();
             today.setHours(0, 0, 0, 0);
-            const todayMinutes = user.sessions
+            const todayMinutes = validSessions
                 .filter((s: any) => s.startTs >= today)
                 .reduce((acc: number, s: any) => acc + s.durationMin, 0);
 
@@ -45,14 +48,14 @@ export async function checkMissionCompletion(userId: string, missionId: string) 
         } else if (mission.type === "WEEKLY") {
             const weekAgo = new Date();
             weekAgo.setDate(weekAgo.getDate() - 7);
-            const weekMinutes = user.sessions
+            const weekMinutes = validSessions
                 .filter((s: any) => s.startTs >= weekAgo)
                 .reduce((acc: number, s: any) => acc + s.durationMin, 0);
 
             if (weekMinutes >= requiredMinutes) completed = true;
         } else if (mission.type === "LONG_TERM") {
             // Total accumulated time
-            const totalMinutes = user.sessions
+            const totalMinutes = validSessions
                 .reduce((acc: number, s: any) => acc + s.durationMin, 0);
 
             if (totalMinutes >= requiredMinutes) completed = true;
@@ -67,16 +70,44 @@ export async function checkMissionCompletion(userId: string, missionId: string) 
         if (mission.type === "DAILY") {
             const today = new Date();
             today.setHours(0, 0, 0, 0);
-            const todaySessions = user.sessions.filter((s: any) => s.startTs >= today).length;
-            if (todaySessions >= requiredCount) completed = true;
+
+            // Time-based checks for daily missions
+            if (criteria.includes("before 8 am")) {
+                const morningSessions = validSessions.filter((s: any) => {
+                    const d = new Date(s.startTs);
+                    return d >= today && d.getHours() < 8;
+                }).length;
+                if (morningSessions >= requiredCount) completed = true;
+            } else if (criteria.includes("after 10 pm")) {
+                const nightSessions = validSessions.filter((s: any) => {
+                    const d = new Date(s.startTs);
+                    return d >= today && d.getHours() >= 22;
+                }).length;
+                if (nightSessions >= requiredCount) completed = true;
+            } else {
+                // Normal daily count
+                const todaySessions = validSessions.filter((s: any) => s.startTs >= today).length;
+                if (todaySessions >= requiredCount) completed = true;
+            }
         } else if (mission.type === "WEEKLY") {
             const weekAgo = new Date();
             weekAgo.setDate(weekAgo.getDate() - 7);
-            const weekSessions = user.sessions.filter((s: any) => s.startTs >= weekAgo).length;
-            if (weekSessions >= requiredCount) completed = true;
+
+            if (criteria.includes("weekend")) {
+                // Check for sessions on Sat (6) or Sun (0)
+                const weekendSessions = validSessions.filter((s: any) => {
+                    const d = new Date(s.startTs);
+                    const day = d.getDay();
+                    return d >= weekAgo && (day === 0 || day === 6);
+                }).length;
+                if (weekendSessions >= requiredCount) completed = true;
+            } else {
+                const weekSessions = validSessions.filter((s: any) => s.startTs >= weekAgo).length;
+                if (weekSessions >= requiredCount) completed = true;
+            }
         } else if (mission.type === "LONG_TERM") {
             // Total sessions ever
-            const totalSessions = user.sessions.length;
+            const totalSessions = validSessions.length;
             if (totalSessions >= requiredCount) completed = true;
         }
     }

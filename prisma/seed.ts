@@ -131,6 +131,33 @@ async function main() {
             xpReward: 750,
             active: true
         },
+        {
+            title: "Weekend Warrior",
+            description: "Complete 5 sessions on a weekend.",
+            criteria: "Complete 5 sessions",
+            type: "WEEKLY",
+            difficulty: "MEDIUM",
+            xpReward: 200,
+            active: true
+        },
+        {
+            title: "Early Bird",
+            description: "Complete a session before 8 AM.",
+            criteria: "Complete 1 session",
+            type: "DAILY",
+            difficulty: "MEDIUM",
+            xpReward: 100,
+            active: true
+        },
+        {
+            title: "Night Owl",
+            description: "Complete a session after 10 PM.",
+            criteria: "Complete 1 session",
+            type: "DAILY",
+            difficulty: "MEDIUM",
+            xpReward: 100,
+            active: true
+        },
     ];
 
     for (const m of missionsData) {
@@ -154,28 +181,8 @@ async function main() {
     console.log("Missions seeded.");
 
     // 4. Create Demo Users
-    const demoUsers = [
-        { username: "CyberNinja", email: "ninja@test.com", squad: "Alpha Team" },
-        { username: "NeonRunner", email: "runner@test.com", squad: "Byte Blasters" },
-        { username: "CodeWraith", email: "wraith@test.com", squad: "Omega Ops" },
-        { username: "DataDrifter", email: "drifter@test.com", squad: "Delta Force" },
-    ];
-
-    for (const u of demoUsers) {
-        const pw = await hash("password", 10);
-        await prisma.user.upsert({
-            where: { email: u.email },
-            update: {},
-            create: {
-                email: u.email,
-                username: u.username,
-                passwordHash: pw,
-                squad: { connect: { name: u.squad } },
-                totalXp: Math.floor(Math.random() * 1000),
-                totalMinutes: Math.floor(Math.random() * 2000),
-            },
-        });
-    }
+    // 4. Create Demo Users - REMOVED
+    console.log("Skipping demo users seed.");
     console.log("Demo users seeded.");
 }
 

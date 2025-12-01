@@ -37,8 +37,14 @@ export default function AdminDashboard() {
 
     // Edit State
     const [editingUser, setEditingUser] = useState<User | null>(null);
+    const [squads, setSquads] = useState<{ id: string; name: string }[]>([]);
     const [editXp, setEditXp] = useState(0);
     const [editMinutes, setEditMinutes] = useState(0);
+    const [editSquadId, setEditSquadId] = useState<string>("");
+
+    useEffect(() => {
+        fetchSquads();
+    }, []);
 
     useEffect(() => {
         const delayDebounceFn = setTimeout(() => {
@@ -47,6 +53,15 @@ export default function AdminDashboard() {
 
         return () => clearTimeout(delayDebounceFn);
     }, [search, page]);
+
+    async function fetchSquads() {
+        try {
+            const data = await api.get("/api/squads"); // Assuming this endpoint exists and returns { squads: [] }
+            setSquads(data.squads);
+        } catch (error) {
+            console.error("Failed to fetch squads:", error);
+        }
+    }
 
     async function fetchUsers() {
         setLoading(true);
@@ -89,7 +104,8 @@ export default function AdminDashboard() {
             await api.post("/api/admin/users/update", {
                 userId: editingUser.id,
                 totalXp: editXp,
-                totalMinutes: editMinutes
+                totalMinutes: editMinutes,
+                squadId: editSquadId
             });
             toast({ title: "User updated", description: "User stats have been updated." });
 
@@ -198,6 +214,7 @@ export default function AdminDashboard() {
                                                             setEditingUser(user);
                                                             setEditXp(user.totalXp);
                                                             setEditMinutes(user.totalMinutes);
+                                                            setEditSquadId(user.squad?.id || "");
                                                         }}
                                                     >
                                                         <Edit className="mr-2 h-4 w-4" /> Edit Stats
@@ -249,6 +266,23 @@ export default function AdminDashboard() {
                                 onChange={(e) => setEditMinutes(parseInt(e.target.value))}
                                 className="col-span-3"
                             />
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <label htmlFor="squad" className="text-right text-sm">Squad</label>
+                            <div className="col-span-3">
+                                <Select value={editSquadId} onValueChange={setEditSquadId}>
+                                    <SelectTrigger className="w-full">
+                                        <SelectValue placeholder="Select a squad" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {squads.map((squad) => (
+                                            <SelectItem key={squad.id} value={squad.id}>
+                                                {squad.name}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
                         </div>
                     </div>
                     <DialogFooter>

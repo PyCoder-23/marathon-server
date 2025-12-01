@@ -6,18 +6,24 @@ export async function POST(req: Request) {
     try {
         const adminPayload = await requireAdmin();
         const body = await req.json();
-        const { userId, totalXp, totalMinutes } = body;
+        const { userId, totalXp, totalMinutes, squadId } = body;
 
         if (!userId) {
             return errorResponse("User ID is required", 400);
         }
 
+        const updateData: any = {
+            totalXp: totalXp !== undefined ? parseInt(totalXp) : undefined,
+            totalMinutes: totalMinutes !== undefined ? parseInt(totalMinutes) : undefined,
+        };
+
+        if (squadId) {
+            updateData.squad = { connect: { id: squadId } };
+        }
+
         const user = await prisma.user.update({
             where: { id: userId },
-            data: {
-                totalXp: totalXp !== undefined ? parseInt(totalXp) : undefined,
-                totalMinutes: totalMinutes !== undefined ? parseInt(totalMinutes) : undefined,
-            },
+            data: updateData,
         });
 
         // Log audit
@@ -26,7 +32,7 @@ export async function POST(req: Request) {
                 adminId: adminPayload.userId,
                 adminName: adminPayload.username || "Admin",
                 action: "UPDATE_USER_STATS",
-                details: `Updated user ${user.username} (XP: ${totalXp}, Min: ${totalMinutes})`,
+                details: `Updated user ${user.username} (XP: ${totalXp}, Min: ${totalMinutes}, Squad: ${squadId || "No Change"})`,
                 userId: userId,
             },
         });
