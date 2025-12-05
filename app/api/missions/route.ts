@@ -6,6 +6,10 @@ export async function GET() {
     try {
         const payload = await requireAuth();
 
+        // Reset expired missions first
+        const { resetExpiredMissions } = await import("@/lib/mission-reset");
+        await resetExpiredMissions(payload.userId);
+
         // Get all missions
         const missions = await prisma.mission.findMany({
             where: {

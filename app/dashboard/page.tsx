@@ -140,31 +140,76 @@ export default function DashboardPage() {
                 <Card className="md:col-span-8 border-white/10">
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2">
-                            <BarChart3 className="w-5 h-5" /> Weekly Activity
+                            <BarChart3 className="w-5 h-5" /> Weekly XP Progress
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="h-[200px] flex items-end justify-between gap-2 px-2">
-                            {stats?.weekly.map((day: any, i) => {
-                                const maxXp = Math.max(...(stats.weekly.map((d: any) => d.xp) || [100]));
-                                const heightPercent = maxXp > 0 ? (day.xp / maxXp) * 100 : 0;
+                        <div className="h-[200px] relative">
+                            {/* Y-axis labels */}
+                            <div className="absolute left-0 top-0 bottom-8 w-10 flex flex-col justify-between text-xs text-muted font-mono">
+                                {(() => {
+                                    if (!stats?.weekly || stats.weekly.length === 0) return null;
+                                    const maxXp = Math.max(...stats.weekly.map((d: any) => d.xp), 1);
+                                    const step = Math.ceil(maxXp / 4);
+                                    return [4, 3, 2, 1, 0].map((i) => (
+                                        <span key={i}>{(step * i).toLocaleString()}</span>
+                                    ));
+                                })()}
+                            </div>
 
-                                return (
-                                    <div key={i} className="flex flex-col items-center gap-2 w-full group">
+                            {/* Graph area */}
+                            <div className="absolute left-10 right-0 top-0 bottom-8 pl-2">
+                                <div className="w-full h-full border-l border-b border-white/10 relative">
+                                    {/* Grid lines */}
+                                    {[0, 0.25, 0.5, 0.75, 1].map((ratio, i) => (
                                         <div
-                                            className="w-full bg-primary/20 hover:bg-primary/50 transition-all rounded-t-sm relative group-hover:shadow-[0_0_15px_rgba(0,255,149,0.3)]"
-                                            style={{ height: `${Math.max(heightPercent, 2)}%` }}
-                                        >
-                                            <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-black text-xs px-2 py-1 rounded border border-white/10 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
-                                                {day.xp} XP
-                                            </div>
+                                            key={i}
+                                            className="absolute w-full border-t border-white/5"
+                                            style={{ top: `${ratio * 100}%` }}
+                                        />
+                                    ))}
+
+                                    {/* Bar chart */}
+                                    {stats?.weekly && stats.weekly.length > 0 && (
+                                        <div className="absolute inset-0 flex items-end gap-1 px-2">
+                                            {stats.weekly.map((day: any, i: number) => {
+                                                const maxXp = Math.max(...stats.weekly.map((d: any) => d.xp), 1);
+                                                const heightPercent = (day.xp / maxXp) * 100;
+
+                                                return (
+                                                    <div
+                                                        key={i}
+                                                        className="flex-1 group relative flex flex-col justify-end"
+                                                    >
+                                                        {/* Bar */}
+                                                        <div
+                                                            className="w-full bg-primary rounded-t transition-all hover:opacity-80"
+                                                            style={{ height: `${heightPercent}%` }}
+                                                        />
+
+                                                        {/* Tooltip */}
+                                                        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-black text-xs px-2 py-1 rounded border border-white/10 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10 pointer-events-none">
+                                                            <div className="font-bold text-primary">{day.xp} XP</div>
+                                                            <div className="text-muted">{new Date(day.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</div>
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })}
                                         </div>
-                                        <span className="text-xs text-muted">
-                                            {['M', 'T', 'W', 'T', 'F', 'S', 'S'][i]}
-                                        </span>
-                                    </div>
-                                );
-                            })}
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* X-axis labels */}
+                            <div className="absolute left-10 right-0 bottom-0 h-8 pl-2">
+                                <div className="w-full h-full flex items-start gap-1 px-2">
+                                    {stats?.weekly.map((day: any, i: number) => (
+                                        <div key={i} className="flex-1 text-center text-xs text-muted">
+                                            {new Date(day.date).toLocaleDateString('en-US', { month: 'numeric', day: 'numeric' })}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
                         </div>
                     </CardContent>
                 </Card>

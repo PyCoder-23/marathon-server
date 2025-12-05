@@ -21,6 +21,7 @@ const navItems = [
     { name: "Missions", href: "/missions" },
     { name: "Squads", href: "/squads" },
     { name: "Leaderboard", href: "/leaderboard" },
+    { name: "Hall of Fame", href: "/hall-of-fame" },
 ];
 
 export function Navbar() {

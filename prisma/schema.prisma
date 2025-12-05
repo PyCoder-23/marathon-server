@@ -35,20 +35,23 @@ model User {
   image       String?
 
   // Relations
-  sessions        Session[]
-  xpTransactions  XPTransaction[]
-  missionProgress MissionProgress[]
+  sessions            Session[]
+  xpTransactions      XPTransaction[]
+  missionProgress     MissionProgress[]
+  monthlyWins         UserMonthlyWinner[]
+  weeklyWins          UserWeeklyWinner[]
 }
 
 model Squad {
-  id          String          @id @default(cuid())
-  name        String          @unique
-  description String          @default("")
-  slogan      String?
-  bannerUrl   String?
-  createdAt   DateTime        @default(now())
-  members     User[]
-  winners     MonthlyWinner[]
+  id             String          @id @default(cuid())
+  name           String          @unique
+  description    String          @default("")
+  slogan         String?
+  bannerUrl      String?
+  createdAt      DateTime        @default(now())
+  members        User[]
+  monthlyWinners MonthlyWinner[]
+  weeklyWinners  WeeklyWinner[]
   // computed fields handled in API: weeklyHours, monthlyXp, memberCount
 }
 
@@ -118,6 +121,39 @@ model MonthlyWinner {
   createdAt DateTime @default(now())
 
   @@unique([month, squadId])
+}
+
+model WeeklyWinner {
+  id        String   @id @default(cuid())
+  week      String // "YYYY-WW" (year and week number)
+  squadId   String
+  squad     Squad    @relation(fields: [squadId], references: [id])
+  totalXp   Int
+  createdAt DateTime @default(now())
+
+  @@unique([week, squadId])
+}
+
+model UserMonthlyWinner {
+  id        String   @id @default(cuid())
+  month     String // "YYYY-MM"
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  totalXp   Int
+  createdAt DateTime @default(now())
+
+  @@unique([month, userId])
+}
+
+model UserWeeklyWinner {
+  id        String   @id @default(cuid())
+  week      String // "YYYY-WW" (year and week number)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  totalXp   Int
+  createdAt DateTime @default(now())
+
+  @@unique([week, userId])
 }
 
 model AuditLog {

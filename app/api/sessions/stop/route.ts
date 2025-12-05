@@ -79,7 +79,8 @@ export async function POST(req: Request) {
                 },
             });
 
-            // Check and update streak
+            // Check and update streak using IST timezone
+            const { getISTDayStart } = await import("@/lib/timezone-utils");
             const user = await prisma.user.findUnique({
                 where: { id: payload.userId },
                 include: {
@@ -89,30 +90,26 @@ export async function POST(req: Request) {
                             durationMin: { gte: MIN_DURATION } // Only count valid sessions for streak
                         },
                         orderBy: { startTs: 'desc' },
-                        take: 10,
+                        take: 30, // Get more sessions to check streak properly
                     }
                 }
             });
 
             if (user) {
-                const today = new Date();
-                today.setHours(0, 0, 0, 0);
+                const todayIST = getISTDayStart();
+                const yesterdayIST = new Date(todayIST);
+                yesterdayIST.setDate(yesterdayIST.getDate() - 1);
 
-                const yesterday = new Date(today);
-                yesterday.setDate(yesterday.getDate() - 1);
-
-                // Check if user studied yesterday
+                // Check if user studied yesterday (IST)
                 const studiedYesterday = user.sessions.some((s: any) => {
-                    const sessionDate = new Date(s.startTs);
-                    sessionDate.setHours(0, 0, 0, 0);
-                    return sessionDate.getTime() === yesterday.getTime();
+                    const sessionDate = getISTDayStart(s.startTs);
+                    return sessionDate.getTime() === yesterdayIST.getTime();
                 });
 
-                // Check if this is the first session today
+                // Check if this is the first session today (IST)
                 const sessionsToday = user.sessions.filter((s: any) => {
-                    const sessionDate = new Date(s.startTs);
-                    sessionDate.setHours(0, 0, 0, 0);
-                    return sessionDate.getTime() === today.getTime();
+                    const sessionDate = getISTDayStart(s.startTs);
+                    return sessionDate.getTime() === todayIST.getTime();
                 });
 
                 // Update streak: increment if studied yesterday, reset to 1 if not

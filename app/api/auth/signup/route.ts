@@ -33,9 +33,15 @@ export async function POST(req: Request) {
             );
         }
 
-        // 2. Squad Assignment (Balanced)
+        // 2. Squad Assignment (Lowest XP)
+        // Assign new user to the squad with the lowest total XP
+        // This helps balance competition rather than just member count
         const squads = await prisma.squad.findMany({
-            include: { _count: { select: { members: true } } },
+            include: {
+                members: {
+                    select: { totalXp: true }
+                }
+            },
         });
 
         if (squads.length === 0) {
@@ -45,15 +51,20 @@ export async function POST(req: Request) {
             );
         }
 
-        // Sort by member count (asc), then by createdAt (asc) for stability
-        squads.sort((a, b) => {
-            if (a._count.members !== b._count.members) {
-                return a._count.members - b._count.members;
+        // Calculate total XP for each squad and sort by lowest XP first
+        const squadsWithXp = squads.map(squad => ({
+            ...squad,
+            totalXp: squad.members.reduce((sum, member) => sum + member.totalXp, 0)
+        }));
+
+        squadsWithXp.sort((a, b) => {
+            if (a.totalXp !== b.totalXp) {
+                return a.totalXp - b.totalXp; // Lowest XP first
             }
-            return a.createdAt.getTime() - b.createdAt.getTime();
+            return a.createdAt.getTime() - b.createdAt.getTime(); // Tie-breaker: oldest squad
         });
 
-        const assignedSquad = squads[0];
+        const assignedSquad = squadsWithXp[0];
 
         // 3. Create User
         const passwordHash = await hashPassword(password);

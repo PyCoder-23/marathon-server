@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { requireAuth, errorResponse, successResponse } from "@/lib/api-helpers";
+import { getISTWeekStart, getISTMonthStart } from "@/lib/timezone-utils";
 
 export async function GET(req: Request) {
     try {
@@ -11,16 +12,16 @@ export async function GET(req: Request) {
         const limit = 50;
         const skip = (page - 1) * limit;
 
-        // Determine date range based on period
+        // Determine date range based on period using IST timezone
         let dateFilter = {};
-        const now = new Date();
 
         if (period === "weekly") {
-            const weekStart = new Date(now);
-            weekStart.setDate(now.getDate() - 7);
+            // Week starts on Monday 12:00 AM IST
+            const weekStart = getISTWeekStart();
             dateFilter = { createdAt: { gte: weekStart } };
         } else if (period === "monthly") {
-            const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+            // Month starts on 1st day 12:00 AM IST
+            const monthStart = getISTMonthStart();
             dateFilter = { createdAt: { gte: monthStart } };
         }
 
@@ -34,6 +35,7 @@ export async function GET(req: Request) {
                 select: {
                     id: true,
                     username: true,
+                    image: true,
                     totalXp: true,
                     totalMinutes: true,
                     squad: {
@@ -71,6 +73,7 @@ export async function GET(req: Request) {
                 select: {
                     id: true,
                     username: true,
+                    image: true,
                     totalMinutes: true, // This is all-time, might want period specific but schema doesn't support easily without transaction sum
                     squad: {
                         select: { name: true }
@@ -84,6 +87,7 @@ export async function GET(req: Request) {
                 return {
                     id: agg.userId,
                     username: user?.username || "Unknown",
+                    image: user?.image || null,
                     totalXp: agg._sum.amount || 0,
                     totalMinutes: user?.totalMinutes || 0, // Showing all-time minutes for now as approx
                     squad: user?.squad,

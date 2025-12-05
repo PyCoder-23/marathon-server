@@ -3,257 +3,647 @@
 ═══════════════════════════════════════════════════════════════════════════
 
 Welcome to Marathon Server - a futuristic training camp for disciplined 
-students! This guide will help you navigate and use all the features of 
-the platform.
+students! This comprehensive guide covers all features and functionality.
 
 ═══════════════════════════════════════════════════════════════════════════
 TABLE OF CONTENTS
 ═══════════════════════════════════════════════════════════════════════════
 
 1. Getting Started
-2. Dashboard Overview
+2. Dashboard Overview (Command Center)
 3. Study Sessions & Timer
 4. Missions System
 5. Squads & Team Competition
-6. Leaderboard
-7. Admin Panel (Admin Users Only)
-8. XP & Progression System
+6. Leaderboard & Rankings
+7. Hall of Fame
+8. Profile & Settings
+9. Admin Panel (Admin Users Only)
+10. XP & Progression System
+11. Time Zone & IST Principle
 
 ═══════════════════════════════════════════════════════════════════════════
 1. GETTING STARTED
 ═══════════════════════════════════════════════════════════════════════════
 
 CREATING AN ACCOUNT:
-• Navigate to the homepage
-• Click "Join Camp" or "Sign Up" on Login Page
+• Navigate to the homepage at Marathon Server
+• Click "Start Training" or navigate to the signup page
 • Provide your email, username, and password
-• Add your Discord handle for integration
+• Click "Join Camp" to create your account
+• You'll be redirected to a welcome page
 
 LOGGING IN:
-• Click "Login"
-• Enter your credentials
-• You'll be redirected to your Command Center (Dashboard)
+• Click "View Dashboard" or navigate to /login
+• Enter your username/email and password
+• Click "Login" to access your Command Center
+• Your session persists across browser sessions
+
+FIRST TIME SETUP:
+• You'll automatically receive a default profile picture (pfp1-pfp10)
+• Your profile picture is randomly assigned based on your user ID
+• You'll be automatically assigned to a squad (the one with lowest total XP)
+• This helps balance competition across squads
+• Navigate to Settings to customize your profile
 
 ═══════════════════════════════════════════════════════════════════════════
 2. DASHBOARD OVERVIEW (Command Center)
 ═══════════════════════════════════════════════════════════════════════════
 
-Your dashboard displays:
+Your dashboard is your central hub for all activities.
 
 DAILY PROGRESS PANEL:
-• Hours studied today
-• Daily goal (default: 6.0 hours)
-• Progress bar showing completion percentage
-• Pomodoro count (25-minute sessions completed)
-• Current streak (consecutive days of study)
-
-WEEKLY ACTIVITY GRAPH:
-• Bar chart showing XP earned each day of the week
-• Hover over bars to see exact XP amounts
-• Helps track consistency and patterns
+• Today's Hours - Total hours studied today (IST timezone)
+• Daily Goal - Default 6.0 hours target
+• Progress Bar - Visual representation of daily completion
+• Pomodoro Count - Number of 25-minute sessions completed today
+• Current Streak - Consecutive days you've studied
 
 STUDY SESSION TIMER:
-• Start/stop study sessions
-• Real-time timer display
-• XP tracking (see Section 3 for details)
+• Large, prominent timer display
+• Start/Stop session controls
+• Real-time XP tracking
+• Subject tagging (optional)
+• Persistent across page refreshes
 
-SQUAD STATUS:
-• Shows your current squad (if joined)
-• Squad name and slogan
-• Quick link to squad details
+SQUAD STATUS CARD:
+• Shows your current squad name and slogan
+• Quick link to squad details page
+• Displays if you're not in a squad yet
 
 QUICK ACTIONS:
 • View Missions - Navigate to mission board
 • Browse Squads - Explore available squads
 • Leaderboard - Check global rankings
-• History - (Coming soon)
+• Settings - Manage your profile
+
+TOP NAVIGATION BAR:
+• Marathon Server logo (home link)
+• Dashboard link
+• Missions link
+• Squads link
+• Leaderboard link
+• Hall of Fame link
+• Your XP displayed in top-right corner
+• Profile dropdown with Settings, Admin (if admin), and Logout
 
 ═══════════════════════════════════════════════════════════════════════════
 3. STUDY SESSIONS & TIMER
 ═══════════════════════════════════════════════════════════════════════════
 
+The core feature of Marathon Server is the study session tracker.
+
 HOW TO START A SESSION:
-1. Click "Start Session" on the dashboard
-2. (Optional) Add a subject tag (e.g., "Mathematics", "Physics")
-3. Click "Begin" to start the timer
+1. Navigate to your Dashboard
+2. Click "Start Session" button
+3. (Optional) Add a subject tag in the input field
+4. Timer begins immediately
+5. Timer shows HH:MM:SS format
 
 TIMER FEATURES:
-• Real-time countdown display (HH:MM:SS format)
+• Real-time countdown display
 • Shows total minutes elapsed
-• Displays current XP earned
-• Shows time until next XP drop (every 25 minutes)
+• Displays current XP earned (updates every 25 minutes)
+• Shows time until next XP drop
+• Persists if you close/refresh the browser
+• Only one active session allowed per user
 
-XP EARNING RULES:
+XP EARNING RULES (CRITICAL):
 • You earn 20 XP for every 25 minutes of study
 • Sessions MUST be at least 25 minutes to count
-• If you stop before 25 minutes, you get a warning
-• Stopping early = NO XP, NO progress on missions
+• XP drops occur at 25, 50, 75, 100 minutes, etc.
+• Stopping before 25 minutes = NO XP, NO mission progress
+• All XP is awarded when you stop the session
 
 STOPPING A SESSION:
 • Click "Stop Session" when done
-• If under 25 minutes: confirmation popup appears
-• If confirmed early: no rewards given
-• If 25+ minutes: XP is awarded and displayed
-• Your total XP updates automatically in the top-right corner
+• If under 25 minutes: Warning popup appears
+  - "Session too short! You need at least 25 minutes to earn XP"
+  - Option to continue or confirm early stop
+  - Confirming early stop = no rewards
+• If 25+ minutes: XP is calculated and awarded
+  - Success message shows total XP earned
+  - Your total XP updates in top-right corner
+  - Session is saved to your history
+  - Missions are checked for completion
 
-PERSISTENT SESSIONS:
-• If you close the browser, your session continues
-• When you return, the timer resumes from where it left off
-• Only one active session allowed at a time
+SESSION VALIDATION:
+• Only sessions >= 25 minutes count for:
+  - XP rewards
+  - Mission progress
+  - Total study time
+  - Pomodoro count
+  - Streak maintenance
+
+SUBJECT TAGGING:
+• Optional field to categorize your sessions
+• Examples: "Mathematics", "Physics", "Programming"
+• Helps you track which subjects you study
+• Useful for personal analytics
 
 ═══════════════════════════════════════════════════════════════════════════
 4. MISSIONS SYSTEM
 ═══════════════════════════════════════════════════════════════════════════
 
-Navigate to the Mission Board to view and complete objectives.
+Missions are objectives that provide bonus XP beyond study sessions.
 
 MISSION TYPES:
-• DAILY - Resets every day, quick objectives
-• WEEKLY - Resets every week, moderate challenges
-• LONG_TERM - Extended goals, higher rewards
+• DAILY - Resets every day at 12:00 AM IST
+• WEEKLY - Resets every Monday at 12:00 AM IST
+• LONG_TERM - Never resets, cumulative goals
 
 DIFFICULTY LEVELS:
-• EASY (Green) - Simple tasks, lower XP
-• MEDIUM (Yellow) - Moderate challenges, medium XP
-• HARD (Red) - Difficult objectives, high XP
+• EASY (Green badge) - Simple tasks, 50-100 XP
+• MEDIUM (Yellow badge) - Moderate challenges, 100-200 XP
+• HARD (Red badge) - Difficult objectives, 200-300 XP
+
+MISSION INTERFACE:
+• Three tabs: Daily, Weekly, Long-Term
+• Each mission card shows:
+  - Title and description
+  - XP reward (with star icon)
+  - Difficulty badge (color-coded)
+  - Mission type icon
+  - Current status (Available/In Progress/Completed)
+  - Action button (Accept/Check Progress/Completed)
 
 HOW TO COMPLETE MISSIONS:
-1. Browse available missions (filter by type using tabs)
+1. Browse available missions using the tabs
 2. Click "Accept Mission" to start tracking
-3. Complete the required criteria (e.g., study X hours, complete Y sessions)
+3. Complete the required criteria:
+   - Study for X minutes
+   - Complete Y sessions
+   - Maintain Z day streak
+   - Study during specific times/days
 4. Click "Check Progress" to verify completion
 5. If criteria met: XP is awarded automatically
-6. If not met: you'll see a message to keep training
+6. If not met: Message shows what's still needed
+7. Completed missions show green "Completed" badge
 
-MISSION CARD INFORMATION:
-• Title and description of the objective
-• XP reward amount (shown with star icon)
-• Difficulty badge (color-coded)
-• Mission type icon (Timer/Trophy/Target)
-• Current status (Available/In Progress/Completed)
+MISSION CRITERIA EXAMPLES:
+• "Study for 300 minutes" - Total study time
+• "Complete 5 sessions" - Number of valid sessions (25+ min each)
+• "7 day streak" - Study at least once daily for 7 consecutive days
+• "Study on Monday" - Complete a session on Monday (IST)
+• "Study between 6 AM - 12 PM" - Session during morning hours (IST)
+
+MISSION RESET BEHAVIOR:
+• Daily missions reset at 12:00 AM IST
+• Weekly missions reset Monday 12:00 AM IST
+• When you open the missions page, expired missions auto-reset
+• IMPORTANT: Incomplete missions incur penalties!
+
+MISSION PENALTIES (NEW FEATURE):
+• If you fail to complete a mission before deadline:
+  - You lose HALF the XP reward (rounded up)
+  - Example: 150 XP mission incomplete = -75 XP penalty
+  - Example: 100 XP mission incomplete = -50 XP penalty
+• Penalties are deducted from your total XP
+• Your XP can go negative
+• Penalty affects your squad's ranking (calculated from members)
+• XP transaction is created with source="mission"
+• Penalty message appears in console logs
+
+MISSION STRATEGY:
+• Accept missions you're confident you can complete
+• Daily missions are easier to complete consistently
+• Weekly missions offer higher rewards but require planning
+• Long-term missions provide the highest XP but take time
+• Don't accept missions you can't finish to avoid penalties
 
 ═══════════════════════════════════════════════════════════════════════════
 5. SQUADS & TEAM COMPETITION
 ═══════════════════════════════════════════════════════════════════════════
 
-Squads are teams that compete for collective glory.
+Squads are teams that compete for collective glory and rankings.
 
 BROWSING SQUADS:
-• Navigate to the Squads page
-• View all available squads ranked by performance
-• Each squad shows:
-  - Rank number
-  - Squad name and description
+• Navigate to the Squads page from top navigation
+• View all squads ranked by total XP
+• Each squad card shows:
+  - Rank number with special badges (Diamond, Gold, Silver, Bronze)
+  - Squad name
+  - Squad slogan
   - Member count
+  - Total squad XP (sum of all members' XP)
+  - Average XP per member
+
+RANK BADGES (TOP 4 SQUADS):
+• Rank #1 - Diamond badge with shimmer animation
+• Rank #2 - Gold badge with shimmer animation
+• Rank #3 - Silver badge with shimmer animation
+• Rank #4 - Bronze badge with shimmer animation
+
+JOINING A SQUAD:
+• Click on any squad card to view details
+• Click "Join Squad" button
+• You can only be in one squad at a time
+• Joining is immediate (no approval needed)
+
+VIEWING SQUAD DETAILS:
+• Click on your squad from dashboard or squads page
+• Squad detail page shows:
+  - Squad name, description, and slogan
+  - Total members count
   - Total squad XP
   - Average XP per member
+  - List of all members with:
+    * Profile picture
+    * Username
+    * Individual XP
+    * Total study hours
+• Members are sorted by XP (highest first)
 
 SQUAD BENEFITS:
 • Contribute to your team's total XP
 • Compete on squad leaderboards
-• Monthly squad competitions
 • Team camaraderie and motivation
+• Collective goals and achievements
+• Your XP automatically counts toward squad total
 
-VIEWING SQUAD DETAILS:
-• Click on your squad from the dashboard
-• See all members and their contributions
-• View squad statistics and rankings
-• Track squad progress
+HOW SQUAD XP WORKS:
+• Squad XP = Sum of all members' total XP
+• When you earn XP, your squad's total increases
+• When you lose XP (penalties), squad total decreases
+• Squads are ranked by total XP
+• Average XP = Total XP / Number of members
+
+AUTOMATIC SQUAD ASSIGNMENT:
+• New users are automatically assigned to a squad upon signup
+• Assignment goes to the squad with the LOWEST total XP
+• This helps balance competition across squads
+• Prevents one squad from dominating due to more members
+• If multiple squads have the same XP, oldest squad is chosen
+
+LEAVING A SQUAD:
+• Currently managed through admin panel
+• Contact an administrator to change squads
+• Your XP stays with you when you leave
 
 ═══════════════════════════════════════════════════════════════════════════
-6. LEADERBOARD
+6. LEADERBOARD & RANKINGS
 ═══════════════════════════════════════════════════════════════════════════
 
 The Global Rankings show top performers across the platform.
 
 LEADERBOARD PERIODS:
-• Weekly - Top performers this week
-• Monthly - Top performers this month
-• All-Time - Lifetime rankings
+• Weekly - Top performers this week (Monday 12 AM IST - Sunday 11:59 PM IST)
+• Monthly - Top performers this month (1st 12 AM IST - Last day 11:59 PM IST)
+• All-Time - Lifetime rankings (total XP ever earned)
+
+SWITCHING PERIODS:
+• Three tabs at the top: Weekly, Monthly, All-Time
+• Click any tab to switch views
+• Rankings update in real-time
 
 TOP 3 PODIUM:
-• 1st Place (Gold) - Crown icon, largest podium
-• 2nd Place (Silver) - Medal icon, medium podium
-• 3rd Place (Bronze) - Medal icon, smallest podium
+• Special display for top 3 performers
+• 1st Place (Gold):
+  - Largest podium
+  - Crown icon
+  - Gold medal
+  - Profile picture displayed
+• 2nd Place (Silver):
+  - Medium podium
+  - Silver medal
+  - Profile picture displayed
+• 3rd Place (Bronze):
+  - Smallest podium
+  - Bronze medal
+  - Profile picture displayed
 
-LEADERBOARD INFORMATION:
-• Rank number
-• Username
-• Squad affiliation
-• Total XP earned
-• Total study hours
-• Your position is highlighted (if on the list)
+LEADERBOARD TABLE:
+• Shows ranks 4 and below
+• Each entry displays:
+  - Rank number
+  - Profile picture
+  - Username
+  - Squad name (if member of a squad)
+  - Total XP for the period
+  - Total study hours
+• Your position is highlighted with special styling
+• Sorted by XP (highest to lowest)
+
+PROFILE PICTURES:
+• All users have profile pictures displayed
+• If no custom picture set, shows default avatar (pfp1-pfp10)
+• Fallback to username initials if image fails to load
 
 HOW RANKINGS WORK:
 • Sorted by total XP (highest to lowest)
 • XP is earned through study sessions and missions
-• Updates in real-time as users earn XP
-• Switch between periods to see different rankings
+• Penalties from incomplete missions reduce XP
+• Updates in real-time as users earn/lose XP
+• Weekly rankings reset Monday 12:00 AM IST
+• Monthly rankings reset 1st of month 12:00 AM IST
+• All-time rankings never reset
 
 ═══════════════════════════════════════════════════════════════════════════
-7. ADMIN PANEL (Admin Users Only)
+7. HALL OF FAME
+═══════════════════════════════════════════════════════════════════════════
+
+The Hall of Fame preserves the legacy of top performers.
+
+WHAT IS HALL OF FAME:
+• Archives top 3 squads and users from past periods
+• Preserves history of weekly and monthly winners
+• Permanent record of achievements
+• Accessible from top navigation
+
+HALL OF FAME SECTIONS:
+• Monthly Squad Winners - Top 3 squads each month
+• Weekly Squad Winners - Top 3 squads each week
+• Monthly User Winners - Top 3 users each month
+• Weekly User Winners - Top 3 users each week
+
+WINNER CARDS:
+• Each winner card shows:
+  - Rank badge (1st, 2nd, 3rd)
+  - Profile picture (for users)
+  - Name (squad or username)
+  - Total XP earned during that period
+  - Period identifier (e.g., "2024-12", "2024-W49")
+
+HOW ARCHIVAL WORKS:
+• Winners are archived automatically before leaderboard resets
+• Weekly: Archived Monday 12:01 AM IST (before weekly reset)
+• Monthly: Archived 1st of month 12:01 AM IST (before monthly reset)
+• Top 3 performers are saved permanently
+• Archival script runs via cron job (set up by admin)
+
+NOTE: Hall of Fame feature is currently prepared but requires database
+migration to be fully enabled. Contact your administrator for activation.
+
+═══════════════════════════════════════════════════════════════════════════
+8. PROFILE & SETTINGS
+═══════════════════════════════════════════════════════════════════════════
+
+Customize your profile and account settings.
+
+ACCESSING SETTINGS:
+• Click your profile dropdown in top-right corner
+• Select "Settings" from the menu
+• Or navigate directly to /settings
+
+PROFILE INFORMATION:
+• Username - Your display name (visible to all users)
+• Email - Your account email (for login and notifications)
+• Profile Picture - Your avatar displayed across the platform
+
+PROFILE PICTURE OPTIONS (3 WAYS):
+
+1. DEFAULT AVATAR:
+   • Click "Use Default" button
+   • Randomly selects from 10 default avatars (pfp1-pfp10)
+   • High-quality, professional avatars
+   • Instant preview
+
+2. IMAGE URL:
+   • Paste any image URL in the "Image URL" field
+   • Must be a valid, publicly accessible image
+   • Supports JPG, PNG, GIF formats
+   • Preview updates automatically
+
+3. UPLOAD IMAGE:
+   • Click "Choose File" in "Upload Image" section
+   • Select an image from your computer
+   • Image is converted to base64 and stored
+   • Supports JPG, PNG, GIF formats
+   • Preview shows before saving
+
+PROFILE PICTURE PREVIEW:
+• Large preview at top of settings page
+• Shows current profile picture with border
+• Updates in real-time as you change options
+• Displays "Current profile picture" label
+
+SAVING CHANGES:
+• Click "Save Changes" button at bottom
+• All fields (username, email, image) are updated
+• Success message appears
+• Changes reflect immediately across the platform
+• Your profile picture updates in:
+  - Top-right navigation
+  - Leaderboard
+  - Squad member lists
+  - Hall of Fame (if applicable)
+
+PROFILE PICTURE VISIBILITY:
+• Your profile picture appears everywhere your name is shown:
+  - Navigation bar (top-right)
+  - Leaderboard rankings
+  - Squad member lists
+  - Hall of Fame entries
+  - Admin panel user list
+
+═══════════════════════════════════════════════════════════════════════════
+9. ADMIN PANEL (Admin Users Only)
 ═══════════════════════════════════════════════════════════════════════════
 
 If you have admin privileges, you can access the Admin Command panel.
 
-USER MANAGEMENT:
-• Search for users by username or email
-• View all user statistics and status
-• See squad affiliations
-• Check ban status
+ACCESSING ADMIN PANEL:
+• Click your profile dropdown in top-right corner
+• Select "Admin" from the menu (only visible to admins)
+• Or navigate directly to /admin
+• Requires admin role in database
+
+USER MANAGEMENT TABLE:
+• Search bar - Filter users by username or email
+• User column shows:
+  - Profile picture
+  - Username
+  - Email
+  - Admin badge (shield icon) if user is admin
+• Squad column - Current squad membership
+• Stats column - Total XP and study hours
+• Status column - Active or Banned (with expiry date)
+• Actions column - Dropdown menu with admin operations
 
 ADMIN ACTIONS:
-• Edit Stats - Manually adjust user XP, minutes, or squad
-• Ban User - Temporarily ban for 7 days
-• Delete User - Permanently remove account (irreversible)
 
-EDITING USER STATS:
-1. Click the menu (three dots) next to a user
-2. Select "Edit Stats"
-3. Modify Total XP, Total Minutes, or Squad
-4. Click "Save Changes"
-5. Changes reflect immediately (including in top-right XP display)
+1. EDIT STATS:
+   • Click the menu (three dots) next to a user
+   • Select "Edit Stats"
+   • Modal opens with editable fields:
+     - Total XP (can be negative)
+     - Total Minutes (study time)
+     - Squad (dropdown of all squads)
+   • Click "Save Changes"
+   • Changes apply immediately
+   • User's XP updates in top-right corner (if they're logged in)
+   • Creates XP transaction with source="admin"
 
-USER TABLE COLUMNS:
-• User - Username, email, admin badge (shield icon)
-• Squad - Current squad membership
-• Stats - Total XP and study hours
-• Status - Active or Banned
-• Actions - Dropdown menu for admin operations
+2. BAN USER:
+   • Click the menu next to a user
+   • Select "Ban User"
+   • Confirmation dialog appears
+   • User is banned for 7 days from current time
+   • Banned users cannot log in
+   • Ban expiry date shown in Status column
+   • User can be unbanned by admin
+
+3. DELETE USER:
+   • Click the menu next to a user
+   • Select "Delete User"
+   • Confirmation dialog appears (IRREVERSIBLE)
+   • Deletes user and all related data:
+     - Mission progress
+     - XP transactions
+     - Study sessions
+     - (Hall of Fame entries when enabled)
+   • Creates audit log entry with userId: null
+   • Cannot be undone - use with caution
+
+ADMIN RESPONSIBILITIES:
+• Manage user accounts and permissions
+• Adjust XP for corrections or bonuses
+• Handle user violations and bans
+• Monitor platform activity
+• Ensure fair play and data integrity
+
+AUDIT LOGGING:
+• All admin actions are logged
+• Audit logs track:
+  - Admin user who performed action
+  - Target user (or null if deleted)
+  - Action type (edit, ban, delete)
+  - Timestamp
+  - Details of changes made
 
 ═══════════════════════════════════════════════════════════════════════════
-8. XP & PROGRESSION SYSTEM
+10. XP & PROGRESSION SYSTEM
 ═══════════════════════════════════════════════════════════════════════════
 
-XP (Experience Points) is the core progression metric.
+XP (Experience Points) is the core progression metric in Marathon Server.
 
 HOW TO EARN XP:
-• Study Sessions: 20 XP per 25 minutes (minimum)
-• Mission Completion: Varies by difficulty (shown on mission card)
-• Admin Bonuses: Manually awarded by administrators
 
-XP SOURCES:
+1. STUDY SESSIONS:
+   • 20 XP per 25 minutes of study
+   • Must complete at least 25 minutes
+   • XP awarded when session stops
+   • Example: 50 minutes = 40 XP (2 × 20)
+   • Example: 75 minutes = 60 XP (3 × 20)
+
+2. MISSION COMPLETION:
+   • Varies by difficulty:
+     - EASY: 50-100 XP
+     - MEDIUM: 100-200 XP
+     - HARD: 200-300 XP
+   • XP shown on mission card
+   • Awarded instantly upon completion
+   • Check Progress to verify and claim
+
+3. ADMIN BONUSES:
+   • Manually awarded by administrators
+   • For special achievements or corrections
+   • Amount varies based on admin decision
+   • Creates XP transaction with source="admin"
+
+HOW TO LOSE XP:
+
+1. MISSION PENALTIES:
+   • Incomplete missions incur penalties
+   • Penalty = Half the XP reward (rounded up)
+   • Applied when mission expires (daily/weekly reset)
+   • Example: 150 XP mission incomplete = -75 XP
+   • Your XP can go negative
+
+2. ADMIN ADJUSTMENTS:
+   • Admins can reduce XP for violations
+   • Used for corrections or penalties
+   • Creates XP transaction with negative amount
+
+XP SOURCES (Transaction Types):
 • "session" - Earned from completed study sessions
-• "mission" - Earned from completing mission objectives
+• "mission" - Earned from completing missions or penalties
 • "admin" - Manually adjusted by administrators
-• "bonus" - Special rewards
+• "bonus" - Special rewards (if implemented)
 
 VIEWING YOUR XP:
 • Top-right corner of every page (next to username)
 • Dashboard daily progress panel
-• Weekly activity graph
 • Leaderboard rankings
+• Squad member lists
+• XP transactions are logged in database
 
 STREAK SYSTEM:
 • Study at least once per day to maintain your streak
-• Streaks are displayed on the dashboard
+• Streak increments on first valid session of the day (IST)
+• Must be at least 25 minutes to count
 • Missing a day resets your streak to 0
-• Streaks encourage daily consistency
+• Streaks are displayed on the dashboard
+• Encourages daily consistency
+• Some missions require specific streak lengths
 
 TOTAL TIME TRACKING:
 • All valid sessions (25+ minutes) count toward total time
 • Displayed in hours on dashboard and leaderboard
-• Used for mission criteria and statistics
+• Used for mission criteria
+• Shown in squad member lists
+• Tracks cumulative study time
+
+POMODORO COUNT:
+• Each 25-minute block = 1 Pomodoro
+• Displayed on dashboard
+• Resets daily at 12:00 AM IST
+• Helps track daily productivity
+• Based on Pomodoro Technique
+
+═══════════════════════════════════════════════════════════════════════════
+11. TIME ZONE & IST PRINCIPLE
+═══════════════════════════════════════════════════════════════════════════
+
+Marathon Server operates entirely on IST (Indian Standard Time, UTC+5:30).
+
+WHY IST:
+• Consistent time reference for all users
+• Fair competition regardless of location
+• Predictable reset times
+• Synchronized leaderboards and missions
+
+IST-BASED FEATURES:
+
+DAILY RESETS (12:00 AM IST):
+• Daily missions reset
+• Daily stats reset (today's hours, pomodoros)
+• Streak checks (did you study yesterday IST?)
+• Daily progress tracking
+
+WEEKLY RESETS (Monday 12:00 AM IST):
+• Weekly missions reset
+• Weekly leaderboard resets
+• Weekly stats calculations
+• Weekly activity graph updates
+
+MONTHLY RESETS (1st 12:00 AM IST):
+• Monthly leaderboard resets
+• Monthly stats calculations
+• Monthly winner archival (Hall of Fame)
+
+MISSION DEADLINES:
+• Daily missions expire at 11:59 PM IST
+• Weekly missions expire Sunday 11:59 PM IST
+• Penalties applied at reset time if incomplete
+
+AUTOMATIC RESET BEHAVIOR:
+• When you open missions page, expired missions auto-reset
+• Penalties are calculated and applied
+• New missions become available
+• Progress starts fresh for the new period
+
+TIME DISPLAY:
+• All timestamps shown in IST
+• Session start/stop times in IST
+• Leaderboard period labels in IST
+• Hall of Fame period identifiers in IST
+
+FOR USERS IN OTHER TIMEZONES:
+• All times are IST, not your local time
+• Daily reset at 12 AM IST may be different local time
+• Plan your study sessions accordingly
+• Missions reset based on IST, not local time
+• Leaderboards update based on IST periods
 
 ═══════════════════════════════════════════════════════════════════════════
 TIPS FOR SUCCESS
@@ -263,31 +653,50 @@ TIPS FOR SUCCESS
    • Study daily to maintain your streak
    • Aim for at least 25-minute sessions to earn XP
    • Complete daily missions for bonus XP
+   • Build a routine around IST reset times
 
-2. WORK FOR YOUR SQUAD
-   • Team competition adds motivation
-   • Contribute to collective goals
-   • Learn from high-performing squad members
+2. MANAGE YOUR MISSIONS WISELY
+   • Only accept missions you're confident you can complete
+   • Incomplete missions incur penalties (half XP)
+   • Focus on daily missions for quick wins
+   • Plan weekly missions at the start of the week
+   • Long-term missions provide highest rewards
 
-3. TRACK YOUR PROGRESS
-   • Check the weekly activity graph regularly
-   • Identify patterns and optimize study times
-   • Set personal goals beyond the daily 6-hour target
+3. WORK FOR YOUR SQUAD
+   • Your XP contributes to squad rankings
+   • Penalties also affect your squad
+   • Coordinate with squad members
+   • Aim for top 4 to get rank badges
 
-4. COMPLETE MISSIONS
-   • Missions provide bonus XP beyond sessions
-   • Start with EASY missions to build momentum
-   • Focus on DAILY missions for quick wins
+4. TRACK YOUR PROGRESS
+   • Check dashboard daily for stats
+   • Monitor your streak
+   • Review mission progress regularly
+   • Use leaderboard to gauge performance
 
-5. USE SUBJECT TAGS
-   • Tag your sessions by subject
-   • Helps you track which subjects you study most
-   • Useful for balanced study planning
-
-6. AVOID EARLY STOPS
+5. OPTIMIZE YOUR STUDY SESSIONS
    • Always complete at least 25 minutes
-   • Stopping early wastes your time (no XP awarded)
-   • Plan your sessions to avoid interruptions
+   • Stopping early wastes your time (no XP)
+   • Plan sessions to avoid interruptions
+   • Use subject tags for organization
+
+6. CUSTOMIZE YOUR PROFILE
+   • Set a profile picture you like
+   • Choose from 10 default avatars or upload custom
+   • Your picture appears on leaderboards
+   • Makes you recognizable in squad lists
+
+7. UNDERSTAND THE PENALTY SYSTEM
+   • Don't accept missions you can't finish
+   • Incomplete missions cost you XP
+   • Your XP can go negative
+   • Plan your mission commitments carefully
+
+8. LEVERAGE THE LEADERBOARD
+   • Check weekly rankings for short-term goals
+   • Monthly rankings for medium-term progress
+   • All-time for overall achievement
+   • Compete with squad members
 
 ═══════════════════════════════════════════════════════════════════════════
 TROUBLESHOOTING
@@ -297,30 +706,98 @@ TIMER NOT STARTING:
 • Ensure you're logged in
 • Check that you don't have another active session
 • Refresh the page and try again
+• Clear browser cache if issue persists
 
 XP NOT UPDATING:
 • Wait a few seconds for the update to propagate
 • Refresh the page to see latest XP
 • Check that your session was at least 25 minutes
+• Verify mission was actually completed
 
 MISSION NOT COMPLETING:
-• Verify you've met all criteria (e.g., time of day, day of week)
+• Verify you've met all criteria
+• Check time of day requirements (IST)
+• Check day of week requirements (IST)
 • Ensure sessions were valid (25+ minutes)
 • Click "Check Progress" to manually verify
 
+PROFILE PICTURE NOT SHOWING:
+• Ensure image URL is publicly accessible
+• Try using default avatar instead
+• Check image format (JPG, PNG, GIF)
+• Refresh page after saving
+• Clear browser cache
+
 CAN'T JOIN SQUAD:
 • You can only be in one squad at a time
-• Leave your current squad before joining another
-• Contact an admin if issues persist
+• Contact admin to leave current squad
+• Refresh page and try again
+
+NEGATIVE XP:
+• This is normal if you have mission penalties
+• Incomplete missions deduct half their XP reward
+• Complete missions to earn XP back
+• Your XP can recover from negative
+
+SESSION LOST AFTER BROWSER CLOSE:
+• Sessions should persist across browser sessions
+• If lost, it may be a server issue
+• Contact administrator
+• Start a new session
+
+═══════════════════════════════════════════════════════════════════════════
+FREQUENTLY ASKED QUESTIONS
+═══════════════════════════════════════════════════════════════════════════
+
+Q: What happens if I don't complete a mission?
+A: You lose half the XP reward (rounded up) when the mission expires.
+   This penalty is deducted from your total XP.
+
+Q: Can my XP go negative?
+A: Yes! Mission penalties can reduce your XP below zero. You can earn it
+   back through study sessions and completing missions.
+
+Q: How do I change squads?
+A: Currently requires admin assistance. Contact an administrator to change
+   your squad membership.
+
+Q: What timezone does the platform use?
+A: All times are in IST (Indian Standard Time, UTC+5:30). Resets happen
+   at 12:00 AM IST regardless of your location.
+
+Q: How long do I need to study to earn XP?
+A: Minimum 25 minutes. You earn 20 XP per 25-minute block. Sessions under
+   25 minutes earn no XP and don't count for missions.
+
+Q: What are the default profile pictures?
+A: There are 10 default avatars (pfp1-pfp10) that are randomly assigned
+   when you create an account. You can change to any of them or upload
+   your own.
+
+Q: How often do missions reset?
+A: Daily missions reset at 12 AM IST daily. Weekly missions reset Monday
+   12 AM IST. Long-term missions never reset.
+
+Q: Can I have multiple active sessions?
+A: No, only one active session is allowed per user at a time.
+
+Q: What happens to my XP when I leave a squad?
+A: Your XP stays with you. Squad XP is calculated from current members,
+   so your XP will no longer count toward your old squad.
+
+Q: How do I become an admin?
+A: Admin status is granted by existing administrators through database
+   access. Contact your platform administrator.
 
 ═══════════════════════════════════════════════════════════════════════════
 CONTACT & SUPPORT
 ═══════════════════════════════════════════════════════════════════════════
 
-For technical issues or questions:
+For technical issues, questions, or feature requests:
 • Contact your platform administrator
 • Check for updates and announcements
-• Report bugs or suggest features
+• Report bugs through proper channels
+• Suggest features for future development
 
 ═══════════════════════════════════════════════════════════════════════════
 

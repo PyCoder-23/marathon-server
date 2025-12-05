@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/db";
+import { getISTDayStart, getISTWeekStart } from "@/lib/timezone-utils";
 
 export async function checkMissionCompletion(userId: string, missionId: string) {
     const mission = await prisma.mission.findUnique({
@@ -38,23 +39,23 @@ export async function checkMissionCompletion(userId: string, missionId: string) 
         const requiredMinutes = minutesMatch ? parseInt(minutesMatch[1]) : 0;
 
         if (mission.type === "DAILY") {
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
+            // Use IST day start (12:00 AM IST)
+            const todayIST = getISTDayStart();
             const todayMinutes = validSessions
-                .filter((s: any) => s.startTs >= today)
+                .filter((s: any) => s.startTs >= todayIST)
                 .reduce((acc: number, s: any) => acc + s.durationMin, 0);
 
             if (todayMinutes >= requiredMinutes) completed = true;
         } else if (mission.type === "WEEKLY") {
-            const weekAgo = new Date();
-            weekAgo.setDate(weekAgo.getDate() - 7);
+            // Use IST week start (Monday 12:00 AM IST)
+            const weekStartIST = getISTWeekStart();
             const weekMinutes = validSessions
-                .filter((s: any) => s.startTs >= weekAgo)
+                .filter((s: any) => s.startTs >= weekStartIST)
                 .reduce((acc: number, s: any) => acc + s.durationMin, 0);
 
             if (weekMinutes >= requiredMinutes) completed = true;
         } else if (mission.type === "LONG_TERM") {
-            // Total accumulated time
+            // Total accumulated time (all time)
             const totalMinutes = validSessions
                 .reduce((acc: number, s: any) => acc + s.durationMin, 0);
 
@@ -68,18 +69,18 @@ export async function checkMissionCompletion(userId: string, missionId: string) 
         const requiredCount = countMatch ? parseInt(countMatch[1]) : 1;
 
         if (mission.type === "DAILY") {
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
+            // Use IST day start (12:00 AM IST)
+            const todayIST = getISTDayStart();
 
             // Normal daily count
-            const todaySessions = validSessions.filter((s: any) => s.startTs >= today).length;
+            const todaySessions = validSessions.filter((s: any) => s.startTs >= todayIST).length;
             if (todaySessions >= requiredCount) completed = true;
 
         } else if (mission.type === "WEEKLY") {
-            const weekAgo = new Date();
-            weekAgo.setDate(weekAgo.getDate() - 7);
+            // Use IST week start (Monday 12:00 AM IST)
+            const weekStartIST = getISTWeekStart();
 
-            const weekSessions = validSessions.filter((s: any) => s.startTs >= weekAgo).length;
+            const weekSessions = validSessions.filter((s: any) => s.startTs >= weekStartIST).length;
             if (weekSessions >= requiredCount) completed = true;
 
         } else if (mission.type === "LONG_TERM") {

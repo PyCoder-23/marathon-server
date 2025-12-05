@@ -100,30 +100,83 @@ export default function SettingsPage() {
                         </div>
 
                         <div className="space-y-2">
-                            <Label htmlFor="image">Profile Image URL</Label>
-                            <div className="relative">
-                                <ImageIcon className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                                <Input
-                                    id="image"
-                                    value={formData.image}
-                                    onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-                                    className="pl-9"
-                                    placeholder="https://example.com/avatar.jpg"
-                                />
-                            </div>
-                            {formData.image && (
-                                <div className="mt-2">
-                                    <p className="text-xs text-muted mb-2">Preview:</p>
-                                    <div className="w-16 h-16 rounded-full overflow-hidden border border-white/20">
-                                        <img
-                                            src={formData.image}
-                                            alt="Preview"
-                                            className="w-full h-full object-cover"
-                                            onError={(e) => (e.currentTarget.style.display = 'none')}
+                            <Label htmlFor="image">Profile Picture</Label>
+                            <div className="space-y-4">
+                                {/* Preview */}
+                                {formData.image && (
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-primary">
+                                            <img
+                                                src={formData.image}
+                                                alt="Preview"
+                                                className="w-full h-full object-cover"
+                                            />
+                                        </div>
+                                        <div className="text-sm text-muted">
+                                            Current profile picture
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Option 1: Default Random PFP */}
+                                <div className="p-4 border border-white/10 rounded-lg space-y-2">
+                                    <div className="flex items-center justify-between">
+                                        <div>
+                                            <h4 className="text-sm font-medium">Default Avatar</h4>
+                                            <p className="text-xs text-muted">Get a random default profile picture</p>
+                                        </div>
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => {
+                                                const randomNum = Math.floor(Math.random() * 10) + 1;
+                                                setFormData({ ...formData, image: `/pfps/pfp${randomNum}.png` });
+                                            }}
+                                        >
+                                            Use Default
+                                        </Button>
+                                    </div>
+                                </div>
+
+                                {/* Option 2: URL Input */}
+                                <div className="p-4 border border-white/10 rounded-lg space-y-2">
+                                    <h4 className="text-sm font-medium">Image URL</h4>
+                                    <div className="relative">
+                                        <ImageIcon className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                                        <Input
+                                            id="image"
+                                            value={formData.image}
+                                            onChange={(e) => setFormData({ ...formData, image: e.target.value })}
+                                            className="pl-9"
+                                            placeholder="https://example.com/avatar.jpg"
                                         />
                                     </div>
                                 </div>
-                            )}
+
+                                {/* Option 3: File Upload */}
+                                <div className="p-4 border border-white/10 rounded-lg space-y-2">
+                                    <h4 className="text-sm font-medium">Upload Image</h4>
+                                    <Input
+                                        id="imageFile"
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={async (e) => {
+                                            const file = e.target.files?.[0];
+                                            if (file) {
+                                                // Convert to base64
+                                                const reader = new FileReader();
+                                                reader.onloadend = () => {
+                                                    setFormData({ ...formData, image: reader.result as string });
+                                                };
+                                                reader.readAsDataURL(file);
+                                            }
+                                        }}
+                                        className="cursor-pointer"
+                                    />
+                                    <p className="text-xs text-muted">Upload an image file (JPG, PNG, GIF)</p>
+                                </div>
+                            </div>
                         </div>
 
                         <Button type="submit" disabled={loading} className="w-full">
@@ -139,9 +192,9 @@ export default function SettingsPage() {
                                 </>
                             )}
                         </Button>
-                    </form>
-                </CardContent>
-            </Card>
-        </div>
+                    </form >
+                </CardContent >
+            </Card >
+        </div >
     );
 }

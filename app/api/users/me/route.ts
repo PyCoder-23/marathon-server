@@ -18,6 +18,7 @@ export async function GET() {
                 streakDays: true,
                 squadId: true,
                 discordHandle: true,
+                image: true,
                 createdAt: true,
             },
         });

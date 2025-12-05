@@ -1,19 +1,18 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { requireAuth } from "@/lib/api-helpers";
+import { getISTDayStart, getISTDayEnd, getISTDate } from "@/lib/timezone-utils";
 
 export async function GET() {
     try {
         const payload = await requireAuth();
         const userId = payload.userId;
 
-        // Get current date boundaries
-        const now = new Date();
-        const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-        const todayEnd = new Date(todayStart);
-        todayEnd.setDate(todayEnd.getDate() + 1);
+        // Get current date boundaries in IST
+        const todayStart = getISTDayStart();
+        const todayEnd = getISTDayEnd();
 
-        // Get last 7 days for weekly chart
+        // Get last 7 days for weekly chart (in IST)
         const weekStart = new Date(todayStart);
         weekStart.setDate(weekStart.getDate() - 6);
 
