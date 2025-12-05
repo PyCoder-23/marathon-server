@@ -17,6 +17,7 @@ export async function GET(
                     select: {
                         id: true,
                         username: true,
+                        image: true,
                         totalXp: true,
                         totalMinutes: true,
                         streakDays: true,

@@ -1,14 +1,23 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { requireAuth, errorResponse, successResponse } from "@/lib/api-helpers";
+import { shouldRunReset, markResetRun } from "@/lib/mission-reset-throttle";
 
 export async function GET() {
     try {
         const payload = await requireAuth();
 
-        // Reset expired missions first
-        const { resetExpiredMissions } = await import("@/lib/mission-reset");
-        await resetExpiredMissions(payload.userId);
+        // Reset expired missions, but only if enough time has passed
+        // This prevents running reset on every page load
+        if (shouldRunReset(payload.userId)) {
+            const { resetExpiredMissions } = await import("@/lib/mission-reset");
+            const result = await resetExpiredMissions(payload.userId);
+            markResetRun(payload.userId);
+
+            if (result.penaltyCount > 0) {
+                console.log(`⚠️ User ${payload.userId} penalized for ${result.penaltyCount} missions (-${result.totalPenalty} XP)`);
+            }
+        }
 
         // Get all missions
         const missions = await prisma.mission.findMany({

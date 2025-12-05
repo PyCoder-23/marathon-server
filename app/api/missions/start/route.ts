@@ -12,23 +12,20 @@ export async function POST(req: Request) {
             return errorResponse("Mission ID is required", 400);
         }
 
-        // Check if already started
-        const existing = await prisma.missionProgress.findUnique({
+        // Use upsert to prevent race conditions from spam-clicking
+        // If mission already exists, just return it; otherwise create it
+        const progress = await prisma.missionProgress.upsert({
             where: {
                 userId_missionId: {
                     userId: payload.userId,
                     missionId,
                 }
-            }
-        });
-
-        if (existing) {
-            return errorResponse("Mission already started", 400);
-        }
-
-        // Start mission
-        const progress = await prisma.missionProgress.create({
-            data: {
+            },
+            update: {
+                // If it exists, don't change anything
+                // This prevents resetting progress if user spam-clicks
+            },
+            create: {
                 userId: payload.userId,
                 missionId,
                 progress: 0,

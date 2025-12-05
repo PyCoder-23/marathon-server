@@ -8,7 +8,11 @@ import { Play, Pause, Square, Clock } from "lucide-react";
 import { api } from "@/lib/api-client";
 import { useAuth } from "@/lib/auth-context";
 
-export function SessionTimer() {
+interface SessionTimerProps {
+    onComplete?: () => void;
+}
+
+export function SessionTimer({ onComplete }: SessionTimerProps) {
     const [isRunning, setIsRunning] = useState(false);
     const [seconds, setSeconds] = useState(0);
     const [sessionId, setSessionId] = useState<string | null>(null);
@@ -88,6 +92,11 @@ export function SessionTimer() {
 
             // Refresh user data to update XP display
             await refreshUser();
+
+            // Trigger completion callback to update dashboard stats
+            if (onComplete) {
+                onComplete();
+            }
 
             // Clear XP notification after 5 seconds
             setTimeout(() => setXpEarned(null), 5000);

@@ -19,6 +19,7 @@ import {
 const navItems = [
     { name: "Dashboard", href: "/dashboard" },
     { name: "Missions", href: "/missions" },
+    { name: "Planner", href: "/planner" },
     { name: "Squads", href: "/squads" },
     { name: "Leaderboard", href: "/leaderboard" },
     { name: "Hall of Fame", href: "/hall-of-fame" },

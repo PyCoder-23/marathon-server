@@ -13,6 +13,7 @@ import { useAuth } from "@/lib/auth-context";
 interface SquadMember {
     id: string;
     username: string;
+    image?: string | null;
     totalXp: number;
     totalMinutes: number;
     streakDays: number;
@@ -153,8 +154,15 @@ export default function SquadDetailPage() {
                         {squad.members.map((member, index) => (
                             <div key={member.id} className="flex items-center justify-between p-4 rounded-lg bg-white/5 border border-white/5 hover:border-white/10 transition-colors">
                                 <div className="flex items-center gap-4">
-                                    <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-sm font-bold">
-                                        {index + 1}
+                                    <div className="w-6 text-center text-sm font-mono text-muted">
+                                        #{index + 1}
+                                    </div>
+                                    <div className="w-10 h-10 rounded-full bg-white/10 border border-white/20 flex items-center justify-center overflow-hidden">
+                                        {member.image ? (
+                                            <img src={member.image} alt={member.username} className="w-full h-full object-cover" />
+                                        ) : (
+                                            <span className="text-sm font-bold text-white">{member.username.charAt(0).toUpperCase()}</span>
+                                        )}
                                     </div>
                                     <div>
                                         <div className="flex items-center gap-2">

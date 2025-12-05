@@ -18,6 +18,7 @@ interface User {
     id: string;
     username: string;
     email: string;
+    image?: string | null;
     isAdmin: boolean;
     totalXp: number;
     totalMinutes: number;
@@ -169,12 +170,21 @@ export default function AdminDashboard() {
                                 users.map((user) => (
                                     <TableRow key={user.id} className="border-white/5 hover:bg-white/5">
                                         <TableCell>
-                                            <div className="flex flex-col">
-                                                <span className="font-bold text-white flex items-center gap-2">
-                                                    {user.username}
-                                                    {user.isAdmin && <Shield className="w-3 h-3 text-yellow-500" />}
-                                                </span>
-                                                <span className="text-xs text-muted">{user.email}</span>
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-8 h-8 rounded-full bg-white/10 border border-white/20 flex items-center justify-center overflow-hidden">
+                                                    {user.image ? (
+                                                        <img src={user.image} alt={user.username} className="w-full h-full object-cover" />
+                                                    ) : (
+                                                        <span className="text-xs font-bold text-white">{user.username.charAt(0).toUpperCase()}</span>
+                                                    )}
+                                                </div>
+                                                <div className="flex flex-col">
+                                                    <span className="font-bold text-white flex items-center gap-2">
+                                                        {user.username}
+                                                        {user.isAdmin && <Shield className="w-3 h-3 text-yellow-500" />}
+                                                    </span>
+                                                    <span className="text-xs text-muted">{user.email}</span>
+                                                </div>
                                             </div>
                                         </TableCell>
                                         <TableCell>

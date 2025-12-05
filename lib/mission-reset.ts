@@ -18,7 +18,7 @@ export async function resetExpiredMissions(userId: string) {
     });
 
     const toReset: string[] = [];
-    const incompleteMissions: Array<{ progress: any; mission: any }> = [];
+    const incompleteMissions: Map<string, { progress: any; mission: any }> = new Map();
 
     for (const progress of allProgress) {
         const mission = progress.mission;
@@ -40,15 +40,16 @@ export async function resetExpiredMissions(userId: string) {
         if (shouldReset) {
             toReset.push(progress.id);
 
-            // If mission was not completed, add to penalty list
-            if (!progress.completed) {
-                incompleteMissions.push({ progress, mission });
+            // If mission was not completed, add to penalty map
+            // Use Map to deduplicate - only penalize each unique mission once
+            if (!progress.completed && !incompleteMissions.has(mission.id)) {
+                incompleteMissions.set(mission.id, { progress, mission });
             }
         }
     }
 
-    // Apply penalties for incomplete missions
-    if (incompleteMissions.length > 0) {
+    // Apply penalties for incomplete missions (deduplicated)
+    if (incompleteMissions.size > 0) {
         const user = await prisma.user.findUnique({
             where: { id: userId },
             select: { id: true, squadId: true, totalXp: true }
@@ -56,33 +57,38 @@ export async function resetExpiredMissions(userId: string) {
 
         if (user) {
             let totalPenalty = 0;
+            const penalizedMissions: string[] = [];
 
-            for (const { mission } of incompleteMissions) {
+            for (const [missionId, { mission }] of incompleteMissions) {
                 // Penalty is half the XP reward, rounded up
                 const penalty = Math.ceil(mission.xpReward / 2);
                 totalPenalty += penalty;
+                penalizedMissions.push(mission.title || missionId);
             }
 
-            // Deduct XP from user (can go negative)
-            const newUserXp = user.totalXp - totalPenalty;
+            // Only apply penalty if there's actually a penalty
+            if (totalPenalty > 0) {
+                // Deduct XP from user (can go negative)
+                const newUserXp = user.totalXp - totalPenalty;
 
-            await prisma.user.update({
-                where: { id: userId },
-                data: { totalXp: newUserXp }
-            });
+                await prisma.user.update({
+                    where: { id: userId },
+                    data: { totalXp: newUserXp }
+                });
 
-            // Create XP transaction record for penalty
-            await prisma.xPTransaction.create({
-                data: {
-                    userId: userId,
-                    amount: -totalPenalty,
-                    source: "mission",
-                    note: `Mission penalty: ${incompleteMissions.length} incomplete mission(s)`,
-                    createdAt: new Date()
-                }
-            });
+                // Create XP transaction record for penalty
+                await prisma.xPTransaction.create({
+                    data: {
+                        userId: userId,
+                        amount: -totalPenalty,
+                        source: "mission",
+                        note: `Mission penalty: ${incompleteMissions.size} incomplete mission(s) - ${penalizedMissions.join(', ')}`,
+                        createdAt: new Date()
+                    }
+                });
 
-            console.log(`⚠️ Penalized user ${userId}: -${totalPenalty} XP for ${incompleteMissions.length} incomplete mission(s)`);
+                console.log(`⚠️ Penalized user ${userId}: -${totalPenalty} XP for ${incompleteMissions.size} incomplete mission(s): ${penalizedMissions.join(', ')}`);
+            }
         }
     }
 
@@ -93,11 +99,13 @@ export async function resetExpiredMissions(userId: string) {
                 id: { in: toReset }
             }
         });
+
+        console.log(`🔄 Reset ${toReset.length} expired mission(s) for user ${userId}`);
     }
 
     return {
         resetCount: toReset.length,
-        penaltyCount: incompleteMissions.length,
-        totalPenalty: incompleteMissions.reduce((sum, { mission }) => sum + Math.ceil(mission.xpReward / 2), 0)
+        penaltyCount: incompleteMissions.size,
+        totalPenalty: Array.from(incompleteMissions.values()).reduce((sum, { mission }) => sum + Math.ceil(mission.xpReward / 2), 0)
     };
 }

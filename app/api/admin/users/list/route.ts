@@ -25,6 +25,7 @@ export async function GET(req: Request) {
                     id: true,
                     username: true,
                     email: true,
+                    image: true,
                     isAdmin: true,
                     totalXp: true,
                     totalMinutes: true,

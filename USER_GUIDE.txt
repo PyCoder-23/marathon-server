@@ -20,6 +20,7 @@ TABLE OF CONTENTS
 9. Admin Panel (Admin Users Only)
 10. XP & Progression System
 11. Time Zone & IST Principle
+12. Planner System
 
 ═══════════════════════════════════════════════════════════════════════════
 1. GETTING STARTED
@@ -210,6 +211,13 @@ MISSION STRATEGY:
 • Long-term missions provide the highest XP but take time
 • Don't accept missions you can't finish to avoid penalties
 
+MISSION HISTORY LOG:
+• Access via the "History" button on the Dashboard
+• View a chronological log of all completed missions and penalties
+• Green entries = XP Earned (Success)
+• Red entries = XP Lost (Penalty)
+• Grouped by date for easy tracking
+
 ═══════════════════════════════════════════════════════════════════════════
 5. SQUADS & TEAM COMPETITION
 ═══════════════════════════════════════════════════════════════════════════
@@ -232,12 +240,6 @@ RANK BADGES (TOP 4 SQUADS):
 • Rank #2 - Gold badge with shimmer animation
 • Rank #3 - Silver badge with shimmer animation
 • Rank #4 - Bronze badge with shimmer animation
-
-JOINING A SQUAD:
-• Click on any squad card to view details
-• Click "Join Squad" button
-• You can only be in one squad at a time
-• Joining is immediate (no approval needed)
 
 VIEWING SQUAD DETAILS:
 • Click on your squad from dashboard or squads page
@@ -644,6 +646,35 @@ FOR USERS IN OTHER TIMEZONES:
 • Plan your study sessions accordingly
 • Missions reset based on IST, not local time
 • Leaderboards update based on IST periods
+
+═══════════════════════════════════════════════════════════════════════════
+12. PLANNER SYSTEM
+═══════════════════════════════════════════════════════════════════════════
+
+The Planner helps you organize your study schedule and tasks.
+
+ACCESSING THE PLANNER:
+• Click "Planner" in the top navigation bar
+• Toggle between Day, Week, and Month views
+
+CALENDAR FEATURES:
+• Visual Grid: See your events color-coded on a timeline
+• Add Events: Click any date or time slot to create an event
+• Edit/Delete: Click an existing event to modify details
+• Views:
+  - Month: Bird's eye view of your schedule
+  - Week: Hourly breakdown for detailed planning
+  - Day: Focused view of a single day
+
+SIMPLE TO-DO LIST:
+• Located below the calendar
+• Hidden by default for a clean look
+• Click "All of this looks too complex?? Use a simple to-do list here" to reveal
+• Features:
+  - Add tasks instantly
+  - Mark as completed (strikethrough effect)
+  - Delete unwanted tasks
+  - Simple, distraction-free interface
 
 ═══════════════════════════════════════════════════════════════════════════
 TIPS FOR SUCCESS

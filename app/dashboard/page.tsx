@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Clock, Flame, Target, Users, Zap, BarChart3, Trophy } from "lucide-react";
+import { Clock, Flame, Target, Users, Zap, BarChart3, Trophy, History as HistoryIcon } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/lib/auth-context";
@@ -19,6 +19,7 @@ interface Stats {
         date: string;
         hours: number;
         pomodoros: number;
+        xp: number;
     }>;
     streak: number;
 }
@@ -149,7 +150,7 @@ export default function DashboardPage() {
                             <div className="absolute left-0 top-0 bottom-8 w-10 flex flex-col justify-between text-xs text-muted font-mono">
                                 {(() => {
                                     if (!stats?.weekly || stats.weekly.length === 0) return null;
-                                    const maxXp = Math.max(...stats.weekly.map((d: any) => d.xp), 1);
+                                    const maxXp = Math.max(...stats.weekly.map((d: any) => d.xp || 0), 100);
                                     const step = Math.ceil(maxXp / 4);
                                     return [4, 3, 2, 1, 0].map((i) => (
                                         <span key={i}>{(step * i).toLocaleString()}</span>
@@ -159,7 +160,7 @@ export default function DashboardPage() {
 
                             {/* Graph area */}
                             <div className="absolute left-10 right-0 top-0 bottom-8 pl-2">
-                                <div className="w-full h-full border-l border-b border-white/10 relative">
+                                <div className="w-full h-full relative border-l border-b border-white/10">
                                     {/* Grid lines */}
                                     {[0, 0.25, 0.5, 0.75, 1].map((ratio, i) => (
                                         <div
@@ -169,45 +170,110 @@ export default function DashboardPage() {
                                         />
                                     ))}
 
-                                    {/* Bar chart */}
+                                    {/* Line Graph */}
                                     {stats?.weekly && stats.weekly.length > 0 && (
-                                        <div className="absolute inset-0 flex items-end gap-1 px-2">
-                                            {stats.weekly.map((day: any, i: number) => {
-                                                const maxXp = Math.max(...stats.weekly.map((d: any) => d.xp), 1);
-                                                const heightPercent = (day.xp / maxXp) * 100;
+                                        <>
+                                            <svg className="absolute inset-0 w-full h-full overflow-visible" viewBox="0 0 100 100" preserveAspectRatio="none">
+                                                <defs>
+                                                    <linearGradient id="lineGradient" x1="0" y1="0" x2="0" y2="1">
+                                                        <stop offset="0%" stopColor="var(--primary)" stopOpacity="0.5" />
+                                                        <stop offset="100%" stopColor="var(--primary)" stopOpacity="0" />
+                                                    </linearGradient>
+                                                </defs>
+                                                {/* Area under curve */}
+                                                <path
+                                                    d={`
+                                                        M 0,100
+                                                        ${stats.weekly.map((day: any, i: number) => {
+                                                        const maxXp = Math.max(...stats.weekly.map((d: any) => d.xp || 0), 100);
+                                                        const x = (i / (stats.weekly.length - 1)) * 100;
+                                                        const y = 100 - ((day.xp || 0) / maxXp) * 100;
+                                                        return `L ${x},${y}`;
+                                                    }).join(' ')}
+                                                        L 100,100 Z
+                                                    `}
+                                                    fill="url(#lineGradient)"
+                                                    fillOpacity="0.2"
+                                                />
+                                                {/* Line */}
+                                                <polyline
+                                                    points={stats.weekly.map((day: any, i: number) => {
+                                                        const maxXp = Math.max(...stats.weekly.map((d: any) => d.xp || 0), 100);
+                                                        const x = (i / (stats.weekly.length - 1)) * 100;
+                                                        const y = 100 - ((day.xp || 0) / maxXp) * 100;
+                                                        return `${x},${y}`;
+                                                    }).join(' ')}
+                                                    fill="none"
+                                                    stroke="var(--primary)"
+                                                    strokeWidth="2"
+                                                    vectorEffect="non-scaling-stroke"
+                                                />
+                                            </svg>
 
-                                                return (
-                                                    <div
-                                                        key={i}
-                                                        className="flex-1 group relative flex flex-col justify-end"
-                                                    >
-                                                        {/* Bar */}
-                                                        <div
-                                                            className="w-full bg-primary rounded-t transition-all hover:opacity-80"
-                                                            style={{ height: `${heightPercent}%` }}
-                                                        />
+                                            {/* Points & Hover Zones */}
+                                            <div className="absolute inset-0">
+                                                {stats.weekly.map((day: any, i: number) => {
+                                                    const maxXp = Math.max(...stats.weekly.map((d: any) => d.xp || 0), 100);
+                                                    const xp = day.xp || 0;
+                                                    const x = (i / (stats.weekly.length - 1)) * 100;
+                                                    const y = 100 - (xp / maxXp * 100);
 
-                                                        {/* Tooltip */}
-                                                        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-black text-xs px-2 py-1 rounded border border-white/10 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10 pointer-events-none">
-                                                            <div className="font-bold text-primary">{day.xp} XP</div>
-                                                            <div className="text-muted">{new Date(day.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</div>
+                                                    return (
+                                                        <div key={i} className="absolute top-0 bottom-0 w-12 -translate-x-1/2 group z-10" style={{ left: `${x}%` }}>
+                                                            {/* Vertical Guide Line on Hover */}
+                                                            <div className="absolute top-0 bottom-0 left-1/2 w-px bg-primary/50 opacity-0 group-hover:opacity-100 transition-opacity" />
+
+                                                            {/* Permanent Point */}
+                                                            <div
+                                                                className="absolute left-1/2 w-3 h-3 -ml-1.5 rounded-full bg-black border-2 border-primary z-20"
+                                                                style={{ top: `calc(${y}% - 6px)` }}
+                                                            />
+
+                                                            {/* Hover Halo */}
+                                                            <div
+                                                                className="absolute left-1/2 w-6 h-6 -ml-3 rounded-full bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                                                                style={{ top: `calc(${y}% - 12px)` }}
+                                                            />
+
+                                                            {/* Tooltip */}
+                                                            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-black text-xs px-2 py-1 rounded border border-white/10 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-30 pointer-events-none">
+                                                                <div className="font-bold text-primary">{xp} XP</div>
+                                                                <div className="text-muted">{new Date(day.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</div>
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                );
-                                            })}
-                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                        </>
                                     )}
                                 </div>
                             </div>
 
                             {/* X-axis labels */}
                             <div className="absolute left-10 right-0 bottom-0 h-8 pl-2">
-                                <div className="w-full h-full flex items-start gap-1 px-2">
-                                    {stats?.weekly.map((day: any, i: number) => (
-                                        <div key={i} className="flex-1 text-center text-xs text-muted">
-                                            {new Date(day.date).toLocaleDateString('en-US', { month: 'numeric', day: 'numeric' })}
-                                        </div>
-                                    ))}
+                                <div className="w-full h-full relative">
+                                    {stats?.weekly.map((day: any, i: number) => {
+                                        const x = (i / (stats.weekly.length - 1)) * 100;
+                                        let className = "absolute top-2 text-xs text-muted transform -translate-x-1/2";
+
+                                        // Adjust first and last labels to stay within bounds
+                                        if (i === 0) className = "absolute top-2 text-xs text-muted left-0";
+                                        else if (i === stats.weekly.length - 1) className = "absolute top-2 text-xs text-muted right-0";
+                                        else className = "absolute top-2 text-xs text-muted -translate-x-1/2";
+
+                                        // For middle elements, use left position
+                                        const style = (i !== 0 && i !== stats.weekly.length - 1) ? { left: `${x}%` } : {};
+
+                                        return (
+                                            <div
+                                                key={i}
+                                                className={className}
+                                                style={style}
+                                            >
+                                                {new Date(day.date).toLocaleDateString('en-US', { month: 'numeric', day: 'numeric' })}
+                                            </div>
+                                        );
+                                    })}
                                 </div>
                             </div>
                         </div>
@@ -216,7 +282,7 @@ export default function DashboardPage() {
 
                 {/* Session Timer - 6 cols */}
                 <div className="md:col-span-6">
-                    <SessionTimer />
+                    <SessionTimer onComplete={fetchData} />
                 </div>
 
                 {/* Squad Summary - 6 cols */}
@@ -278,10 +344,12 @@ export default function DashboardPage() {
                             <span>Leaderboard</span>
                         </Button>
                     </Link>
-                    <Button variant="outline" className="h-auto py-4 flex flex-col gap-2 border-white/10 hover:border-primary/50 hover:bg-primary/5" disabled>
-                        <Zap className="w-6 h-6 text-primary" />
-                        <span>History</span>
-                    </Button>
+                    <Link href="/history" className="contents">
+                        <Button variant="outline" className="h-auto py-4 flex flex-col gap-2 border-white/10 hover:border-primary/50 hover:bg-primary/5">
+                            <HistoryIcon className="w-6 h-6 text-primary" />
+                            <span>History</span>
+                        </Button>
+                    </Link>
                 </div>
 
             </div>

@@ -42,25 +42,31 @@ export default function MissionsPage() {
 
     async function handleStartMission(missionId: string) {
         try {
+            setLoading(true);
             await api.post("/api/missions/start", { missionId });
             await fetchMissions(); // Refresh list
         } catch (error: any) {
             alert(error.message || "Failed to start mission");
+        } finally {
+            setLoading(false);
         }
     }
 
     async function handleCompleteMission(missionId: string) {
         try {
+            setLoading(true);
             const data = await api.post("/api/missions/complete", { missionId });
             if (data.completed) {
                 await fetchMissions();
                 await refreshUser(); // Update XP in navbar
-                alert(`Mission Complete! +${data.xpAwarded} XP`);
+                alert(`🎉 Mission Complete! +${data.xpAwarded} XP`);
             } else {
-                alert("Mission criteria not yet met. Keep training!");
+                alert("❌ Mission criteria not yet met. Keep training!");
             }
         } catch (error: any) {
             alert(error.message || "Failed to complete mission");
+        } finally {
+            setLoading(false);
         }
     }
 
