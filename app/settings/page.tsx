@@ -8,7 +8,7 @@ import { useToast } from "@/components/ui/toast-context";
 import { useAuth } from "@/lib/auth-context";
 import { api } from "@/lib/api-client";
 import { useState, useEffect } from "react";
-import { User, Mail, ImageIcon, Save, Loader2 } from "lucide-react";
+import { User, Mail, ImageIcon, Save, Loader2, Lock } from "lucide-react";
 
 export default function SettingsPage() {
     const { user, refreshUser } = useAuth();
@@ -19,6 +19,8 @@ export default function SettingsPage() {
         username: "",
         email: "",
         image: "",
+        currentPassword: "",
+        isProfileLocked: false
     });
 
     useEffect(() => {
@@ -27,6 +29,8 @@ export default function SettingsPage() {
                 username: user.username || "",
                 email: user.email || "",
                 image: user.image || "",
+                currentPassword: "",
+                isProfileLocked: user.isProfileLocked || false
             });
         }
     }, [user]);
@@ -41,7 +45,9 @@ export default function SettingsPage() {
             toast({
                 title: "Profile updated",
                 description: "Your changes have been saved successfully.",
+                variant: "success"
             });
+            setFormData(prev => ({ ...prev, currentPassword: "" }));
         } catch (error: any) {
             toast({
                 title: "Error",
@@ -179,6 +185,52 @@ export default function SettingsPage() {
                             </div>
                         </div>
 
+                        {/* Password Verification for Sensitive Changes */}
+                        <div className="space-y-2 pt-4 border-t border-white/10">
+                            <Label htmlFor="currentPassword">Current Password</Label>
+                            <div className="relative">
+                                <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                                <Input
+                                    id="currentPassword"
+                                    type="password"
+                                    value={formData.currentPassword}
+                                    onChange={(e) => setFormData({ ...formData, currentPassword: e.target.value })}
+                                    className="pl-9"
+                                    placeholder="Required if changing username or email"
+                                />
+                            </div>
+                            <p className="text-xs text-muted">Include this to verify changes to sensitive information.</p>
+                        </div>
+
+                        {/* Privacy Settings */}
+                        <div className="p-4 border border-white/10 rounded-lg space-y-4 bg-white/5">
+                            <div className="flex items-center justify-between">
+                                <div className="space-y-0.5">
+                                    <Label className="text-base">Lock Profile</Label>
+                                    <p className="text-xs text-muted">
+                                        Hide your stats and activity from other users.
+                                    </p>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                    <Button
+                                        type="button"
+                                        variant={formData.isProfileLocked ? "destructive" : "outline"}
+                                        size="sm"
+                                        onClick={() => setFormData({ ...formData, isProfileLocked: !formData.isProfileLocked })}
+                                    >
+                                        {formData.isProfileLocked ? (
+                                            <>
+                                                <Lock className="w-3 h-3 mr-2" />
+                                                Locked
+                                            </>
+                                        ) : (
+                                            "Unlocked"
+                                        )}
+                                    </Button>
+                                </div>
+                            </div>
+                        </div>
+
                         <Button type="submit" disabled={loading} className="w-full">
                             {loading ? (
                                 <>
@@ -192,9 +244,96 @@ export default function SettingsPage() {
                                 </>
                             )}
                         </Button>
-                    </form >
-                </CardContent >
-            </Card >
-        </div >
+                    </form>
+                </CardContent>
+            </Card>
+
+            <SecuritySection />
+        </div>
+    );
+}
+
+function SecuritySection() {
+    const { toast } = useToast();
+    const [loading, setLoading] = useState(false);
+    const [passwords, setPasswords] = useState({
+        current: "",
+        new: "",
+        confirm: ""
+    });
+
+    async function handlePasswordChange(e: React.FormEvent) {
+        e.preventDefault();
+
+        if (passwords.new !== passwords.confirm) {
+            toast({ title: "Error", description: "New passwords do not match", variant: "destructive" });
+            return;
+        }
+
+        setLoading(true);
+
+        try {
+            await api.post("/api/auth/change-password", {
+                currentPassword: passwords.current,
+                newPassword: passwords.new
+            });
+            toast({ title: "Password Updated", description: "Your password has been changed successfully.", variant: "success" });
+            setPasswords({ current: "", new: "", confirm: "" });
+        } catch (error: any) {
+            toast({ title: "Error", description: error.message || "Failed to change password", variant: "destructive" });
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    return (
+        <Card className="border-white/10 bg-black/40">
+            <CardHeader>
+                <CardTitle>Security</CardTitle>
+                <CardDescription>Manage your password and account security.</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <form onSubmit={handlePasswordChange} className="space-y-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="sec-current">Current Password</Label>
+                        <Input
+                            id="sec-current"
+                            type="password"
+                            value={passwords.current}
+                            onChange={(e) => setPasswords({ ...passwords, current: e.target.value })}
+                            required
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="sec-new">New Password</Label>
+                        <Input
+                            id="sec-new"
+                            type="password"
+                            value={passwords.new}
+                            onChange={(e) => setPasswords({ ...passwords, new: e.target.value })}
+                            required
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="sec-confirm">Confirm New Password</Label>
+                        <Input
+                            id="sec-confirm"
+                            type="password"
+                            value={passwords.confirm}
+                            onChange={(e) => setPasswords({ ...passwords, confirm: e.target.value })}
+                            required
+                        />
+                    </div>
+                    <div className="flex items-center justify-between pt-2">
+                        <a href="/forgot-password" className="text-sm text-primary hover:underline">
+                            Forgot Password?
+                        </a>
+                        <Button type="submit" disabled={loading}>
+                            {loading ? "Updating..." : "Update Password"}
+                        </Button>
+                    </div>
+                </form>
+            </CardContent>
+        </Card>
     );
 }

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { Menu, X, LogOut, User, Shield } from "lucide-react";
+import { Menu, X, LogOut, User, Shield, Settings } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/lib/auth-context";
 import {
@@ -82,10 +82,16 @@ export function Navbar() {
                                 <DropdownMenuContent align="end" className="w-56 bg-black border-white/10 text-white">
                                     <DropdownMenuLabel>My Account</DropdownMenuLabel>
                                     <DropdownMenuSeparator className="bg-white/10" />
-                                    <Link href="/settings">
+                                    <Link href={`/profile/${user.username}`}>
                                         <DropdownMenuItem className="cursor-pointer">
                                             <User className="mr-2 h-4 w-4" />
-                                            <span>Profile & Settings</span>
+                                            <span>Profile</span>
+                                        </DropdownMenuItem>
+                                    </Link>
+                                    <Link href="/settings">
+                                        <DropdownMenuItem className="cursor-pointer">
+                                            <Settings className="mr-2 h-4 w-4" />
+                                            <span>Settings</span>
                                         </DropdownMenuItem>
                                     </Link>
                                     {user.isAdmin && (

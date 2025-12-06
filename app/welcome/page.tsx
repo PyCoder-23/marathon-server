@@ -1,100 +1,79 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { CheckCircle2, ArrowRight } from "lucide-react";
 import Link from "next/link";
-import { useAuth } from "@/lib/auth-context";
-import { useEffect, useState } from "react";
-import { api } from "@/lib/api-client";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Rocket, Target, Users } from "lucide-react";
 
 export default function WelcomePage() {
-    const { user } = useAuth();
-    const [squadName, setSquadName] = useState<string>("");
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        if (user?.squadId) {
-            fetchSquadName(user.squadId);
-        } else {
-            setLoading(false);
-        }
-    }, [user]);
-
-    async function fetchSquadName(squadId: string) {
-        try {
-            const data = await api.get(`/api/squads/${squadId}`);
-            setSquadName(data.squad.name);
-        } catch (error) {
-            console.error("Failed to fetch squad:", error);
-        } finally {
-            setLoading(false);
-        }
-    }
-
     return (
-        <div className="container mx-auto flex items-center justify-center min-h-[calc(100vh-4rem)] px-4">
-            <Card className="w-full max-w-lg border-primary/20 shadow-[0_0_30px_rgba(0,255,149,0.15)]">
-                <CardHeader className="text-center space-y-4">
-                    <div className="mx-auto w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center mb-2">
-                        <CheckCircle2 className="w-8 h-8 text-primary" />
-                    </div>
-                    <CardTitle className="text-3xl text-primary">Welcome to the Camp</CardTitle>
-                    <CardDescription className="text-lg">
-                        Your account has been successfully created.
-                    </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                    <div className="bg-white/5 p-6 rounded-lg border border-white/10 text-center space-y-2">
-                        <p className="text-muted">You have been assigned to</p>
-                        {loading ? (
-                            <div className="h-8 w-32 bg-white/10 animate-pulse rounded mx-auto" />
-                        ) : (
-                            <p className="text-2xl font-bold text-white">{squadName || "Recruit Squad"}</p>
-                        )}
-                        <p className="text-sm text-muted pt-2">
-                            Work with your squad to dominate the leaderboard!
-                        </p>
-                    </div>
+        <div className="min-h-screen flex items-center justify-center bg-black p-4 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-zinc-900 via-black to-black">
+            <div className="max-w-2xl w-full space-y-8 text-center animate-in fade-in zoom-in duration-500">
 
-                    <div className="space-y-4">
-                        <div className="flex items-start gap-3">
-                            <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-primary text-sm font-bold mt-0.5">1</div>
-                            <div>
-                                <p className="font-medium text-white">Join the Discord</p>
-                                <p className="text-sm text-muted">Connect with your squad mates and get updates.</p>
+                <div className="space-y-4">
+                    <h1 className="text-4xl md:text-6xl font-bold font-orbitron text-transparent bg-clip-text bg-gradient-to-r from-primary to-cyan-400">
+                        TRAINING BEGINS
+                    </h1>
+                    <p className="text-xl text-muted font-light">
+                        Welcome to Marathon Server. Your consistency journey starts now.
+                    </p>
+                </div>
+
+                <div className="grid md:grid-cols-3 gap-4">
+                    <Card className="bg-white/5 border-white/10 hover:border-primary/50 transition-colors group">
+                        <CardContent className="pt-6 flex flex-col items-center gap-4">
+                            <div className="p-3 rounded-full bg-primary/10 text-primary group-hover:scale-110 transition-transform">
+                                <Rocket className="w-6 h-6" />
                             </div>
-                        </div>
-                        <div className="flex items-start gap-3">
-                            <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-primary text-sm font-bold mt-0.5">2</div>
-                            <div>
-                                <p className="font-medium text-white">Start a Session</p>
-                                <p className="text-sm text-muted">Go to your dashboard and track your first study session.</p>
+                            <div className="space-y-1">
+                                <h3 className="font-bold text-white">Track Time</h3>
+                                <p className="text-xs text-muted">Log your study sessions and build streaks.</p>
                             </div>
-                        </div>
-                        <div className="flex items-start gap-3">
-                            <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-primary text-sm font-bold mt-0.5">3</div>
-                            <div>
-                                <p className="font-medium text-white">Complete Missions</p>
-                                <p className="text-sm text-muted">Check the mission board for daily objectives.</p>
+                        </CardContent>
+                    </Card>
+
+                    <Card className="bg-white/5 border-white/10 hover:border-primary/50 transition-colors group">
+                        <CardContent className="pt-6 flex flex-col items-center gap-4">
+                            <div className="p-3 rounded-full bg-primary/10 text-primary group-hover:scale-110 transition-transform">
+                                <Target className="w-6 h-6" />
                             </div>
-                        </div>
-                    </div>
-                </CardContent>
-                <CardFooter className="flex flex-col gap-3">
-                    <Link href="/dashboard" className="w-full">
-                        <Button className="w-full shadow-[0_0_15px_rgba(0,255,149,0.2)] text-lg h-12">
-                            Enter Dashboard
-                            <ArrowRight className="w-5 h-5 ml-2" />
+                            <div className="space-y-1">
+                                <h3 className="font-bold text-white">Complete Missions</h3>
+                                <p className="text-xs text-muted">Earn XP by finishing daily & weekly goals.</p>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    <Card className="bg-white/5 border-white/10 hover:border-primary/50 transition-colors group">
+                        <CardContent className="pt-6 flex flex-col items-center gap-4">
+                            <div className="p-3 rounded-full bg-primary/10 text-primary group-hover:scale-110 transition-transform">
+                                <Users className="w-6 h-6" />
+                            </div>
+                            <div className="space-y-1">
+                                <h3 className="font-bold text-white">Compete</h3>
+                                <p className="text-xs text-muted">Join a squad and climb the leaderboard.</p>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
+
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                    <Link href="/dashboard">
+                        <Button size="lg" className="text-lg px-8 shadow-[0_0_20px_rgba(0,255,149,0.3)] hover:shadow-[0_0_30px_rgba(0,255,149,0.5)] transition-shadow">
+                            Enter Command Center
                         </Button>
                     </Link>
-                    <Link href="https://discord.com/invite/N72xXtZtGS" target="_blank" className="w-full">
-                        <Button variant="outline" className="w-full">
-                            Join Discord Server
+
+                    <a href="https://discord.com/invite/R2xGRqQA4J" target="_blank" rel="noopener noreferrer">
+                        <Button variant="outline" size="lg" className="text-lg px-8 border-indigo-500/30 text-indigo-400 hover:bg-indigo-500/10 hover:text-indigo-300 hover:border-indigo-500/60 transition-colors">
+                            <svg className="w-5 h-5 mr-2 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z" />
+                            </svg>
+                            Join Discord
                         </Button>
-                    </Link>
-                </CardFooter>
-            </Card>
+                    </a>
+                </div>
+            </div>
         </div>
     );
 }

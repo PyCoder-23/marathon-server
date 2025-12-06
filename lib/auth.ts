@@ -11,12 +11,16 @@ export async function verifyPassword(password: string, hash: string): Promise<bo
     return await compare(password, hash);
 }
 
-export async function signToken(payload: any): Promise<string> {
+export async function signToken(payload: any, expiresIn: string = "7d"): Promise<string> {
     return await new SignJWT(payload)
         .setProtectedHeader({ alg: "HS256" })
         .setIssuedAt()
-        .setExpirationTime("7d")
+        .setExpirationTime(expiresIn)
         .sign(ENCODED_SECRET);
+}
+
+export async function signResetToken(payload: any): Promise<string> {
+    return signToken(payload, "15m");
 }
 
 export async function verifyToken(token: string): Promise<any> {

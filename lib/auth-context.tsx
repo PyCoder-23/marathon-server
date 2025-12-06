@@ -13,6 +13,7 @@ interface User {
     streakDays: number;
     squadId: string | null;
     image: string | null;
+    isProfileLocked?: boolean;
 }
 
 interface AuthContextType {
@@ -83,9 +84,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
 
         const data = await res.json();
+
         // Fetch full user data after signup
         await checkAuth();
-        router.push("/welcome");
+
+        if (data.requiresVerification) {
+            router.push("/verify-email");
+        } else {
+            router.push("/welcome");
+        }
     }
 
     async function logout() {

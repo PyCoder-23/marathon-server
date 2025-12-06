@@ -74,6 +74,13 @@ export default function DashboardPage() {
     const dailyGoal = 6.0; // hours
     const progressPercent = stats ? Math.min(100, (stats.today.hours / dailyGoal) * 100) : 0;
 
+    // Graph Scale Calculations
+    const weeklyStats = stats?.weekly || [];
+    const xpValues = weeklyStats.map(d => d.xp || 0);
+    const minY = Math.min(...xpValues, 0);
+    const maxY = Math.max(...xpValues, 100);
+    const yRange = maxY - minY || 100;
+
     return (
         <div className="container mx-auto p-6 space-y-8">
             {/* Header */}
@@ -148,14 +155,9 @@ export default function DashboardPage() {
                         <div className="h-[200px] relative">
                             {/* Y-axis labels */}
                             <div className="absolute left-0 top-0 bottom-8 w-10 flex flex-col justify-between text-xs text-muted font-mono">
-                                {(() => {
-                                    if (!stats?.weekly || stats.weekly.length === 0) return null;
-                                    const maxXp = Math.max(...stats.weekly.map((d: any) => d.xp || 0), 100);
-                                    const step = Math.ceil(maxXp / 4);
-                                    return [4, 3, 2, 1, 0].map((i) => (
-                                        <span key={i}>{(step * i).toLocaleString()}</span>
-                                    ));
-                                })()}
+                                {[1, 0.75, 0.5, 0.25, 0].map((ratio) => (
+                                    <span key={ratio}>{Math.round(minY + (yRange * ratio)).toLocaleString()}</span>
+                                ))}
                             </div>
 
                             {/* Graph area */}
@@ -170,8 +172,16 @@ export default function DashboardPage() {
                                         />
                                     ))}
 
+                                    {/* Zero Line (highlighted if visible) */}
+                                    {minY < 0 && maxY > 0 && (
+                                        <div
+                                            className="absolute w-full border-t border-white/20 border-dashed"
+                                            style={{ top: `${(100 - ((0 - minY) / yRange) * 100)}%` }}
+                                        />
+                                    )}
+
                                     {/* Line Graph */}
-                                    {stats?.weekly && stats.weekly.length > 0 && (
+                                    {weeklyStats.length > 0 && (
                                         <>
                                             <svg className="absolute inset-0 w-full h-full overflow-visible" viewBox="0 0 100 100" preserveAspectRatio="none">
                                                 <defs>
@@ -180,14 +190,12 @@ export default function DashboardPage() {
                                                         <stop offset="100%" stopColor="var(--primary)" stopOpacity="0" />
                                                     </linearGradient>
                                                 </defs>
-                                                {/* Area under curve */}
                                                 <path
                                                     d={`
                                                         M 0,100
-                                                        ${stats.weekly.map((day: any, i: number) => {
-                                                        const maxXp = Math.max(...stats.weekly.map((d: any) => d.xp || 0), 100);
-                                                        const x = (i / (stats.weekly.length - 1)) * 100;
-                                                        const y = 100 - ((day.xp || 0) / maxXp) * 100;
+                                                        ${weeklyStats.map((day: any, i: number) => {
+                                                        const x = (i / (weeklyStats.length - 1)) * 100;
+                                                        const y = 100 - (((day.xp || 0) - minY) / yRange) * 100;
                                                         return `L ${x},${y}`;
                                                     }).join(' ')}
                                                         L 100,100 Z
@@ -195,12 +203,10 @@ export default function DashboardPage() {
                                                     fill="url(#lineGradient)"
                                                     fillOpacity="0.2"
                                                 />
-                                                {/* Line */}
                                                 <polyline
-                                                    points={stats.weekly.map((day: any, i: number) => {
-                                                        const maxXp = Math.max(...stats.weekly.map((d: any) => d.xp || 0), 100);
-                                                        const x = (i / (stats.weekly.length - 1)) * 100;
-                                                        const y = 100 - ((day.xp || 0) / maxXp) * 100;
+                                                    points={weeklyStats.map((day: any, i: number) => {
+                                                        const x = (i / (weeklyStats.length - 1)) * 100;
+                                                        const y = 100 - (((day.xp || 0) - minY) / yRange) * 100;
                                                         return `${x},${y}`;
                                                     }).join(' ')}
                                                     fill="none"
@@ -212,32 +218,25 @@ export default function DashboardPage() {
 
                                             {/* Points & Hover Zones */}
                                             <div className="absolute inset-0">
-                                                {stats.weekly.map((day: any, i: number) => {
-                                                    const maxXp = Math.max(...stats.weekly.map((d: any) => d.xp || 0), 100);
+                                                {weeklyStats.map((day: any, i: number) => {
                                                     const xp = day.xp || 0;
-                                                    const x = (i / (stats.weekly.length - 1)) * 100;
-                                                    const y = 100 - (xp / maxXp * 100);
+                                                    const x = (i / (weeklyStats.length - 1)) * 100;
+                                                    const y = 100 - ((xp - minY) / yRange * 100);
 
                                                     return (
                                                         <div key={i} className="absolute top-0 bottom-0 w-12 -translate-x-1/2 group z-10" style={{ left: `${x}%` }}>
-                                                            {/* Vertical Guide Line on Hover */}
+                                                            {/* Vertical Guide Line */}
                                                             <div className="absolute top-0 bottom-0 left-1/2 w-px bg-primary/50 opacity-0 group-hover:opacity-100 transition-opacity" />
 
                                                             {/* Permanent Point */}
                                                             <div
-                                                                className="absolute left-1/2 w-3 h-3 -ml-1.5 rounded-full bg-black border-2 border-primary z-20"
+                                                                className={`absolute left-1/2 w-3 h-3 -ml-1.5 rounded-full border-2 z-20 ${xp < 0 ? 'bg-red-500 border-red-500' : 'bg-black border-primary'}`}
                                                                 style={{ top: `calc(${y}% - 6px)` }}
-                                                            />
-
-                                                            {/* Hover Halo */}
-                                                            <div
-                                                                className="absolute left-1/2 w-6 h-6 -ml-3 rounded-full bg-primary/20 opacity-0 group-hover:opacity-100 transition-opacity z-10"
-                                                                style={{ top: `calc(${y}% - 12px)` }}
                                                             />
 
                                                             {/* Tooltip */}
                                                             <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-black text-xs px-2 py-1 rounded border border-white/10 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-30 pointer-events-none">
-                                                                <div className="font-bold text-primary">{xp} XP</div>
+                                                                <div className={`font-bold ${xp < 0 ? 'text-red-500' : 'text-primary'}`}>{xp} XP</div>
                                                                 <div className="text-muted">{new Date(day.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</div>
                                                             </div>
                                                         </div>
@@ -252,25 +251,18 @@ export default function DashboardPage() {
                             {/* X-axis labels */}
                             <div className="absolute left-10 right-0 bottom-0 h-8 pl-2">
                                 <div className="w-full h-full relative">
-                                    {stats?.weekly.map((day: any, i: number) => {
-                                        const x = (i / (stats.weekly.length - 1)) * 100;
+                                    {weeklyStats.map((day: any, i: number) => {
+                                        const x = (i / (weeklyStats.length - 1)) * 100;
                                         let className = "absolute top-2 text-xs text-muted transform -translate-x-1/2";
-
-                                        // Adjust first and last labels to stay within bounds
                                         if (i === 0) className = "absolute top-2 text-xs text-muted left-0";
-                                        else if (i === stats.weekly.length - 1) className = "absolute top-2 text-xs text-muted right-0";
+                                        else if (i === weeklyStats.length - 1) className = "absolute top-2 text-xs text-muted right-0";
                                         else className = "absolute top-2 text-xs text-muted -translate-x-1/2";
 
-                                        // For middle elements, use left position
-                                        const style = (i !== 0 && i !== stats.weekly.length - 1) ? { left: `${x}%` } : {};
+                                        const style = (i !== 0 && i !== weeklyStats.length - 1) ? { left: `${x}%` } : {};
 
                                         return (
-                                            <div
-                                                key={i}
-                                                className={className}
-                                                style={style}
-                                            >
-                                                {new Date(day.date).toLocaleDateString('en-US', { month: 'numeric', day: 'numeric' })}
+                                            <div key={i} className={className} style={style}>
+                                                {new Date(day.date).toLocaleDateString('en-US', { weekday: 'short' })}
                                             </div>
                                         );
                                     })}

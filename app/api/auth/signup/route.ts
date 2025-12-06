@@ -68,6 +68,11 @@ export async function POST(req: Request) {
 
         // 3. Create User
         const passwordHash = await hashPassword(password);
+
+        // Verification Code
+        const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+        const verificationCodeExpires = new Date(Date.now() + 15 * 60 * 1000); // 15 mins
+
         const user = await prisma.user.create({
             data: {
                 email,
@@ -76,6 +81,10 @@ export async function POST(req: Request) {
                 discordHandle,
                 squadId: assignedSquad.id,
                 totalXp: 10, // Signup bonus
+                verificationCode,
+                verificationCodeExpires,
+                isVerified: false,
+                image: `pfp${Math.floor(Math.random() * 10) + 1}.jpg`
             },
         });
 
@@ -89,7 +98,13 @@ export async function POST(req: Request) {
             },
         });
 
+        // Send Email (Async, don't block)
+        const { sendVerificationEmail } = await import("@/lib/email");
+        sendVerificationEmail(email, verificationCode).catch(console.error);
+
         // 5. Generate Token
+        // Even if unverified, we might give them a token but restrictive? 
+        // Or we give them a token, but the UI checks 'isVerified' and redirects to /verify-email.
         const token = await signToken({ userId: user.id, isAdmin: user.isAdmin });
 
         // 6. Return Response
@@ -97,6 +112,7 @@ export async function POST(req: Request) {
             ok: true,
             userId: user.id,
             squadName: assignedSquad.name,
+            requiresVerification: true // Signal frontend
         });
 
         response.cookies.set("token", token, {

@@ -34,6 +34,15 @@ model User {
   bannedUntil DateTime?
   image       String?
 
+  isProfileLocked         Boolean   @default(false)
+
+  // Verification & Reset
+  isVerified              Boolean   @default(false)
+  verificationCode        String?
+  verificationCodeExpires DateTime?
+  resetCode               String?
+  resetCodeExpires        DateTime?
+
   // Relations
   sessions            Session[]
   xpTransactions      XPTransaction[]

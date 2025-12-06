@@ -52,6 +52,11 @@ export default function LoginPage() {
                                 Password
                             </label>
                             <Input id="password" name="password" type="password" required />
+                            <div className="flex justify-end">
+                                <Link href="/forgot-password" className="text-xs text-primary hover:underline">
+                                    Forgot password?
+                                </Link>
+                            </div>
                         </div>
                         {error && (
                             <p className="text-sm text-red-500 text-center">{error}</p>

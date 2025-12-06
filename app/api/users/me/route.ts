@@ -20,7 +20,8 @@ export async function GET() {
                 discordHandle: true,
                 image: true,
                 createdAt: true,
-            },
+                isProfileLocked: true,
+            } as any,
         });
 
         if (!user) {
