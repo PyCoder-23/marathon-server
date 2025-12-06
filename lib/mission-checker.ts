@@ -118,30 +118,42 @@ export async function checkAllActiveMissions(userId: string) {
     for (const p of progress) {
         const isComplete = await checkMissionCompletion(userId, p.missionId);
         if (isComplete) {
-            // Update progress
-            await prisma.missionProgress.update({
-                where: { id: p.id },
-                data: { completed: true, completedAt: new Date() }
-            });
+            if (isComplete) {
+                // Atomic update to prevent double XP awarding
+                // We update where id matches AND completed is false
+                const updateResult = await prisma.missionProgress.updateMany({
+                    where: {
+                        id: p.id,
+                        completed: false
+                    },
+                    data: {
+                        completed: true,
+                        completedAt: new Date()
+                    }
+                });
 
-            // Award XP
-            await prisma.user.update({
-                where: { id: userId },
-                data: { totalXp: { increment: p.mission.xpReward } }
-            });
+                // Only award XP if we actually updated the row (i.e., it wasn't already completed)
+                if (updateResult.count > 0) {
+                    // Award XP
+                    await prisma.user.update({
+                        where: { id: userId },
+                        data: { totalXp: { increment: p.mission.xpReward } }
+                    });
 
-            // Log transaction
-            await prisma.xPTransaction.create({
-                data: {
-                    userId,
-                    amount: p.mission.xpReward,
-                    source: "mission",
-                    referenceId: p.id,
-                    note: `Completed mission: ${p.mission.title}`
+                    // Log transaction
+                    await prisma.xPTransaction.create({
+                        data: {
+                            userId,
+                            amount: p.mission.xpReward,
+                            source: "mission",
+                            referenceId: p.id,
+                            note: `Completed mission: ${p.mission.title}`
+                        }
+                    });
+
+                    completedMissions.push(p.mission);
                 }
-            });
-
-            completedMissions.push(p.mission);
+            }
         }
     }
 

@@ -29,7 +29,7 @@ export async function POST(req: Request) {
             return errorResponse("Session already completed", 400);
         }
 
-        // Calculate duration
+        // Calculate duration logic
         const endTs = new Date();
         const durationMs = endTs.getTime() - session.startTs.getTime();
         const durationMin = Math.floor(durationMs / 60000);
@@ -38,14 +38,11 @@ export async function POST(req: Request) {
         const MIN_DURATION = 25;
         const isValidSession = durationMin >= MIN_DURATION;
 
-        // Calculate XP: 20 XP per full 25-minute block
-        // y = largest multiple of 25 <= durationMin
-        // XP = (y / 25) * 20
+        // Calculate XP logic
         const blocks = Math.floor(durationMin / 25);
         const xpEarned = isValidSession ? blocks * 20 : 0;
 
         // Update session
-        // We mark it as completed so it's no longer active, but we can filter invalid sessions later
         const updatedSession = await prisma.session.update({
             where: { id: sessionId },
             data: {
@@ -55,95 +52,97 @@ export async function POST(req: Request) {
             },
         });
 
-        // Only update user stats and streak if session is valid
-        if (isValidSession) {
-            // Create XP transaction
-            if (xpEarned > 0) {
-                await prisma.xPTransaction.create({
-                    data: {
-                        userId: payload.userId,
-                        amount: xpEarned,
-                        source: "session",
-                        referenceId: sessionId,
-                        note: `Study session: ${durationMin} minutes (${blocks} blocks)`,
-                    },
-                });
-            }
-
-            // Update user stats
-            await prisma.user.update({
-                where: { id: payload.userId },
-                data: {
-                    totalXp: { increment: xpEarned },
-                    totalMinutes: { increment: durationMin },
-                },
-            });
-
-            // Check and update streak using IST timezone
-            const { getISTDayStart } = await import("@/lib/timezone-utils");
-            const user = await prisma.user.findUnique({
-                where: { id: payload.userId },
-                include: {
-                    sessions: {
-                        where: {
-                            completed: true,
-                            durationMin: { gte: MIN_DURATION } // Only count valid sessions for streak
-                        },
-                        orderBy: { startTs: 'desc' },
-                        take: 30, // Get more sessions to check streak properly
-                    }
-                }
-            });
-
-            if (user) {
-                const todayIST = getISTDayStart();
-                const yesterdayIST = new Date(todayIST);
-                yesterdayIST.setDate(yesterdayIST.getDate() - 1);
-
-                // Check if user studied yesterday (IST)
-                const studiedYesterday = user.sessions.some((s: any) => {
-                    const sessionDate = getISTDayStart(s.startTs);
-                    return sessionDate.getTime() === yesterdayIST.getTime();
-                });
-
-                // Check if this is the first session today (IST)
-                const sessionsToday = user.sessions.filter((s: any) => {
-                    const sessionDate = getISTDayStart(s.startTs);
-                    return sessionDate.getTime() === todayIST.getTime();
-                });
-
-                // Update streak: increment if studied yesterday, reset to 1 if not
-                if (sessionsToday.length === 1) { // Only update on first session of the day
-                    const newStreak = studiedYesterday ? user.streakDays + 1 : 1;
-                    await prisma.user.update({
-                        where: { id: payload.userId },
-                        data: { streakDays: newStreak },
-                    });
-                }
-            }
-
-            // Check mission progress - ONLY for valid sessions
-            const { checkAllActiveMissions } = await import("@/lib/mission-checker");
-            const completedMissions = await checkAllActiveMissions(payload.userId);
-
+        // HANDLE INVALID SESSION (Too Short)
+        if (!isValidSession) {
             return successResponse({
                 session: updatedSession,
-                xpEarned,
+                xpEarned: 0,
                 durationMin,
-                isValidSession,
-                completedMissions: completedMissions.map(m => ({ id: m.id, title: m.title, xpReward: m.xpReward })),
+                isValidSession: false,
+                completedMissions: [],
+                message: "Session too short. Minimum 25 minutes required for XP and mission progress."
             });
         }
 
-        // Session was too short - return without checking missions
+        // HANDLE VALID SESSION
+        // 1. Create XP transaction
+        await prisma.xPTransaction.create({
+            data: {
+                userId: payload.userId,
+                amount: xpEarned,
+                source: "session",
+                referenceId: sessionId,
+                note: `Study session: ${durationMin} minutes (${blocks} blocks)`,
+            },
+        });
+
+        // 2. Update user stats
+        await prisma.user.update({
+            where: { id: payload.userId },
+            data: {
+                totalXp: { increment: xpEarned },
+                totalMinutes: { increment: durationMin },
+            },
+        });
+
+        // 3. Check and update streak using IST timezone
+        const { getISTDayStart } = await import("@/lib/timezone-utils");
+        const user = await prisma.user.findUnique({
+            where: { id: payload.userId },
+            include: {
+                sessions: {
+                    where: {
+                        completed: true,
+                        durationMin: { gte: MIN_DURATION } // Only count valid sessions for streak
+                    },
+                    orderBy: { startTs: 'desc' },
+                    take: 30, // Get more sessions to check streak properly
+                }
+            }
+        });
+
+        if (user) {
+            const todayIST = getISTDayStart();
+            const yesterdayIST = new Date(todayIST);
+            yesterdayIST.setDate(yesterdayIST.getDate() - 1);
+
+            // Check if user studied yesterday (IST)
+            const studiedYesterday = user.sessions.some((s: any) => {
+                const sessionDate = getISTDayStart(s.startTs);
+                return sessionDate.getTime() === yesterdayIST.getTime();
+            });
+
+            // Check if this is the first session today (IST)
+            const sessionsToday = user.sessions.filter((s: any) => {
+                const sessionDate = getISTDayStart(s.startTs);
+                return sessionDate.getTime() === todayIST.getTime();
+            });
+
+            if (sessionsToday.length === 1) { // Only update on first session of the day
+                const newStreak = studiedYesterday ? user.streakDays + 1 : 1;
+                await prisma.user.update({
+                    where: { id: payload.userId },
+                    data: { streakDays: newStreak },
+                });
+
+                // 4. Check for Streak Milestone Rewards
+                const { checkAndAwardStreakMilestone } = await import("@/lib/coin-manager");
+                await checkAndAwardStreakMilestone(payload.userId, newStreak);
+            }
+        }
+
+        // 5. Check mission progress
+        const { checkAllActiveMissions } = await import("@/lib/mission-checker");
+        const completedMissions = await checkAllActiveMissions(payload.userId);
+
         return successResponse({
             session: updatedSession,
-            xpEarned: 0,
+            xpEarned,
             durationMin,
-            isValidSession: false,
-            completedMissions: [],
-            message: "Session too short. Minimum 25 minutes required for XP and mission progress."
+            isValidSession: true,
+            completedMissions: completedMissions.map(m => ({ id: m.id, title: m.title, xpReward: m.xpReward })),
         });
+
     } catch (error: any) {
         if (error.message === "Unauthorized") {
             return errorResponse("Unauthorized", 401);

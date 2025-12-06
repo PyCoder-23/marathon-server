@@ -48,6 +48,11 @@ export async function GET(req: Request, { params }: { params: Promise<{ username
                 rank: 0 // Placeholder
             } : null,
             joinedAt: targetUser.createdAt,
+            equippedFrame: (targetUser as any).equippedFrame,
+            equippedNameplate: (targetUser as any).equippedNameplate,
+            equippedBanner: (targetUser as any).equippedBanner,
+            equippedBadge: (targetUser as any).equippedBadge,
+            coins: (targetUser as any).coins,
         };
 
         if (isLocked) {
@@ -87,52 +92,78 @@ export async function GET(req: Request, { params }: { params: Promise<{ username
         const hallOfFameWins = targetUser._count.monthlyWins + targetUser._count.weeklyWins;
 
         // 5. Graph Data (Last 7 Days) - REUSED LOGIC
+        // 5. Graph Data (Last 7 Days) - Optimized
         const weeklyActivity = [];
         const now = new Date();
         const istOffset = 5.5 * 60 * 60 * 1000;
-        const istTime = new Date(now.getTime() + istOffset);
+        const istNow = new Date(now.getTime() + istOffset);
 
-        const istYear = istTime.getUTCFullYear();
-        const istMonth = istTime.getUTCMonth();
-        const istDate = istTime.getUTCDate();
+        // Calculate the range for the last 7 days
+        // We go back 6 days from today, so range is [today-6, today]
+        const istYear = istNow.getUTCFullYear();
+        const istMonth = istNow.getUTCMonth();
+        const istDate = istNow.getUTCDate();
 
+        // Start of the 7-day window (00:00 IST of 6 days ago)
+        const startOfWindowIST = new Date(Date.UTC(istYear, istMonth, istDate - 6, 0, 0, 0));
+        const endOfWindowIST = new Date(Date.UTC(istYear, istMonth, istDate + 1, 0, 0, 0)); // Until tomorrow 00:00
+
+        const queryStart = new Date(startOfWindowIST.getTime() - istOffset);
+        const queryEnd = new Date(endOfWindowIST.getTime() - istOffset);
+
+        // Fetch all data in one go
+        const [allSessions, allXp] = await Promise.all([
+            prisma.session.findMany({
+                where: {
+                    userId: targetUser.id,
+                    startTs: { gte: queryStart, lt: queryEnd },
+                    completed: true,
+                },
+                select: { startTs: true, durationMin: true }
+            }),
+            prisma.xPTransaction.findMany({
+                where: {
+                    userId: targetUser.id,
+                    createdAt: { gte: queryStart, lt: queryEnd },
+                },
+                select: { createdAt: true, amount: true }
+            })
+        ]);
+
+        // Group by Date String (YYYY-MM-DD)
+        const sessionMap = new Map<string, typeof allSessions>();
+        const xpMap = new Map<string, typeof allXp>();
+
+        for (const s of allSessions) {
+            // Convert back to IST date string
+            const sDateIST = new Date(s.startTs.getTime() + istOffset);
+            const dateStr = sDateIST.toISOString().split('T')[0];
+            if (!sessionMap.has(dateStr)) sessionMap.set(dateStr, []);
+            sessionMap.get(dateStr)!.push(s);
+        }
+
+        for (const x of allXp) {
+            const xDateIST = new Date(x.createdAt.getTime() + istOffset);
+            const dateStr = xDateIST.toISOString().split('T')[0];
+            if (!xpMap.has(dateStr)) xpMap.set(dateStr, []);
+            xpMap.get(dateStr)!.push(x);
+        }
+
+        // Reconstruct the 7 days array
         for (let i = 6; i >= 0; i--) {
-            const targetDate = new Date(Date.UTC(istYear, istMonth, istDate - i, 0, 0, 0));
+            const d = new Date(Date.UTC(istYear, istMonth, istDate - i, 0, 0, 0));
+            const dateStr = d.toISOString().split('T')[0];
 
-            const yyyy = targetDate.getUTCFullYear();
-            const mm = String(targetDate.getUTCMonth() + 1).padStart(2, '0');
-            const dd = String(targetDate.getUTCDate()).padStart(2, '0');
-            const dateStr = `${yyyy}-${mm}-${dd}`;
-
-            const queryStart = new Date(targetDate.getTime() - istOffset);
-            const queryEnd = new Date(queryStart.getTime() + 24 * 60 * 60 * 1000);
-
-            // Optimized: We only need XP for the graph really, maybe minutes too
-            const [daySessions, dayXpTransactions] = await Promise.all([
-                prisma.session.findMany({
-                    where: {
-                        userId: targetUser.id,
-                        startTs: { gte: queryStart, lt: queryEnd },
-                        completed: true,
-                    },
-                    select: { durationMin: true }
-                }),
-                prisma.xPTransaction.findMany({
-                    where: {
-                        userId: targetUser.id,
-                        createdAt: { gte: queryStart, lt: queryEnd },
-                    },
-                    select: { amount: true }
-                })
-            ]);
+            const daySessions = sessionMap.get(dateStr) || [];
+            const dayXpTrans = xpMap.get(dateStr) || [];
 
             const dayMinutes = daySessions.reduce((sum, s) => sum + s.durationMin, 0);
-            const dayXp = dayXpTransactions.reduce((sum, t) => sum + t.amount, 0);
+            const dayXpAmount = dayXpTrans.reduce((sum, t) => sum + t.amount, 0);
 
             weeklyActivity.push({
                 date: dateStr,
                 hours: dayMinutes / 60,
-                xp: dayXp,
+                xp: dayXpAmount,
                 pomodoros: daySessions.length,
             });
         }

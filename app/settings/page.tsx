@@ -8,7 +8,8 @@ import { useToast } from "@/components/ui/toast-context";
 import { useAuth } from "@/lib/auth-context";
 import { api } from "@/lib/api-client";
 import { useState, useEffect } from "react";
-import { User, Mail, ImageIcon, Save, Loader2, Lock } from "lucide-react";
+import Link from "next/link";
+import { User, Mail, ImageIcon, Save, Loader2, Lock, ShieldCheck } from "lucide-react";
 
 export default function SettingsPage() {
     const { user, refreshUser } = useAuth();
@@ -245,6 +246,39 @@ export default function SettingsPage() {
                             )}
                         </Button>
                     </form>
+                </CardContent>
+            </Card>
+
+            <Card className="border-white/10 bg-black/40">
+                <CardHeader>
+                    <CardTitle>Appearance & Customization</CardTitle>
+                    <CardDescription>Customize your profile and cosmetics.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                    <div className="flex items-center justify-between p-4 border border-white/10 rounded-lg bg-white/5">
+                        <div className="space-y-1">
+                            <h4 className="font-medium text-white">Profile Cosmetics</h4>
+                            <p className="text-xs text-muted">Equip frames, nameplates, and banners from your inventory.</p>
+                        </div>
+                        <Link href="/shop">
+                            <Button variant="secondary">Go to Marketplace</Button>
+                        </Link>
+                    </div>
+
+                    <div className="flex items-center justify-between p-4 border border-white/10 rounded-lg bg-white/5">
+                        <div className="flex items-center gap-3">
+                            <div className="bg-blue-500/10 p-2 rounded-lg">
+                                <ShieldCheck className="w-6 h-6 text-blue-400" />
+                            </div>
+                            <div>
+                                <h4 className="font-medium text-white">Streak Freezes</h4>
+                                <p className="text-xs text-muted">You have <span className="text-white font-mono font-bold">{user?.streakFreezes || 0}</span> freezes available.</p>
+                            </div>
+                        </div>
+                        <Link href="/shop">
+                            <Button variant="outline" size="sm">Get More</Button>
+                        </Link>
+                    </div>
                 </CardContent>
             </Card>
 

@@ -16,6 +16,11 @@ interface ProfileData {
         isOwner: boolean;
         squad: { id: string; name: string; rank: number } | null;
         joinedAt: string;
+        equippedFrame?: string | null;
+        equippedNameplate?: string | null;
+        equippedBanner?: string | null;
+        equippedBadge?: string | null;
+        coins?: number;
     };
     locked: boolean;
     stats?: {
@@ -120,24 +125,31 @@ export default function ProfilePage() {
 
                 {/* LEFT: Profile Card */}
                 <div className="md:col-span-4 space-y-6">
-                    <Card className="border-white/10 bg-black/40 overflow-hidden relative">
-                        {/* Profile Header */}
-                        <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-primary/20 to-transparent"></div>
+                    <Card className="border-white/10 bg-black/40 overflow-hidden relative group">
+                        {/* Profile Header (Banner) */}
+                        <div
+                            className={`absolute top-0 left-0 w-full h-32 ${profile.equippedBanner || 'bg-gradient-to-b from-primary/20 to-transparent'}`}
+                            style={profile.equippedBanner?.startsWith('/') ? { backgroundImage: `url(${profile.equippedBanner})` } : {}}
+                        ></div>
                         <CardContent className="pt-12 relative z-10 flex flex-col items-center text-center">
 
-                            {/* PFP */}
-                            <div className="w-32 h-32 rounded-full border-4 border-black/50 bg-black shadow-lg mb-4 overflow-hidden relative">
-                                {profile.image ? (
-                                    <img src={profile.image} alt={profile.username} className="w-full h-full object-cover" />
-                                ) : (
-                                    <div className="w-full h-full flex items-center justify-center bg-gray-800 text-4xl font-bold text-white">
-                                        {profile.username.charAt(0)}
-                                    </div>
-                                )}
+                            {/* PFP with Frame */}
+                            <div className={`w-36 h-36 flex items-center justify-center mb-4 relative ${profile.equippedFrame || ''}`}>
+                                <div className="w-32 h-32 rounded-full border-4 border-black/50 bg-black shadow-lg overflow-hidden">
+                                    {profile.image ? (
+                                        <img src={profile.image} alt={profile.username} className="w-full h-full object-cover" />
+                                    ) : (
+                                        <div className="w-full h-full flex items-center justify-center bg-gray-800 text-4xl font-bold text-white">
+                                            {profile.username.charAt(0)}
+                                        </div>
+                                    )}
+                                </div>
                                 {/* Online indicator could go here */}
                             </div>
 
-                            <h1 className="text-3xl font-bold text-white mb-1">{profile.username}</h1>
+                            <h1 className={`text-3xl font-bold text-white mb-1 ${profile.equippedNameplate || ''}`}>
+                                {profile.username}
+                            </h1>
                             <p className="text-muted mb-6 flex items-center gap-2">
                                 <Users className="w-4 h-4" />
                                 {profile.squad ? profile.squad.name : "Lone Wolf"}
@@ -313,7 +325,7 @@ export default function ProfilePage() {
                     </Card>
 
                     {/* Additional Stats Box */}
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                         <Card className="border-white/10 bg-black/40 p-4 flex items-center gap-4">
                             <Clock className="w-8 h-8 text-blue-400" />
                             <div>
@@ -326,6 +338,13 @@ export default function ProfilePage() {
                             <div>
                                 <p className="text-2xl font-bold text-white">{stats.totalXp.toLocaleString()}</p>
                                 <p className="text-xs text-muted">Lifetime XP</p>
+                            </div>
+                        </Card>
+                        <Card className="border-white/10 bg-black/40 p-4 flex items-center gap-4">
+                            <div className="w-8 h-8 rounded-full bg-yellow-500/10 flex items-center justify-center border border-yellow-500/20 text-yellow-500 font-bold text-lg">$</div>
+                            <div>
+                                <p className="text-2xl font-bold text-white">{profile.coins || 0}</p>
+                                <p className="text-xs text-muted">Total Coins</p>
                             </div>
                         </Card>
                     </div>

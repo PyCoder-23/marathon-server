@@ -74,12 +74,43 @@ export default function DashboardPage() {
     const dailyGoal = 6.0; // hours
     const progressPercent = stats ? Math.min(100, (stats.today.hours / dailyGoal) * 100) : 0;
 
-    // Graph Scale Calculations
+    // Graph Scale Calculations (Nice Numbers Algorithm)
     const weeklyStats = stats?.weekly || [];
     const xpValues = weeklyStats.map(d => d.xp || 0);
-    const minY = Math.min(...xpValues, 0);
-    const maxY = Math.max(...xpValues, 100);
-    const yRange = maxY - minY || 100;
+    const rawMinY = Math.min(...xpValues, 0); // Always include 0
+    const rawMaxY = Math.max(...xpValues, 100); // Default max 100 if empty/low
+
+    const calculateNiceScale = (min: number, max: number, tickCount: number = 5) => {
+        if (min === max) {
+            return { min: 0, max: 100, step: 25, ticks: [0, 25, 50, 75, 100] };
+        }
+
+        const range = max - min;
+        const roughStep = range / (tickCount - 1);
+        const magnitude = Math.pow(10, Math.floor(Math.log10(roughStep)));
+        const normalizedStep = roughStep / magnitude;
+
+        let niceNormalizedStep;
+        if (normalizedStep <= 1) niceNormalizedStep = 1;
+        else if (normalizedStep <= 2) niceNormalizedStep = 2;
+        else if (normalizedStep <= 5) niceNormalizedStep = 5;
+        else niceNormalizedStep = 10;
+
+        const step = niceNormalizedStep * magnitude;
+        const niceMin = Math.floor(min / step) * step;
+        const niceMax = Math.ceil(max / step) * step;
+
+        // Generate ticks
+        const ticks = [];
+        for (let v = niceMin; v <= niceMax + (step * 0.1); v += step) {
+            ticks.push(v);
+        }
+
+        return { min: niceMin, max: niceMax, step, ticks };
+    };
+
+    const { min: minY, max: maxY, ticks: yTicks } = calculateNiceScale(rawMinY, rawMaxY, 5);
+    const yRange = maxY - minY;
 
     return (
         <div className="container mx-auto p-6 space-y-8">
@@ -124,20 +155,27 @@ export default function DashboardPage() {
                             ></div>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-4 pt-2">
-                            <div className="bg-white/5 p-3 rounded-lg border border-white/5">
-                                <p className="text-xs text-muted flex items-center gap-1">
-                                    <Target className="w-3 h-3" /> Pomodoros
+                        <div className="grid grid-cols-3 gap-2 pt-2">
+                            <div className="bg-white/5 p-2 rounded-lg border border-white/5">
+                                <p className="text-[10px] text-muted flex items-center gap-1 uppercase tracking-wider">
+                                    <Target className="w-3 h-3" /> Pomo
                                 </p>
-                                <p className="text-2xl font-bold text-white">{stats?.today.pomodoros || 0}</p>
+                                <p className="text-xl font-bold text-white">{stats?.today.pomodoros || 0}</p>
                             </div>
-                            <div className="bg-white/5 p-3 rounded-lg border border-white/5">
-                                <p className="text-xs text-muted flex items-center gap-1">
+                            <div className="bg-white/5 p-2 rounded-lg border border-white/5">
+                                <p className="text-[10px] text-muted flex items-center gap-1 uppercase tracking-wider">
                                     <Flame className="w-3 h-3" /> Streak
                                 </p>
-                                <p className="text-2xl font-bold text-orange-500">
+                                <p className="text-xl font-bold text-orange-500">
                                     {stats?.streak || 0}
-                                    <span className="text-xs text-muted ml-1">days</span>
+                                </p>
+                            </div>
+                            <div className="bg-white/5 p-2 rounded-lg border border-white/5">
+                                <p className="text-[10px] text-muted flex items-center gap-1 uppercase tracking-wider">
+                                    <span className="w-3 h-3 rounded-full bg-yellow-500/20 text-yellow-500 flex items-center justify-center text-[8px] font-bold">$</span> Coins
+                                </p>
+                                <p className="text-xl font-bold text-yellow-500">
+                                    {user?.coins || 0}
                                 </p>
                             </div>
                         </div>
@@ -155,8 +193,8 @@ export default function DashboardPage() {
                         <div className="h-[200px] relative">
                             {/* Y-axis labels */}
                             <div className="absolute left-0 top-0 bottom-8 w-10 flex flex-col justify-between text-xs text-muted font-mono">
-                                {[1, 0.75, 0.5, 0.25, 0].map((ratio) => (
-                                    <span key={ratio}>{Math.round(minY + (yRange * ratio)).toLocaleString()}</span>
+                                {[...yTicks].reverse().map((tick) => (
+                                    <span key={tick}>{tick.toLocaleString()}</span>
                                 ))}
                             </div>
 
@@ -164,13 +202,16 @@ export default function DashboardPage() {
                             <div className="absolute left-10 right-0 top-0 bottom-8 pl-2">
                                 <div className="w-full h-full relative border-l border-b border-white/10">
                                     {/* Grid lines */}
-                                    {[0, 0.25, 0.5, 0.75, 1].map((ratio, i) => (
-                                        <div
-                                            key={i}
-                                            className="absolute w-full border-t border-white/5"
-                                            style={{ top: `${ratio * 100}%` }}
-                                        />
-                                    ))}
+                                    {yTicks.map((tick) => {
+                                        const ratio = (tick - minY) / yRange;
+                                        return (
+                                            <div
+                                                key={tick}
+                                                className="absolute w-full border-t border-white/5"
+                                                style={{ bottom: `${ratio * 100}%` }}
+                                            />
+                                        );
+                                    })}
 
                                     {/* Zero Line (highlighted if visible) */}
                                     {minY < 0 && maxY > 0 && (

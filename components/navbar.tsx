@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { Menu, X, LogOut, User, Shield, Settings } from "lucide-react";
+import { Menu, X, LogOut, User, Shield, Settings, ShoppingBag } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/lib/auth-context";
 import {
@@ -66,7 +66,7 @@ export function Navbar() {
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                     <Button variant="ghost" className="flex items-center gap-2 pl-2 pr-4 hover:bg-white/5">
-                                        <div className="w-8 h-8 rounded-full bg-primary/20 border border-primary/50 flex items-center justify-center overflow-hidden">
+                                        <div className={`w-8 h-8 rounded-full bg-primary/20 border border-primary/50 flex items-center justify-center overflow-hidden ${user.equippedFrame || ''}`}>
                                             {user.image ? (
                                                 <img src={user.image} alt={user.username} className="w-full h-full object-cover" />
                                             ) : (
@@ -74,7 +74,7 @@ export function Navbar() {
                                             )}
                                         </div>
                                         <div className="flex flex-col items-start text-xs">
-                                            <span className="text-white font-medium">{user.username}</span>
+                                            <span className={`font-medium ${user.equippedNameplate || 'text-white'}`}>{user.username}</span>
                                             <span className="text-primary font-mono">{user.totalXp} XP</span>
                                         </div>
                                     </Button>
@@ -92,6 +92,12 @@ export function Navbar() {
                                         <DropdownMenuItem className="cursor-pointer">
                                             <Settings className="mr-2 h-4 w-4" />
                                             <span>Settings</span>
+                                        </DropdownMenuItem>
+                                    </Link>
+                                    <Link href="/shop">
+                                        <DropdownMenuItem className="cursor-pointer">
+                                            <ShoppingBag className="mr-2 h-4 w-4 text-purple-400" />
+                                            <span>Shop</span>
                                         </DropdownMenuItem>
                                     </Link>
                                     {user.isAdmin && (

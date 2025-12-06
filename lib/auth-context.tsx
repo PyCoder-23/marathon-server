@@ -14,6 +14,14 @@ interface User {
     squadId: string | null;
     image: string | null;
     isProfileLocked?: boolean;
+    // Shop & Cosmetics
+    coins?: number;
+    missionPardons?: number;
+    streakFreezes?: number;
+    equippedFrame?: string | null;
+    equippedNameplate?: string | null;
+    equippedBanner?: string | null;
+    equippedBadge?: string | null;
 }
 
 interface AuthContextType {

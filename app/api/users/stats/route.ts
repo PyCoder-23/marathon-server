@@ -28,7 +28,8 @@ export async function GET() {
         // Calculate today's stats
         const todayMinutes = todaySessions.reduce((sum, s) => sum + s.durationMin, 0);
         const todayHours = todayMinutes / 60;
-        const todayPomodoros = todaySessions.length;
+        // Only count sessions >= 25 minutes as "Pomodoros"
+        const todayPomodoros = todaySessions.filter(s => s.durationMin >= 25).length;
 
         // Get weekly activity (last 7 days including today)
         const weeklyActivity = [];
@@ -90,7 +91,7 @@ export async function GET() {
                 date: dateStr,
                 hours: dayMinutes / 60,
                 xp: dayXp,
-                pomodoros: daySessions.length,
+                pomodoros: daySessions.filter(s => s.durationMin >= 25).length,
             });
         }
 

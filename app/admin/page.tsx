@@ -24,6 +24,7 @@ interface User {
     totalMinutes: number;
     streakDays: number;
     bannedUntil: string | null;
+    coins: number;
     squad: { id: string; name: string } | null;
 }
 
@@ -41,6 +42,7 @@ export default function AdminDashboard() {
     const [squads, setSquads] = useState<{ id: string; name: string }[]>([]);
     const [editXp, setEditXp] = useState(0);
     const [editMinutes, setEditMinutes] = useState(0);
+    const [editCoins, setEditCoins] = useState(0);
     const [editSquadId, setEditSquadId] = useState<string>("");
 
     useEffect(() => {
@@ -57,7 +59,7 @@ export default function AdminDashboard() {
 
     async function fetchSquads() {
         try {
-            const data = await api.get("/api/squads"); // Assuming this endpoint exists and returns { squads: [] }
+            const data = await api.get("/api/squads");
             setSquads(data.squads);
         } catch (error) {
             console.error("Failed to fetch squads:", error);
@@ -106,6 +108,7 @@ export default function AdminDashboard() {
                 userId: editingUser.id,
                 totalXp: editXp,
                 totalMinutes: editMinutes,
+                coins: editCoins,
                 squadId: editSquadId
             });
             toast({ title: "User updated", description: "User stats have been updated." });
@@ -224,6 +227,7 @@ export default function AdminDashboard() {
                                                             setEditingUser(user);
                                                             setEditXp(user.totalXp);
                                                             setEditMinutes(user.totalMinutes);
+                                                            setEditCoins(user.coins);
                                                             setEditSquadId(user.squad?.id || "");
                                                         }}
                                                     >
@@ -274,6 +278,16 @@ export default function AdminDashboard() {
                                 type="number"
                                 value={editMinutes}
                                 onChange={(e) => setEditMinutes(parseInt(e.target.value))}
+                                className="col-span-3"
+                            />
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <label htmlFor="coins" className="text-right text-sm">Coins</label>
+                            <Input
+                                id="coins"
+                                type="number"
+                                value={editCoins}
+                                onChange={(e) => setEditCoins(parseInt(e.target.value))}
                                 className="col-span-3"
                             />
                         </div>

@@ -207,10 +207,58 @@ async function main() {
     }
     console.log("Missions seeded.");
 
-    // 4. Create Demo Users
-    // 4. Create Demo Users - REMOVED
-    console.log("Skipping demo users seed.");
-    console.log("Demo users seeded.");
+    // 4. Create Shop Items
+    // Clean up existing shop items first (optional, useful for development)
+    // await prisma.shopItem.deleteMany({});
+
+    const shopItems = [
+        // Consumables
+        { name: "Streak Freeze", description: "Preserve one missed day without losing your streak.", type: "FREEZE", price: 15, assetUrl: "/icons/freeze.svg", cssClass: "item-freeze" },
+        { name: "Mission Pardon", description: "Withdraw from a mission without penalty.", type: "PARDON", price: 50, assetUrl: "/icons/pardon.svg", cssClass: "item-pardon" },
+
+        // Exotic Nameplates
+        { name: "Aurora Borealis", description: "Shifting northern lights effect.", type: "NAMEPLATE", price: 800, cssClass: "name-aurora", isAnimated: true },
+        { name: "Fire God", description: "Raging inferno text.", type: "NAMEPLATE", price: 1000, cssClass: "name-fire-god", isAnimated: true },
+        { name: "Quantum Realm", description: "Sub-atomic particle shift.", type: "NAMEPLATE", price: 600, cssClass: "name-quantum", isAnimated: true },
+
+
+        // PFP Frames
+        { name: "Neon Blue Frame", description: "Minimalist neon blue border.", type: "FRAME", price: 100, cssClass: "frame-neon-blue" },
+        { name: "Neon Pink Frame", description: "Vibrant pink neon border.", type: "FRAME", price: 100, cssClass: "frame-neon-pink" },
+        { name: "Neon Green Frame", description: "Toxic green neon border.", type: "FRAME", price: 100, cssClass: "frame-neon-green" },
+        { name: "Gamer RGB", description: "Chroma RGB lighting effect.", type: "FRAME", price: 200, cssClass: "frame-gamer-rgb", isAnimated: true },
+        { name: "Anime Speedline", description: "High velocity action lines.", type: "FRAME", price: 200, cssClass: "frame-anime-speed" },
+        { name: "Cyber Glitch", description: "Digital distortion effect.", type: "FRAME", price: 200, cssClass: "frame-cyber-glitch", isAnimated: true },
+        { name: "Legendary Aura", description: "Golden emanating power.", type: "FRAME", price: 300, cssClass: "frame-legendary", isAnimated: true },
+        { name: "Cosmic Void", description: "Deep space particle effect.", type: "FRAME", price: 300, cssClass: "frame-cosmic", isAnimated: true },
+
+        // Nameplates
+        { name: "Neon Glow", description: "Subtle glowing username.", type: "NAMEPLATE", price: 150, cssClass: "name-neon-glow" },
+        { name: "Gradient Shimmer", description: "Shifting gradient text.", type: "NAMEPLATE", price: 200, cssClass: "name-gradient-shimmer", isAnimated: true },
+        { name: "Cosmic Pulse", description: "Pulsing starfield effect.", type: "NAMEPLATE", price: 250, cssClass: "name-cosmic-pulse", isAnimated: true },
+        { name: "Cyberpunk Glitch", description: "Tech glitch text effect.", type: "NAMEPLATE", price: 300, cssClass: "name-cyber-glitch", isAnimated: true },
+        { name: "Gold Shine", description: "Premium golden reflection.", type: "NAMEPLATE", price: 400, cssClass: "name-gold-shine", isAnimated: true },
+        { name: "Pastel Underline", description: "Soft animated underline.", type: "NAMEPLATE", price: 150, cssClass: "name-pastel-line", isAnimated: true },
+
+        // Banners
+        { name: "Midnight City", description: "Cyberpunk city skyline.", type: "BANNER", price: 200, assetUrl: "/banners/city.jpg", cssClass: "banner-city" },
+        { name: "Matrix Rain", description: "Digital code rain.", type: "BANNER", price: 300, assetUrl: "/banners/matrix.gif", cssClass: "banner-matrix", isAnimated: true },
+    ];
+
+    for (const item of shopItems) {
+        // Upsert based on name (ShopItem doesn't have unique name yet, but we'll findFirst)
+        const exists = await prisma.shopItem.findFirst({ where: { name: item.name } });
+        if (!exists) {
+            await prisma.shopItem.create({ data: item });
+        } else {
+            // Update price/desc if needed
+            await prisma.shopItem.update({
+                where: { id: exists.id },
+                data: item
+            });
+        }
+    }
+    console.log("Shop items seeded.");
 }
 
 main()

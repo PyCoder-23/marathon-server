@@ -214,3 +214,305 @@
     color: var(--muted-foreground) !important;
   }
 }
+
+/* -------------------------------------------------------------------------- */
+/*                                SHOP COSMETICS                              */
+/* -------------------------------------------------------------------------- */
+
+/* --- FRAMES --- */
+/* Applied to the Avatar/Image container (assumes rounded-full) */
+
+.frame-neon-blue {
+  border: 3px solid #3b82f6;
+  /* blue-500 */
+  box-shadow: 0 0 10px #3b82f6, inset 0 0 10px #3b82f6;
+}
+
+.frame-neon-pink {
+  border: 3px solid #ec4899;
+  /* pink-500 */
+  box-shadow: 0 0 10px #ec4899, inset 0 0 10px #ec4899;
+}
+
+.frame-neon-green {
+  border: 3px solid #22c55e;
+  /* green-500 */
+  box-shadow: 0 0 10px #22c55e, inset 0 0 10px #22c55e;
+}
+
+.frame-gamer-rgb {
+  border: 3px solid transparent;
+  background-image: linear-gradient(white, white), linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet);
+  background-origin: border-box;
+  background-clip: content-box, border-box;
+  animation: spin-rgb 4s linear infinite;
+}
+
+@keyframes spin-rgb {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Wait, rotating the frame rotates the image inside if not careful. */
+/* Better RGB approach for React: box-shadow */
+.frame-gamer-rgb {
+  animation: rgb-shadow 3s linear infinite;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+@keyframes rgb-shadow {
+  0% {
+    box-shadow: 0 0 15px red;
+    border-color: red;
+  }
+
+  33% {
+    box-shadow: 0 0 15px lime;
+    border-color: lime;
+  }
+
+  66% {
+    box-shadow: 0 0 15px blue;
+    border-color: blue;
+  }
+
+  100% {
+    box-shadow: 0 0 15px red;
+    border-color: red;
+  }
+}
+
+.frame-anime-speed {
+  border: 2px solid white;
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.1);
+  background: repeating-conic-gradient(transparent 0 15deg, rgba(255, 255, 255, 0.5) 15deg 30deg);
+  /* Simple effect */
+}
+
+.frame-cyber-glitch {
+  border: 2px solid #0ff;
+  box-shadow: -2px 0 #f0f, 2px 0 #0ff;
+  animation: glitch-box 2s infinite;
+}
+
+@keyframes glitch-box {
+  0% {
+    transform: translate(0);
+  }
+
+  2% {
+    transform: translate(-2px, 2px);
+  }
+
+  4% {
+    transform: translate(2px, -2px);
+  }
+
+  6% {
+    transform: translate(0);
+  }
+}
+
+.frame-legendary {
+  border: 3px solid #eab308;
+  /* yellow-500 */
+  box-shadow: 0 0 15px #eab308, 0 0 30px #eab308;
+  animation: pulse-gold 2s infinite;
+}
+
+@keyframes pulse-gold {
+  0% {
+    box-shadow: 0 0 15px #eab308;
+  }
+
+  50% {
+    box-shadow: 0 0 30px #ca8a04, 0 0 10px white;
+  }
+
+  100% {
+    box-shadow: 0 0 15px #eab308;
+  }
+}
+
+.frame-cosmic {
+  border: 2px solid #8b5cf6;
+  box-shadow: 0 0 20px #4c1d95;
+  background: radial-gradient(circle at 50% 50%, transparent 60%, #4c1d95 100%);
+}
+
+/* --- NAMEPLATES --- */
+
+.name-neon-glow {
+  text-shadow: 0 0 5px rgba(255, 255, 255, 0.8), 0 0 10px currentColor;
+}
+
+.name-gradient-shimmer {
+  background: linear-gradient(90deg, #ff00cc, #3333ff, #ff00cc);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shine 3s linear infinite;
+  font-weight: 800;
+}
+
+@keyframes shine {
+  to {
+    background-position: 200% center;
+  }
+}
+
+.name-cosmic-pulse {
+  color: #a78bfa;
+  text-shadow: 0 0 5px #8b5cf6;
+  animation: cosmic-text 3s infinite alternate;
+}
+
+@keyframes cosmic-text {
+  from {
+    color: #a78bfa;
+    text-shadow: 0 0 5px #8b5cf6;
+  }
+
+  to {
+    color: #ddd6fe;
+    text-shadow: 0 0 20px #6d28d9;
+  }
+}
+
+.name-cyber-glitch {
+  position: relative;
+  color: #22d3ee;
+}
+
+/* A simple implementation using text-shadow for glitch */
+.name-cyber-glitch:hover {
+  text-shadow: 2px 2px #ff00ff, -2px -2px #00ffff;
+}
+
+.name-gold-shine {
+  background: linear-gradient(to bottom, #fefce8 0%, #ca8a04 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 2px 5px rgba(202, 138, 4, 0.3);
+  font-weight: 900;
+}
+
+.name-pastel-line {
+  border-bottom: 2px solid #f9a8d4;
+  padding-bottom: 2px;
+}
+
+/* --- BANNERS --- */
+.banner-city {
+  background-image: url('/banners/city.jpg');
+  background-size: cover;
+  /* Fallback if file missing: gray */
+  background-position: center;
+  background-color: #1a1a1a;
+}
+
+.banner-matrix {
+  background-image: url('/banners/matrix.gif');
+  background-size: cover;
+  background-position: center;
+  background-color: #000;
+}
+
+/* --- EXOTIC NAMEPLATES --- */
+.name-aurora {
+  background: linear-gradient(90deg, #00ff99, #00ccff, #9900ff, #00ff99);
+  background-size: 300% auto;
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: aurora-flow 2s linear infinite;
+  /* Faster */
+  font-weight: 900;
+  text-shadow: 0 0 10px rgba(0, 255, 153, 0.5);
+  /* Stronger glow */
+  filter: drop-shadow(0 0 2px rgba(0, 255, 153, 0.3));
+}
+
+.name-fire-god {
+  background: linear-gradient(0deg, #b91c1c, #ef4444, #fbbf24, #fefce8);
+  /* Dark red to yellow to white */
+  background-size: 100% 200%;
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: fire-rise 0.8s linear infinite;
+  /* Much Faster */
+  text-shadow: 0 0 15px rgba(239, 68, 68, 0.8);
+  font-weight: 900;
+  filter: drop-shadow(0 -2px 2px rgba(255, 0, 0, 0.5));
+}
+
+.name-quantum {
+  background: linear-gradient(135deg, #00ffff 0%, #ff00ff 25%, #ffffff 50%, #ff00ff 75%, #00ffff 100%);
+  background-size: 200% 200%;
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: quantum-flux 0.5s linear infinite;
+  /* Very Fast jitter */
+  font-weight: 900;
+  letter-spacing: 2px;
+  text-shadow: 0 0 5px rgba(0, 255, 255, 0.5), 2px 0 0 rgba(255, 0, 255, 0.5), -2px 0 0 rgba(0, 255, 255, 0.5);
+  /* Glitch shadow */
+}
+
+@keyframes aurora-flow {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  100% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes fire-rise {
+  0% {
+    background-position: 0% 100%;
+    transform: scale(1);
+  }
+
+  50% {
+    background-position: 0% 0%;
+    transform: scale(1.02);
+  }
+
+  /* Slight pulse */
+  100% {
+    background-position: 0% 100%;
+    transform: scale(1);
+  }
+}
+
+@keyframes quantum-flux {
+  0% {
+    background-position: 0% 0%;
+    text-shadow: 2px 0 red, -2px 0 blue;
+  }
+
+  25% {
+    background-position: 100% 0%;
+    text-shadow: -2px 0 red, 2px 0 blue;
+  }
+
+  50% {
+    background-position: 100% 100%;
+    text-shadow: 2px 0 blue, -2px 0 red;
+  }
+
+  75% {
+    background-position: 0% 100%;
+    text-shadow: -2px 0 blue, 2px 0 red;
+  }
+
+  100% {
+    background-position: 0% 0%;
+    text-shadow: 2px 0 red, -2px 0 blue;
+  }
+}

@@ -21,6 +21,12 @@ export async function GET() {
                 image: true,
                 createdAt: true,
                 isProfileLocked: true,
+                coins: true,
+                streakFreezes: true,
+                equippedFrame: true,
+                equippedNameplate: true,
+                equippedBanner: true,
+                equippedBadge: true,
             } as any,
         });
 

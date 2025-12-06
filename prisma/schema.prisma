@@ -35,6 +35,7 @@ model User {
   image       String?
 
   isProfileLocked         Boolean   @default(false)
+  lastMissionCheck        DateTime  @default(now())
 
   // Verification & Reset
   isVerified              Boolean   @default(false)
@@ -42,6 +43,17 @@ model User {
   verificationCodeExpires DateTime?
   resetCode               String?
   resetCodeExpires        DateTime?
+
+  // Coins & Shop
+  coins            Int @default(0)
+  streakFreezes    Int @default(0)
+  missionPardons   Int @default(0)
+
+  // Equipped Cosmetics
+  equippedFrame       String? // Asset URL or Item ID
+  equippedNameplate   String?
+  equippedBanner      String?
+  equippedBadge       String?
 
   // Relations
   sessions            Session[]
@@ -51,6 +63,46 @@ model User {
   weeklyWins          UserWeeklyWinner[]
   events              Event[]
   tasks               Task[]
+  coinTransactions    CoinTransaction[]
+  inventory           UserItem[]
+}
+
+model ShopItem {
+  id          String     @id @default(cuid())
+  name        String
+  description String
+  type        String // "FRAME" | "NAMEPLATE" | "BANNER" | "BADGE" | "FREEZE"
+  price       Int
+  assetUrl    String?
+  cssClass    String? // For CSS-only effects
+  isAnimated  Boolean    @default(false)
+  createdAt   DateTime   @default(now())
+  userItems   UserItem[]
+}
+
+model UserItem {
+  id        String   @id @default(cuid())
+  userId    String
+  itemId    String
+  purchasedAt DateTime @default(now())
+  
+  user      User     @relation(fields: [userId], references: [id])
+  item      ShopItem @relation(fields: [itemId], references: [id])
+
+  @@unique([userId, itemId])
+}
+
+model CoinTransaction {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  amount      Int      // positive for earn, negative for spend
+  type        String   // "streak" | "competition" | "shop_purchase" | "admin"
+  description String
+  metadata    String?  // JSON string for extra data
+  createdAt   DateTime @default(now())
+
+  @@index([userId])
 }
 
 model Squad {
@@ -63,7 +115,6 @@ model Squad {
   members        User[]
   monthlyWinners MonthlyWinner[]
   weeklyWinners  WeeklyWinner[]
-  // computed fields handled in API: weeklyHours, monthlyXp, memberCount
 }
 
 model Session {

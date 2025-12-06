@@ -6,7 +6,7 @@ export async function POST(req: Request) {
     try {
         const adminPayload = await requireAdmin();
         const body = await req.json();
-        const { userId, totalXp, totalMinutes, squadId } = body;
+        const { userId, totalXp, totalMinutes, squadId, coins } = body;
 
         if (!userId) {
             return errorResponse("User ID is required", 400);
@@ -15,6 +15,7 @@ export async function POST(req: Request) {
         const updateData: any = {
             totalXp: totalXp !== undefined ? parseInt(totalXp) : undefined,
             totalMinutes: totalMinutes !== undefined ? parseInt(totalMinutes) : undefined,
+            coins: coins !== undefined ? parseInt(coins) : undefined,
         };
 
         if (squadId) {
@@ -32,7 +33,7 @@ export async function POST(req: Request) {
                 adminId: adminPayload.userId,
                 adminName: adminPayload.username || "Admin",
                 action: "UPDATE_USER_STATS",
-                details: `Updated user ${user.username} (XP: ${totalXp}, Min: ${totalMinutes}, Squad: ${squadId || "No Change"})`,
+                details: `Updated user ${user.username} (XP: ${totalXp}, Min: ${totalMinutes}, Coins: ${coins}, Squad: ${squadId || "No Change"})`,
                 userId: userId,
             },
         });

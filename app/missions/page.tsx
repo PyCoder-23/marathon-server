@@ -4,7 +4,18 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { CheckCircle2, Circle, Lock, Star, Timer, Trophy, Target } from "lucide-react";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { CheckCircle2, Star, Timer, Trophy, Target, AlertTriangle, Play } from "lucide-react";
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api-client";
 import { useAuth } from "@/lib/auth-context";
@@ -23,7 +34,7 @@ interface Mission {
 export default function MissionsPage() {
     const [missions, setMissions] = useState<Mission[]>([]);
     const [loading, setLoading] = useState(true);
-    const { refreshUser } = useAuth();
+    const { user, refreshUser } = useAuth();
 
     useEffect(() => {
         fetchMissions();
@@ -44,7 +55,7 @@ export default function MissionsPage() {
         try {
             setLoading(true);
             await api.post("/api/missions/start", { missionId });
-            await fetchMissions(); // Refresh list
+            await fetchMissions();
         } catch (error: any) {
             alert(error.message || "Failed to start mission");
         } finally {
@@ -58,13 +69,28 @@ export default function MissionsPage() {
             const data = await api.post("/api/missions/complete", { missionId });
             if (data.completed) {
                 await fetchMissions();
-                await refreshUser(); // Update XP in navbar
+                await refreshUser();
                 alert(`🎉 Mission Complete! +${data.xpAwarded} XP`);
             } else {
                 alert("❌ Mission criteria not yet met. Keep training!");
             }
         } catch (error: any) {
             alert(error.message || "Failed to complete mission");
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    async function handleWithdraw(missionId: string) {
+        try {
+            setLoading(true);
+            const res = await api.post("/api/missions/withdraw", { missionId });
+            await fetchMissions();
+            await refreshUser();
+            const method = res.method === "PARDON" ? "Used 1 Mission Pardon" : "Paid 50 Coins";
+            alert(`Withdrawn successfully (${method})`);
+        } catch (error: any) {
+            alert(error.message || "Failed to withdraw");
         } finally {
             setLoading(false);
         }
@@ -106,8 +132,10 @@ export default function MissionsPage() {
                             <MissionCard
                                 key={mission.id}
                                 mission={mission}
+                                user={user}
                                 onStart={() => handleStartMission(mission.id)}
                                 onComplete={() => handleCompleteMission(mission.id)}
+                                onWithdraw={() => handleWithdraw(mission.id)}
                             />
                         ))}
                     </div>
@@ -119,8 +147,10 @@ export default function MissionsPage() {
                             <MissionCard
                                 key={mission.id}
                                 mission={mission}
+                                user={user}
                                 onStart={() => handleStartMission(mission.id)}
                                 onComplete={() => handleCompleteMission(mission.id)}
+                                onWithdraw={() => handleWithdraw(mission.id)}
                             />
                         ))}
                     </div>
@@ -132,8 +162,10 @@ export default function MissionsPage() {
                             <MissionCard
                                 key={mission.id}
                                 mission={mission}
+                                user={user}
                                 onStart={() => handleStartMission(mission.id)}
                                 onComplete={() => handleCompleteMission(mission.id)}
+                                onWithdraw={() => handleWithdraw(mission.id)}
                             />
                         ))}
                     </div>
@@ -145,8 +177,10 @@ export default function MissionsPage() {
                             <MissionCard
                                 key={mission.id}
                                 mission={mission}
+                                user={user}
                                 onStart={() => handleStartMission(mission.id)}
                                 onComplete={() => handleCompleteMission(mission.id)}
+                                onWithdraw={() => handleWithdraw(mission.id)}
                             />
                         ))}
                     </div>
@@ -158,14 +192,18 @@ export default function MissionsPage() {
 
 function MissionCard({
     mission,
+    user,
     onStart,
-    onComplete
+    onComplete,
+    onWithdraw
 }: {
     mission: Mission;
+    user: any;
     onStart: () => void;
     onComplete: () => void;
+    onWithdraw: () => void;
 }) {
-    const difficultyColor = {
+    const difficultyColor: Record<string, string> = {
         EASY: "text-green-400 border-green-400/30 bg-green-400/10",
         MEDIUM: "text-yellow-400 border-yellow-400/30 bg-yellow-400/10",
         HARD: "text-red-400 border-red-400/30 bg-red-400/10",
@@ -175,7 +213,7 @@ function MissionCard({
         <Card className={`border-white/10 bg-black/40 backdrop-blur-sm hover:border-primary/30 transition-all duration-300 group ${mission.status === 'COMPLETED' ? 'opacity-70' : ''}`}>
             <CardHeader>
                 <div className="flex justify-between items-start mb-2">
-                    <Badge variant="outline" className={difficultyColor[mission.difficulty]}>
+                    <Badge variant="outline" className={difficultyColor[mission.difficulty] || difficultyColor.EASY}>
                         {mission.difficulty}
                     </Badge>
                     <div className="flex items-center text-primary font-mono text-sm">
@@ -198,23 +236,69 @@ function MissionCard({
                     <span>{mission.type.replace("_", " ")} Mission</span>
                 </div>
             </CardContent>
-            <CardFooter>
+            <CardFooter className="gap-2">
                 {mission.status === "AVAILABLE" && (
                     <Button
                         className="w-full shadow-[0_0_10px_rgba(0,255,149,0.2)]"
                         onClick={onStart}
                     >
+                        <Play className="w-4 h-4 mr-2" />
                         Accept Mission
                     </Button>
                 )}
                 {mission.status === "IN_PROGRESS" && (
-                    <Button
-                        variant="secondary"
-                        className="w-full bg-yellow-500/20 text-yellow-500 hover:bg-yellow-500/30 border border-yellow-500/50"
-                        onClick={onComplete}
-                    >
-                        Check Progress
-                    </Button>
+                    <>
+                        <Button
+                            variant="secondary"
+                            className="flex-1 bg-yellow-500/20 text-yellow-500 hover:bg-yellow-500/30 border border-yellow-500/50"
+                            onClick={onComplete}
+                        >
+                            Check Progress
+                        </Button>
+
+                        <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                                <Button variant="outline" size="icon" className="border-red-500/30 text-red-500 hover:bg-red-500/10">
+                                    <AlertTriangle className="w-4 h-4" />
+                                </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent className="bg-black border-white/10 text-white">
+                                <AlertDialogHeader>
+                                    <AlertDialogTitle>Withdraw from Mission?</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                        This will cancel the mission without an XP penalty.
+                                    </AlertDialogDescription>
+                                </AlertDialogHeader>
+
+                                <div className="py-4 space-y-2 text-sm">
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-muted">Mission Pardons (Owned):</span>
+                                        <span className={(user?.missionPardons || 0) > 0 ? "text-green-400 font-bold" : "text-white"}>
+                                            {user?.missionPardons || 0}
+                                        </span>
+                                    </div>
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-muted">Or Pay Coins:</span>
+                                        <span className="text-yellow-500 font-bold">50 C</span>
+                                    </div>
+                                    <div className="text-xs text-muted pt-2 text-right">
+                                        Your Balance: <span className="text-yellow-500">{user?.coins || 0} C</span>
+                                    </div>
+                                </div>
+
+                                <AlertDialogFooter>
+                                    <AlertDialogCancel className="border-white/10 hover:bg-white/5 hover:text-white">Cancel</AlertDialogCancel>
+                                    <AlertDialogAction
+                                        className="bg-red-600 hover:bg-red-700 text-white border-0"
+                                        onClick={onWithdraw}
+                                        disabled={!user || ((user.missionPardons || 0) === 0 && (user.coins || 0) < 50)}
+                                    >
+                                        {(user?.missionPardons || 0) > 0 ? "Use Pardon" : "Pay 50 Coins"}
+                                    </AlertDialogAction>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialog>
+                    </>
                 )}
                 {mission.status === "COMPLETED" && (
                     <Button variant="ghost" className="w-full text-green-400 cursor-default hover:text-green-400 hover:bg-transparent">

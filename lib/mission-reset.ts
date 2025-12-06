@@ -9,8 +9,29 @@ import { getISTDayStart, getISTWeekStart, getISTMonthStart } from "@/lib/timezon
 export async function resetExpiredMissions(userId: string) {
     const todayIST = getISTDayStart();
     const weekStartIST = getISTWeekStart();
-    const monthStartIST = getISTMonthStart();
 
+    // 1. Thread-safe Gatekeeper using Atomic Database Update
+    // Attempt to update lastMissionCheck only if it's older than today's start time (IST)
+    // This ensures this logic runs EXACTLY ONCE per day per user, preventing race conditions and double penalties.
+    const gatekeeperResult = await prisma.user.updateMany({
+        where: {
+            id: userId,
+            lastMissionCheck: { lt: todayIST }
+        } as any,
+        data: {
+            lastMissionCheck: new Date()
+        } as any
+    });
+
+    // If no rows were updated, it means lastMissionCheck >= todayIST
+    // Someone else (or another request) already ran the reset today. Abort.
+    if (gatekeeperResult.count === 0) {
+        return { skipped: true, resetCount: 0, penaltyCount: 0, totalPenalty: 0 };
+    }
+
+    console.log(`🛡️ Running mission reset for user ${userId} (Gatekeeper passed)`);
+
+    // 2. Logic: Fetch, Identify Expired, Penalize, Delete
     // Get all user's mission progress
     const allProgress = await prisma.missionProgress.findMany({
         where: { userId },
@@ -41,54 +62,44 @@ export async function resetExpiredMissions(userId: string) {
             toReset.push(progress.id);
 
             // If mission was not completed, add to penalty map
-            // Use Map to deduplicate - only penalize each unique mission once
             if (!progress.completed && !incompleteMissions.has(mission.id)) {
                 incompleteMissions.set(mission.id, { progress, mission });
             }
         }
     }
 
-    // Apply penalties for incomplete missions (deduplicated)
+    // Apply penalties for incomplete missions
     if (incompleteMissions.size > 0) {
-        const user = await prisma.user.findUnique({
-            where: { id: userId },
-            select: { id: true, squadId: true, totalXp: true }
-        });
+        // We need to fetch user again to get current XP (since we didn't lock the row fully, but we own the day)
+        // Note: There's a tiny race here if user earns XP *while* this runs, 
+        // but since we are doing an atomic decrement via prisma update, it's fine.
 
-        if (user) {
-            let totalPenalty = 0;
-            const penalizedMissions: string[] = [];
+        let totalPenalty = 0;
+        const penalizedMissions: string[] = [];
 
-            for (const [missionId, { mission }] of incompleteMissions) {
-                // Penalty is half the XP reward, rounded up
-                const penalty = Math.ceil(mission.xpReward / 2);
-                totalPenalty += penalty;
-                penalizedMissions.push(mission.title || missionId);
-            }
+        for (const [missionId, { mission }] of incompleteMissions) {
+            const penalty = Math.ceil(mission.xpReward / 2);
+            totalPenalty += penalty;
+            penalizedMissions.push(mission.title || missionId);
+        }
 
-            // Only apply penalty if there's actually a penalty
-            if (totalPenalty > 0) {
-                // Deduct XP from user (can go negative)
-                const newUserXp = user.totalXp - totalPenalty;
+        if (totalPenalty > 0) {
+            await prisma.user.update({
+                where: { id: userId },
+                data: { totalXp: { decrement: totalPenalty } }
+            });
 
-                await prisma.user.update({
-                    where: { id: userId },
-                    data: { totalXp: newUserXp }
-                });
+            await prisma.xPTransaction.create({
+                data: {
+                    userId: userId,
+                    amount: -totalPenalty,
+                    source: "mission",
+                    note: `Mission penalty: ${incompleteMissions.size} incomplete mission(s) (${penalizedMissions.join(', ')})`,
+                    createdAt: new Date()
+                }
+            });
 
-                // Create XP transaction record for penalty
-                await prisma.xPTransaction.create({
-                    data: {
-                        userId: userId,
-                        amount: -totalPenalty,
-                        source: "mission",
-                        note: `Mission penalty: ${incompleteMissions.size} incomplete mission(s) - ${penalizedMissions.join(', ')}`,
-                        createdAt: new Date()
-                    }
-                });
-
-                console.log(`⚠️ Penalized user ${userId}: -${totalPenalty} XP for ${incompleteMissions.size} incomplete mission(s): ${penalizedMissions.join(', ')}`);
-            }
+            console.log(`⚠️ Penalized user ${userId}: -${totalPenalty} XP`);
         }
     }
 
@@ -99,11 +110,11 @@ export async function resetExpiredMissions(userId: string) {
                 id: { in: toReset }
             }
         });
-
-        console.log(`🔄 Reset ${toReset.length} expired mission(s) for user ${userId}`);
+        console.log(`🔄 Reset ${toReset.length} expired mission(s)`);
     }
 
     return {
+        skipped: false,
         resetCount: toReset.length,
         penaltyCount: incompleteMissions.size,
         totalPenalty: Array.from(incompleteMissions.values()).reduce((sum, { mission }) => sum + Math.ceil(mission.xpReward / 2), 0)

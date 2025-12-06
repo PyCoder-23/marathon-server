@@ -22,10 +22,11 @@ TABLE OF CONTENTS
 7.  GLOBAL LEADERBOARDS
 8.  HALL OF FAME
 9.  THE PLANNER
-10. PROFILE & SECURITY
-11. ADMIN PANEL (ACCESS RESTRICTED)
-12. TECHNICAL SPECIFICATIONS (IST)
-13. TROUBLESHOOTING
+10. PUBLIC PROFILES & PRIVACY
+11. SETTINGS & SECURITY
+12. ADMIN PANEL (ACCESS RESTRICTED)
+13. TECHNICAL SPECIFICATIONS (IST)
+14. TROUBLESHOOTING
 
 ═══════════════════════════════════════════════════════════════════════════
 1. ACCOUNT & AUTHENTICATION
@@ -173,6 +174,9 @@ THE FLOW:
 3. "In Progress": The mission moves to your active Missions tab.
 4. "Check Progress": Click this button to sync your stats.
 5. "Claim": Once criteria are met, the XP is awarded instantly.
+6. "Withdraw": Realized you can't make it? Click Withdraw.
+   -> Uses 1 "Mission Pardon" (if owned) OR costs 50 Coins.
+   -> Removes the mission without XP penalty.
 
 THE PENALTY SYSTEM (WARNING):
 • This is what makes Marathon Server hardcore.
@@ -191,7 +195,30 @@ RESET TIMES:
 • Upon opening the Missions page after a reset, the system calculates results for expired missions and applies penalties or cleanups automatically.
 
 ═══════════════════════════════════════════════════════════════════════════
-6. SQUAD SYSTEM & RANKINGS
+6. SHOP & ECONOMY
+═══════════════════════════════════════════════════════════════════════════
+
+The Cyber Bazaar is where you spend Coins earned from missions and sessions.
+
+CURRENCY (COINS):
+• Earned by completing missions, certain challenges, or rare events.
+• Used to buy cosmetics and survival items.
+• Your balance is visible on the Dashboard and Profile.
+
+COSMETICS:
+• Profile Frames: Neon, RGB, and Animated borders for your avatar.
+• Nameplates: Glowing, Glitching, or Burning text effects for your username.
+• Banners (Coming Soon): Backgrounds for your profile header.
+• Equip/Unequip: Manage your look in the "Shop" tab. Select "Default" to remove an item.
+
+SURVIVAL GEAR:
+• Mission Pardon: A consumable item.
+  -> Max Inventory: 3.
+  -> Usage: Allows you to Withdraw from an active mission for FREE (no coin cost, no XP penalty).
+  -> Essential for saving your streak when life gets busy.
+
+═══════════════════════════════════════════════════════════════════════════
+7. SQUAD SYSTEM & RANKINGS
 ═══════════════════════════════════════════════════════════════════════════
 
 You are never fighting alone. You are part of a Squad.
@@ -202,27 +229,20 @@ SQUAD XP:
 • If you slack off or take penalties, your squad falls.
 
 RANK BADGES:
-The top 4 squads receive special animated badges on the Squads page:
-• #1: Diamond (The highest honor, blue shimmer).
-• #2: Gold (Yellow shimmer).
-• #3: Silver (Gray shimmer).
-• #4: Bronze (Orange shimmer).
-• Ranks 5+ get standard numeric badges.
+• Top 4 squads receive animated badges: Diamond, Gold, Silver, Bronze.
 
 SQUAD DETIALS PAGE:
 • Lists every member of the squad.
 • Sorted by XP contribution (Highest to Lowest).
-• Be careful: Only the active members contribute. If a high-XP user leaves, the squad score drops immediately.
 
 JOINING/LEAVING:
 • Currently, movement is restricted to Admin actions or initial auto-assignment.
-• This prevents "bandwagoning" (jumping to the winning team last minute).
 
 ═══════════════════════════════════════════════════════════════════════════
-7. GLOBAL LEADERBOARDS
+8. GLOBAL LEADERBOARDS
 ═══════════════════════════════════════════════════════════════════════════
 
-The arena where champions are proven.
+The arena where champions are proven. Your equipped Frames and Nameplates are visible here to all rivals.
 
 VIEWS:
 • Weekly: Resets every Monday. Shows who is winning *right now*.
@@ -230,40 +250,26 @@ VIEWS:
 • All-Time: The legends. Never resets.
 
 THE PODIUM:
-• The Top 3 users get a distinctive visual display at the top of the page.
-• #1: Center, Large, Gold Crown, Animated Glow.
-• #2: Left, Medium, Silver Medal.
-• #3: Right, Small, Bronze Medal.
+• Top 3 users get a distinctive visual display.
+• Equipped cosmetics (Frames/Nameplates) are fully animated on the podium.
 
 THE LIST:
-• Ranks 4 through 50 are shown in a tabular list below.
-• Your own entry is highlighted in blue so you can find yourself easily.
-• Columns: Rank, User (PFP+Name), Squad, Total XP, Total Hours.
-
-REAL-TIME:
-• Leaderboards update instantly. If you finish a session, you can refresh and see your rank jump up immediately.
+• Ranks 4 through 50 are shown in a tabular list.
+• Your own entry is highlighted in blue.
 
 ═══════════════════════════════════════════════════════════════════════════
-8. HALL OF FAME
+9. HALL OF FAME
 ═══════════════════════════════════════════════════════════════════════════
 
 History is written by the victors.
 
 PURPOSE:
-• Leaderboards reset (Weekly/Monthly), but the Hall of Fame is forever.
-• It captures a snapshot of the winners at the exact moment of reset.
-
-ARCHIVES:
+• Captures a snapshot of the winners at the exact moment of reset.
 • Weekly Winners: Archived every Monday at 12:01 AM IST.
 • Monthly Winners: Archived every 1st of the Month at 12:01 AM IST.
 
-CONTENT:
-• Displays the Top 3 Users and Top 3 Squads for that period.
-• You can browse back through history to see who dominated in previous months.
-• Validated proof of your legacy on the platform.
-
 ═══════════════════════════════════════════════════════════════════════════
-9. THE PLANNER
+10. THE PLANNER
 ═══════════════════════════════════════════════════════════════════════════
 
 Ideally, you shouldn't just study; you should plan.
@@ -284,10 +290,36 @@ SIMPLE TO-DO LIST:
 • Best for daily checklists like "Read Chapter 4", "Solve 5 problems".
 
 ═══════════════════════════════════════════════════════════════════════════
-10. PROFILE & SECURITY
+═══════════════════════════════════════════════════════════════════════════
+11. PUBLIC PROFILES & PRIVACY
 ═══════════════════════════════════════════════════════════════════════════
 
-Located at /settings or via the top-right Profile Dropdown.
+Every user has a public profile that showcases their achievements.
+
+ACCESS:
+• Visit via URL: /profile/<username>
+• Click "Profile" in the top-right dropdown menu.
+• Click any user's name on the Leaderboard or Squad pages.
+
+CONTENT:
+• PFP & Name: Identity and Squad affiliation. Includes equipped Frames/Nameplates.
+• Ranks: Displays Global Rank and Squad Rank.
+• Graph: A Weekly Activity graph (similar to Dashboard) showing their recent consistency.
+• Legacy: A count of their Hall of Fame wins.
+• Lifetime Stats: Total XP, Total Practice Minutes, and Total Coins.
+
+PRIVACY LOCK:
+• If you prefer to train in shadow, you can LOCK your profile.
+• Visitors to a locked profile see a blurred screen with a Lock icon.
+• No stats, graphs, or ranks are visible to the public.
+• You (the owner) can ALWAYS see your profile, even if locked.
+• Note: Your name and XP will still appear on Leaderboards, but clicking your name will lead to a locked page.
+
+═══════════════════════════════════════════════════════════════════════════
+12. SETTINGS & SECURITY
+═══════════════════════════════════════════════════════════════════════════
+
+Located at /settings or via "Settings" in the top-right dropdown.
 
 PROFILE CUSTOMIZATION:
 • Display Name: Update how you appear on leaderboards.
@@ -296,6 +328,9 @@ PROFILE CUSTOMIZATION:
   2. URL: Paste a link to an image hosted elsewhere.
   3. Upload: Upload a file from your device (Converted to Base64).
 
+PRIVACY SETTINGS:
+• "Lock Profile": A toggle switch to enable/disable the profile lock described in Section 11.
+
 ACCOUNT SECURITY:
 • Email Update: You can change your email, but you must enter your Current Password to verify ownership.
 • Change Password:
@@ -303,7 +338,7 @@ ACCOUNT SECURITY:
   - Critical for keeping your hard-earned XP safe.
 
 ═══════════════════════════════════════════════════════════════════════════
-11. ADMIN PANEL (ACCESS RESTRICTED)
+13. ADMIN PANEL (ACCESS RESTRICTED)
 ═══════════════════════════════════════════════════════════════════════════
 
 Accessible only to users with the `isAdmin` flag in the database.
@@ -313,7 +348,7 @@ DASHBOARD:
 
 USER MANAGEMENT:
 • Search: Find any user by Name or Email.
-• Edit Stats: Admins can manually correct XP or Minutes (e.g., if a bug occurred).
+• Edit Stats: Admins can manually correct XP, Minutes, or Coins.
 • Ban User:
   -> Banning locks the account for 7 Days.
   -> Banned users cannot login.
@@ -328,7 +363,7 @@ AUDIT LOGS:
 • Ensures admins are accountable for their changes.
 
 ═══════════════════════════════════════════════════════════════════════════
-12. TECHNICAL SPECIFICATIONS (TIMEZONE)
+14. TECHNICAL SPECIFICATIONS (TIMEZONE)
 ═══════════════════════════════════════════════════════════════════════════
 
 The Single Source of Truth:
@@ -342,7 +377,7 @@ WHY IS THIS IMPORTANT?
    -> If you study at 11:55 PM IST and finish at 12:20 AM IST, the session counts for the day it *started* (usually) or the XP is awarded when it *ends*. (In Marathon Server, XP is awarded at the STOP moment, so it counts for the day you finished).
 
 ═══════════════════════════════════════════════════════════════════════════
-13. TROUBLESHOOTING
+15. TROUBLESHOOTING
 ═══════════════════════════════════════════════════════════════════════════
 
 Q: My XP shows negative?
@@ -359,6 +394,9 @@ A: Working as intended. Minimum session length is 25 minutes.
 
 Q: Can I pause a session?
 A: No. The timer runs continuously. Pause is for the weak. (Technical reason: simpler verification logic).
+
+Q: My profile says "Locked" to my friend?
+A: You enabled "Lock Profile" in Settings. Disable it if you want them to see your stats.
 
 ═══════════════════════════════════════════════════════════════════════════
                     Train Hard. Stay Consistent.

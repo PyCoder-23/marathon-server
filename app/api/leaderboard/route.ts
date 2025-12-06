@@ -74,23 +74,27 @@ export async function GET(req: Request) {
                     id: true,
                     username: true,
                     image: true,
-                    totalMinutes: true, // This is all-time, might want period specific but schema doesn't support easily without transaction sum
+                    totalMinutes: true,
                     squad: {
                         select: { name: true }
-                    }
-                }
+                    },
+                    equippedFrame: true,
+                    equippedNameplate: true,
+                } as any
             });
 
             // Merge data
             rankedUsers = xpAggregates.map((agg: any) => {
-                const user = users.find((u: any) => u.id === agg.userId);
+                const user: any = users.find((u: any) => u.id === agg.userId);
                 return {
                     id: agg.userId,
                     username: user?.username || "Unknown",
                     image: user?.image || null,
                     totalXp: agg._sum.amount || 0,
-                    totalMinutes: user?.totalMinutes || 0, // Showing all-time minutes for now as approx
+                    totalMinutes: user?.totalMinutes || 0,
                     squad: user?.squad,
+                    equippedFrame: user?.equippedFrame,
+                    equippedNameplate: user?.equippedNameplate,
                 };
             });
         }
