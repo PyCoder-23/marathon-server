@@ -1,33 +1,50 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { requireAuth, errorResponse, successResponse } from "@/lib/api-helpers";
+import { cache, cacheKey, CacheTTL } from "@/lib/cache";
 
 export async function GET() {
     try {
         await requireAuth();
 
-        // Get all squads with member counts
+        // ✅ Check cache first
+        const key = cacheKey('squads', 'all');
+        const cached = cache.get(key);
+        if (cached) {
+            return successResponse(cached);
+        }
+
+        // ✅ Get squads without loading all members
         const squads = await prisma.squad.findMany({
-            include: {
-                _count: {
-                    select: { members: true },
-                },
-                members: {
-                    select: {
-                        totalXp: true,
-                        totalMinutes: true,
-                    }
-                }
-            },
+            select: {
+                id: true,
+                name: true,
+                description: true,
+                slogan: true,
+                bannerUrl: true,
+            }
         });
 
-        // Calculate stats for each squad
-        const squadsWithStats = squads.map((squad: any) => {
-            const totalXp = squad.members.reduce((sum: number, member: any) => sum + member.totalXp, 0);
-            const totalMinutes = squad.members.reduce((sum: number, member: any) => sum + member.totalMinutes, 0);
-            const memberCount = squad._count.members;
+        // ✅ Get aggregated stats in parallel for ALL squads at once
+        const statsPromises = squads.map((squad: any) =>
+            prisma.user.aggregate({
+                where: { squadId: squad.id },
+                _sum: {
+                    totalXp: true,
+                    totalMinutes: true,
+                },
+                _count: true
+            })
+        );
 
-            // Calculate average XP per member (avoid division by zero)
+        const allStats = await Promise.all(statsPromises);
+
+        // ✅ Combine squad data with stats
+        const squadsWithStats = squads.map((squad: any, index: number) => {
+            const stats = allStats[index];
+            const totalXp = stats._sum.totalXp || 0;
+            const totalMinutes = stats._sum.totalMinutes || 0;
+            const memberCount = stats._count;
             const averageXp = memberCount > 0 ? Math.floor(totalXp / memberCount) : 0;
 
             return {
@@ -52,7 +69,12 @@ export async function GET() {
             rank: index + 1,
         }));
 
-        return successResponse({ squads: rankedSquads });
+        const result = { squads: rankedSquads };
+
+        // ✅ Cache for 2 minutes
+        cache.set(key, result, CacheTTL.MEDIUM);
+
+        return successResponse(result);
     } catch (error: any) {
         if (error.message === "Unauthorized") {
             return errorResponse("Unauthorized", 401);

@@ -1,404 +1,661 @@
-═══════════════════════════════════════════════════════════════════════════
-                        MARATHON SERVER - OFFICIAL USER GUIDE
-═══════════════════════════════════════════════════════════════════════════
+═══════════════════════════════════════════════════════════════════════════════
+                        MARATHON SERVER - USER GUIDE
+                     A Futuristic Study Community Platform
+═══════════════════════════════════════════════════════════════════════════════
 
-Welcome to Marathon Server - the ultimate gamified productivity platform designed 
-to turn your study habits into a competitive sport. 
-
-This comprehensive guide covers every single feature, mechanic, and rule 
-of the platform. Whether you are a cadet just starting out or a seasoned 
-veteran aiming for the Hall of Fame, this is your manual.
-
-═══════════════════════════════════════════════════════════════════════════
 TABLE OF CONTENTS
-═══════════════════════════════════════════════════════════════════════════
+─────────────────────────────────────────────────────────────────────────────
+1. Introduction & Overview
+2. Getting Started
+3. Core Features
+   3.1 Dashboard
+   3.2 Session Timer
+   3.3 Missions System
+   3.4 Leaderboard
+   3.5 Squads
+   3.6 Shop & Cosmetics
+   3.7 Planner & Calendar
+   3.8 History
+   3.9 Settings
+4. Admin Features
+5. XP & Progression System
+6. Tips & Best Practices
+7. FAQ & Troubleshooting
 
-1.  ACCOUNT & AUTHENTICATION
-2.  ONBOARDING & SQUAD ASSIGNMENT
-3.  COMMAND CENTER (DASHBOARD)
-4.  THE STUDY TIMER & XP MECHANICS
-5.  MISSION CONTROL & PENALTIES
-6.  SQUAD SYSTEM & RANKINGS
-7.  GLOBAL LEADERBOARDS
-8.  HALL OF FAME
-9.  THE PLANNER
-10. PUBLIC PROFILES & PRIVACY
-11. SETTINGS & SECURITY
-12. ADMIN PANEL (ACCESS RESTRICTED)
-13. TECHNICAL SPECIFICATIONS (IST)
-14. TROUBLESHOOTING
+═══════════════════════════════════════════════════════════════════════════════
+1. INTRODUCTION & OVERVIEW
+═══════════════════════════════════════════════════════════════════════════════
 
-═══════════════════════════════════════════════════════════════════════════
-1. ACCOUNT & AUTHENTICATION
-═══════════════════════════════════════════════════════════════════════════
+Marathon Server is a professional-but-fun study community platform designed to 
+help students build consistency and discipline through gamification. The 
+platform combines study tracking, team competition, and achievement systems to 
+create an engaging learning environment.
 
-The first step to glory is securing your identity.
+KEY CONCEPTS:
+• XP (Experience Points): Earned through study sessions and completing missions
+• Sessions: Timed study periods (minimum 25 minutes for rewards)
+• Missions: Daily, weekly, and long-term objectives
+• Squads: Teams that compete for top rankings
+• Coins: Currency earned through streaks and competitions
+• Cosmetics: Profile customization items purchased with coins
 
-SIGNING UP:
-• Navigate to the /signup page.
-• Enter a unique Username (this will be your public identity).
-• Enter a valid Email Address (required for verification and recovery).
-• Create a strong Password.
-• Click "Join Camp".
-  -> Triggers an email verification flow.
-  -> Check your email inbox (and spam folder) for a 6-digit code.
-  -> Enter the code on the verification page to activate your account.
+═══════════════════════════════════════════════════════════════════════════════
+2. GETTING STARTED
+═══════════════════════════════════════════════════════════════════════════════
 
-LOGGING IN:
-• Navigate to /login.
-• You can log in using either your Username OR Email.
-• The system is case-insensitive (e.g., "UserOne" and "userone" work the same).
-• Enter your password and click "Login".
-• If valid, you are redirected to the Dashboard.
-• Your session is persistent; you won't need to log in every time unless you logout.
+ACCOUNT CREATION
+─────────────────────────────────────────────────────────────────────────────
+1. Navigate to the homepage (http://localhost:3000)
+2. Click "Start Training" or navigate to /signup
+3. Fill in the registration form:
+   • Email address (must be unique)
+   • Username (must be unique)
+   • Password (secure password required)
+   • Optional: Discord handle
+4. Verify your email (if email verification is enabled)
+5. You'll be redirected to the welcome page
 
-FORGOT PASSWORD:
-• If you lose your credentials, click "Forgot Password?" on the login screen.
-• Enter your registered Email Address.
-• The system sends a secure 6-digit reset code to your inbox.
-• On the next screen, enter:
-  a. The 6-digit code
-  b. Your NEW password
-• Once verified, your password is instantly updated, and you can log in.
+LOGGING IN
+─────────────────────────────────────────────────────────────────────────────
+1. Navigate to /login
+2. Enter your email and password
+3. Click "Login"
+4. You'll be redirected to the dashboard
 
-═══════════════════════════════════════════════════════════════════════════
-2. ONBOARDING & SQUAD ASSIGNMENT
-═══════════════════════════════════════════════════════════════════════════
+FORGOT PASSWORD
+─────────────────────────────────────────────────────────────────────────────
+1. Click "Forgot Password" on the login page
+2. Enter your registered email
+3. Check your email for a reset code
+4. Enter the code on the verification page
+5. Set your new password
 
-Marathon Server uses an automated balancing system to ensure fair competition.
+═══════════════════════════════════════════════════════════════════════════════
+3. CORE FEATURES
+═══════════════════════════════════════════════════════════════════════════════
 
-AUTO-SQUAD ASSIGNMENT:
-• Upon account creation, you do not choose a squad manually.
-• The "Sorting Hat" algorithm assigns you to the Squad with the LOWEST Total XP.
-• Why? This prevents "super squads" from dominating simply by having the most members.
-• It ensures that new reinforcements (you!) go to the teams that need them most.
+3.1 DASHBOARD
+─────────────────────────────────────────────────────────────────────────────
+The dashboard is your central hub, displaying:
 
-DEFAULT PROFILE PICTURE:
-• You are automatically assigned one of 10 high-quality default avatars (pfp1-pfp10).
-• Assignments are random based on your User ID.
-• You can change this later in Settings.
+TODAY'S STATS:
+• Hours studied today
+• Pomodoros (sessions) completed
+• Total minutes
 
-WELCOME BRIEFING:
-• After verification, you are taken to a /welcome page.
-• It gives you a quick rundown of the platform's core philosophy.
-• Provides access to the official Discord community.
+OVERALL STATS:
+• Total XP
+• Current streak (consecutive days)
+• Total study hours
+• Total sessions completed
 
-═══════════════════════════════════════════════════════════════════════════
-3. COMMAND CENTER (DASHBOARD)
-═══════════════════════════════════════════════════════════════════════════
+WEEKLY ACTIVITY CHART:
+• Visual graph showing your study activity over the past 7 days
+• Displays hours, sessions, and XP earned per day
+• Hover over bars to see detailed stats
 
-The Dashboard (/dashboard) is your HQ. It is divided into strategic sectors.
+SQUAD INFORMATION:
+• Your current squad name and slogan
+• Quick link to squad details
 
-A. DAILY PROGRESS STATS (Top Left Card):
-• Today's Hours: Total study time logged *Since 12:00 AM IST Today*.
-• Goal: A fixed daily target (Default: 6.0 Hours).
-• Progress Bar: Visualizes how close you are to the 6-hour daily goal.
-• Pomodoros: Counts how many full 25-minute sessions you've finished today.
-• Streak: Current consecutive days studied (maintained by studying once/day IST).
+QUICK ACTIONS:
+• Start Session button (launches session timer)
+• View Missions
+• View Leaderboard
+• View History
 
-B. WEEKLY XP GRAPH (Large Right Card):
-• Visualizes your performance over the last 7 days.
-• X-Axis: Displays the Day Name (e.g., Mon, Tue, Wed).
-• Y-Axis: Shows XP gained.
-• Data Alignment: Strictly follows IST (Indian Standard Time).
-  -> The last point on the right is always "Today" (IST).
-  -> The graph updates in real-time as you finish sessions.
-• Interactive: Hover over any point to see the exact Date and precise XP amount.
+3.2 SESSION TIMER
+─────────────────────────────────────────────────────────────────────────────
+The session timer is the core of your study tracking.
 
-C. THE SESSION TIMER (Middle/Left):
-• The heartbeat of the app.
-• Large digital display (MM:SS).
-• "Start Session" / "Stop Session" buttons.
-• Subject Input: Optional text field to tag your session (e.g., "Math", "History").
+HOW TO USE:
+1. Click "Start Session" from the dashboard
+2. Optional: Add a subject tag (e.g., "Math", "Physics")
+3. Click the Play button to start the timer
+4. Study while the timer runs
+5. Click Pause to temporarily stop (timer continues in background)
+6. Click Stop to end the session
 
-D. SQUAD STATUS (Bottom Right):
-• Shows your current Squad's banner, Name, and Slogan.
-• Displays a "View Squad Details" button for quick access to your teammates.
+IMPORTANT RULES:
+• Minimum session length: 25 minutes
+• Sessions under 25 minutes will trigger a confirmation popup
+• Only completed sessions ≥25 minutes count toward:
+  - XP rewards
+  - Mission progress
+  - Session count
+  - Total study time
+• XP earned: Based on duration (typically 1 XP per minute)
 
-E. QUICK ACTIONS (Bottom Row):
-• Buttons to quickly jump to Missions, Squads, Leaderboard, or History.
+SESSION FEATURES:
+• Real-time timer display (HH:MM:SS format)
+• Subject tagging for organization
+• Automatic XP calculation
+• Mission progress tracking
+• Anti-cheat detection (sessions flagged if suspicious)
 
-═══════════════════════════════════════════════════════════════════════════
-4. THE STUDY TIMER & XP MECHANICS
-═══════════════════════════════════════════════════════════════════════════
-
-Marathon Server rewards *consistency*, not just presence.
-
-THE 25-MINUTE RULE:
-• You ONLY earn XP for sessions that are 25 minutes or longer.
-• This is based on the Pomodoro technique.
-• If you stop a session at 24 minutes and 59 seconds:
-  -> YOU EARN 0 XP.
-  -> It does NOT count towards missions.
-  -> It does NOT increment your streak.
-• A warning popup appears if you try to stop early, giving you a chance to continue.
-
-XP CALCULATION FORMULA:
-• Rate: 20 XP per 25-minute block.
-• We calculate "Blocks" = floor(Total Minutes / 25).
-• Total XP = Blocks * 20.
-  -> Example: 25 mins = 20 XP.
-  -> Example: 49 mins = 20 XP (Only 1 full block).
-  -> Example: 50 mins = 40 XP (2 full blocks).
-• Why? This encourages finishing that extra few minutes to complete the cycle.
-
-SUBJECT TAGGING:
-• You can enter a subject before or during a session.
-• This is saved to your session history for your own tracking.
-• Useful for reviewing what you spent your time on later.
-
-SESSION STATE:
-• If you close the tab or refresh, the timer logic persists on the server.
-• However, ensure you have the tab open to "Stop" it and claim rewards.
-• Only ONE active session is allowed per user at a time.
-
-═══════════════════════════════════════════════════════════════════════════
-5. MISSION CONTROL & PENALTIES
-═══════════════════════════════════════════════════════════════════════════
-
-Missions are high-stakes contracts you sign to earn bonus XP.
+3.3 MISSIONS SYSTEM
+─────────────────────────────────────────────────────────────────────────────
+Missions are objectives that reward XP upon completion.
 
 MISSION TYPES:
-• Daily: Expires at 12:00 AM IST Tonight.
-• Weekly: Expires at 12:00 AM IST on Monday.
-• Long-Term: No expiry, milestone-based achievements.
+1. DAILY: Reset every day at midnight
+2. WEEKLY: Reset every Monday
+3. LONG_TERM: Ongoing objectives
 
-DIFFICULTY TIERS:
-• Easy (Green): 50-100 XP. Simple tasks like "Study 50 minutes".
-• Medium (Yellow): 100-200 XP. Moderate tasks like "Complete 4 sessions".
-• Hard (Red): 200-300 XP. Challening tasks like "Study 6 hours in a day".
+DIFFICULTY LEVELS:
+• EASY: Lower XP rewards, simpler objectives
+• MEDIUM: Moderate XP rewards
+• HARD: Higher XP rewards, challenging objectives
 
-THE FLOW:
-1. "Available" Tab: Browse missions here.
-2. "Accept": You MUST click Accept to start tracking a mission.
-3. "In Progress": The mission moves to your active Missions tab.
-4. "Check Progress": Click this button to sync your stats.
-5. "Claim": Once criteria are met, the XP is awarded instantly.
-6. "Withdraw": Realized you can't make it? Click Withdraw.
-   -> Uses 1 "Mission Pardon" (if owned) OR costs 50 Coins.
-   -> Removes the mission without XP penalty.
+MISSION STATUSES:
+• AVAILABLE: Not yet started
+• IN_PROGRESS: Currently active
+• COMPLETED: Finished and rewarded
 
-THE PENALTY SYSTEM (WARNING):
-• This is what makes Marathon Server hardcore.
-• If you ACCEPT a mission but FAIL to complete it before it expires:
-  -> You are PENALIZED.
-  -> Penalty Amount = 50% of the Release Reward (Rounded Up).
-• Example: You accept a Hard Mission (Reward: 300 XP).
-  -> You fail to finish it by reset time.
-  -> DEDUCTION: -150 XP.
-• Yes, your total XP can go NEGATIVE.
-• Strategy: Do not accept missions unless you are sure you can finish them.
+HOW TO COMPLETE MISSIONS:
+1. Navigate to /missions
+2. Browse available missions
+3. Click "Start Mission" to begin tracking
+4. Complete the objective (e.g., "Study for 60 minutes")
+5. Click "Complete Mission" when done
+6. System verifies completion automatically
+7. XP is awarded if criteria are met
 
-RESET TIMES:
-• Daily Missions reset every single night at 12:00 AM IST.
-• Weekly Missions reset every Monday at 12:00 AM IST.
-• Upon opening the Missions page after a reset, the system calculates results for expired missions and applies penalties or cleanups automatically.
+MISSION EXAMPLES:
+• "Early Bird": Study before 9 AM
+• "Night Owl": Study after 9 PM
+• "Weekend Warrior": Study on Saturday or Sunday
+• "Marathon Session": Complete a 2-hour session
+• "Consistency King": Study 5 days in a row
 
-═══════════════════════════════════════════════════════════════════════════
-6. SHOP & ECONOMY
-═══════════════════════════════════════════════════════════════════════════
+MISSION WITHDRAWAL:
+• You can withdraw from a mission if you can't complete it
+• Click "Withdraw" on the mission card
+• No penalties for withdrawal
 
-The Cyber Bazaar is where you spend Coins earned from missions and sessions.
+3.4 LEADERBOARD
+─────────────────────────────────────────────────────────────────────────────
+The leaderboard displays top performers across different time periods.
 
-CURRENCY (COINS):
-• Earned by completing missions, certain challenges, or rare events.
-• Used to buy cosmetics and survival items.
-• Your balance is visible on the Dashboard and Profile.
+LEADERBOARD TABS:
+1. ALL-TIME: Total XP since account creation
+2. MONTHLY: XP earned this month
+3. WEEKLY: XP earned this week
 
-COSMETICS:
-• Profile Frames: Neon, RGB, and Animated borders for your avatar.
-• Nameplates: Glowing, Glitching, or Burning text effects for your username.
-• Banners (Coming Soon): Backgrounds for your profile header.
-• Equip/Unequip: Manage your look in the "Shop" tab. Select "Default" to remove an item.
+LEADERBOARD DISPLAY:
+• Rank #1-3: Special medal icons (Gold, Silver, Bronze)
+• Your position is highlighted
+• Shows: Username, Squad, Total XP, Study Time
+• Profile pictures and equipped cosmetics visible
 
-SURVIVAL GEAR:
-• Mission Pardon: A consumable item.
-  -> Max Inventory: 3.
-  -> Usage: Allows you to Withdraw from an active mission for FREE (no coin cost, no XP penalty).
-  -> Essential for saving your streak when life gets busy.
+RANK INDICATORS:
+• 🥇 Rank #1: Gold Crown
+• 🥈 Rank #2: Silver Medal
+• 🥉 Rank #3: Bronze Medal
+• Rank #4+: Numbered ranking
 
-═══════════════════════════════════════════════════════════════════════════
-7. SQUAD SYSTEM & RANKINGS
-═══════════════════════════════════════════════════════════════════════════
+COSMETIC DISPLAY:
+• Equipped frames appear around profile pictures
+• Nameplates show custom styling
 
-You are never fighting alone. You are part of a Squad.
+3.5 SQUADS
+─────────────────────────────────────────────────────────────────────────────
+Squads are teams that compete for collective XP.
 
-SQUAD XP:
-• A Squad's Score is the SUM of all its current members' Total XP.
-• If you work hard, your squad rises.
-• If you slack off or take penalties, your squad falls.
+SQUAD FEATURES:
+• Team-based competition
+• Combined XP from all members
+• Squad rankings (Diamond, Gold, Silver, Bronze)
+• Squad slogans and descriptions
+• Member count and average XP display
 
-RANK BADGES:
-• Top 4 squads receive animated badges: Diamond, Gold, Silver, Bronze.
+SQUAD RANKINGS:
+• Rank #1: Diamond (with shimmer animation)
+• Rank #2: Gold (with shimmer animation)
+• Rank #3: Silver (with shimmer animation)
+• Rank #4: Bronze (with shimmer animation)
+• Rank #5+: Standard display
 
-SQUAD DETIALS PAGE:
-• Lists every member of the squad.
-• Sorted by XP contribution (Highest to Lowest).
+HOW TO JOIN A SQUAD:
+1. Navigate to /squads
+2. Browse available squads
+3. Click "View Squad" on your preferred team
+4. Click "Join Squad" (if available)
+5. Admin assigns you to the squad
 
-JOINING/LEAVING:
-• Currently, movement is restricted to Admin actions or initial auto-assignment.
+SQUAD DETAILS PAGE:
+• View all squad members
+• See individual member contributions
+• Squad total XP and ranking
+• Squad banner and description
 
-═══════════════════════════════════════════════════════════════════════════
-8. GLOBAL LEADERBOARDS
-═══════════════════════════════════════════════════════════════════════════
+3.6 SHOP & COSMETICS
+─────────────────────────────────────────────────────────────────────────────
+The shop allows you to purchase cosmetic items with coins.
 
-The arena where champions are proven. Your equipped Frames and Nameplates are visible here to all rivals.
+EARNING COINS:
+• Daily streak bonuses
+• Competition rewards (weekly/monthly winners)
+• Special achievements
+• Admin grants
 
-VIEWS:
-• Weekly: Resets every Monday. Shows who is winning *right now*.
-• Monthly: Resets on the 1st. Shows consistent performance over 30 days.
-• All-Time: The legends. Never resets.
+COSMETIC TYPES:
+1. FRAMES: Border around your profile picture
+2. NAMEPLATES: Custom styling for your username
+3. BANNERS: Profile banner backgrounds
+4. BADGES: Achievement badges
+5. CONSUMABLES:
+   • Streak Freezes: Protect your streak for one day
+   • Mission Pardons: Skip a failed mission penalty
 
-THE PODIUM:
-• Top 3 users get a distinctive visual display.
-• Equipped cosmetics (Frames/Nameplates) are fully animated on the podium.
+HOW TO PURCHASE:
+1. Navigate to /shop
+2. Browse items by category
+3. Click "Buy" on desired item
+4. Confirm purchase (coins deducted)
+5. Item added to your inventory
 
-THE LIST:
-• Ranks 4 through 50 are shown in a tabular list.
-• Your own entry is highlighted in blue.
+HOW TO EQUIP COSMETICS:
+1. After purchasing, click "Equip" on the item
+2. Item will appear on your profile immediately
+3. Visible on leaderboard and profile pages
+4. Only one item per type can be equipped at a time
 
-═══════════════════════════════════════════════════════════════════════════
-9. HALL OF FAME
-═══════════════════════════════════════════════════════════════════════════
+HOW TO UNEQUIP:
+1. Click "Unequip" on currently equipped item
+2. Returns to default appearance
 
-History is written by the victors.
+3.7 PLANNER & CALENDAR
+─────────────────────────────────────────────────────────────────────────────
+The planner helps you organize study sessions and tasks.
 
-PURPOSE:
-• Captures a snapshot of the winners at the exact moment of reset.
-• Weekly Winners: Archived every Monday at 12:01 AM IST.
-• Monthly Winners: Archived every 1st of the Month at 12:01 AM IST.
+CALENDAR VIEWS:
+1. MONTH VIEW: Overview of entire month
+2. WEEK VIEW: Detailed weekly schedule
+3. DAY VIEW: Hour-by-hour daily schedule
 
-═══════════════════════════════════════════════════════════════════════════
-10. THE PLANNER
-═══════════════════════════════════════════════════════════════════════════
+CREATING EVENTS:
+1. Navigate to /planner
+2. Click on a date/time slot or click "Add Event"
+3. Fill in event details:
+   • Title (required)
+   • Description (optional)
+   • Start date/time
+   • End date/time
+   • Color (for visual organization)
+   • All-day event toggle
+4. Click "Save"
 
-Ideally, you shouldn't just study; you should plan.
+EDITING EVENTS:
+1. Click on an existing event
+2. Modify details in the modal
+3. Click "Save" to update
+4. Or click "Delete" to remove
 
-CALENDAR VIEW:
-• A visual drag-and-drop style calendar interface.
-• Views: Month, Week, Day.
-• Click anywhere to "Add Event".
-• Set Title, Description, and Color coding.
-• Useful for blocking out study times for future missions.
+TO-DO LIST:
+• Simple task list for quick notes
+• Click "Show To-Do List" to expand
+• Add tasks with the input field
+• Check off completed tasks
+• Delete tasks when done
+• Tasks persist across sessions
 
-SIMPLE TO-DO LIST:
-• Toggled by a button below the calendar ("Use a simple to-do list here").
-• A minimalist list for quick tasks.
-• "Add Task": Type and hit enter.
-• "Complete": Click the circle to strike-through.
-• "Delete": Remove clutter.
-• Best for daily checklists like "Read Chapter 4", "Solve 5 problems".
+3.8 HISTORY
+─────────────────────────────────────────────────────────────────────────────
+The history page shows your XP transaction log.
 
-═══════════════════════════════════════════════════════════════════════════
-═══════════════════════════════════════════════════════════════════════════
-11. PUBLIC PROFILES & PRIVACY
-═══════════════════════════════════════════════════════════════════════════
+WHAT'S DISPLAYED:
+• All XP gains and losses
+• Grouped by date
+• Time of transaction
+• Source of XP (mission, session, admin, bonus)
+• Amount (+/- XP)
 
-Every user has a public profile that showcases their achievements.
+TRANSACTION TYPES:
+• ✅ Mission Completed: +XP (green)
+• ⚠️ Mission Penalty: -XP (red)
+• 📚 Session Completed: +XP (green)
+• 👑 Admin Adjustment: +/- XP
+• 🎁 Bonus Reward: +XP (green)
 
-ACCESS:
-• Visit via URL: /profile/<username>
-• Click "Profile" in the top-right dropdown menu.
-• Click any user's name on the Leaderboard or Squad pages.
+NAVIGATION:
+• Chronologically organized (newest first)
+• Scroll to view older transactions
+• Click "Back" to return to dashboard
 
-CONTENT:
-• PFP & Name: Identity and Squad affiliation. Includes equipped Frames/Nameplates.
-• Ranks: Displays Global Rank and Squad Rank.
-• Graph: A Weekly Activity graph (similar to Dashboard) showing their recent consistency.
-• Legacy: A count of their Hall of Fame wins.
-• Lifetime Stats: Total XP, Total Practice Minutes, and Total Coins.
+3.9 SETTINGS
+─────────────────────────────────────────────────────────────────────────────
+Customize your account and profile.
 
-PRIVACY LOCK:
-• If you prefer to train in shadow, you can LOCK your profile.
-• Visitors to a locked profile see a blurred screen with a Lock icon.
-• No stats, graphs, or ranks are visible to the public.
-• You (the owner) can ALWAYS see your profile, even if locked.
-• Note: Your name and XP will still appear on Leaderboards, but clicking your name will lead to a locked page.
+PROFILE SETTINGS:
+• Username: Change your display name
+• Email: Update email address
+• Profile Picture: Upload custom image
+• Discord Handle: Link your Discord account
 
-═══════════════════════════════════════════════════════════════════════════
-12. SETTINGS & SECURITY
-═══════════════════════════════════════════════════════════════════════════
+SECURITY SETTINGS:
+• Change Password: Update your password
+• Requires current password for verification
 
-Located at /settings or via "Settings" in the top-right dropdown.
+HOW TO UPDATE PROFILE:
+1. Navigate to /settings
+2. Modify desired fields
+3. Click "Save Changes"
+4. Changes reflect immediately
 
-PROFILE CUSTOMIZATION:
-• Display Name: Update how you appear on leaderboards.
-• Profile Picture (3 Methods):
-  1. Default: Spin the wheel for one of 10 presets.
-  2. URL: Paste a link to an image hosted elsewhere.
-  3. Upload: Upload a file from your device (Converted to Base64).
+HOW TO CHANGE PASSWORD:
+1. Scroll to Security section
+2. Enter current password
+3. Enter new password
+4. Confirm new password
+5. Click "Change Password"
 
-PRIVACY SETTINGS:
-• "Lock Profile": A toggle switch to enable/disable the profile lock described in Section 11.
+PROFILE PICTURE UPLOAD:
+1. Click "Choose File" or drag-and-drop
+2. Select image (JPG, PNG, GIF)
+3. Image uploads and displays immediately
+4. Click "Save Changes" to confirm
 
-ACCOUNT SECURITY:
-• Email Update: You can change your email, but you must enter your Current Password to verify ownership.
-• Change Password:
-  - Requires: Current Password, New Password, Confirm New Password.
-  - Critical for keeping your hard-earned XP safe.
+═══════════════════════════════════════════════════════════════════════════════
+4. ADMIN FEATURES
+═══════════════════════════════════════════════════════════════════════════════
 
-═══════════════════════════════════════════════════════════════════════════
-13. ADMIN PANEL (ACCESS RESTRICTED)
-═══════════════════════════════════════════════════════════════════════════
+Admin users have access to the Admin Dashboard (/admin).
 
-Accessible only to users with the `isAdmin` flag in the database.
+ADMIN CAPABILITIES:
+─────────────────────────────────────────────────────────────────────────────
+1. USER MANAGEMENT:
+   • View all users
+   • Search users by username/email
+   • Update user XP, coins, streak
+   • Assign users to squads
+   • Ban/unban users
+   • Delete user accounts
+   • Grant admin privileges
 
-DASHBOARD:
-• A high-level view of Total Users, Active Sessions, and Platform health.
+2. SQUAD MANAGEMENT:
+   • Create new squads
+   • Edit squad details (name, description, slogan)
+   • Upload squad banners
+   • Delete squads
+   • View squad members
 
-USER MANAGEMENT:
-• Search: Find any user by Name or Email.
-• Edit Stats: Admins can manually correct XP, Minutes, or Coins.
-• Ban User:
-  -> Banning locks the account for 7 Days.
-  -> Banned users cannot login.
-  -> Used for cheating or toxic behavior.
-• Delete User:
-  -> The nuclear option.
-  -> Permanently removes User, Sessions, XP History, and Mission data.
-  -> Cannot be undone.
+3. XP ADJUSTMENTS:
+   • Add or subtract XP from users
+   • Adjustments logged in audit trail
+   • Immediate reflection in user stats
 
-AUDIT LOGS:
-• Every admin action (Edit/Ban/Delete) is recorded in an immutable log.
-• Ensures admins are accountable for their changes.
+4. COIN MANAGEMENT:
+   • Grant coins to users
+   • Deduct coins for violations
+   • Track coin transactions
 
-═══════════════════════════════════════════════════════════════════════════
-14. TECHNICAL SPECIFICATIONS (TIMEZONE)
-═══════════════════════════════════════════════════════════════════════════
+5. BAN SYSTEM:
+   • Temporary bans (set duration)
+   • Permanent bans
+   • Banned users cannot log in
+   • Ban expiration automatic
 
-The Single Source of Truth:
-• The server operates on IST (Indian Standard Time).
-• IST = UTC + 5:30.
+6. AUDIT LOG:
+   • All admin actions logged
+   • Includes: admin name, action, target user, timestamp
+   • Viewable in admin dashboard
 
-WHY IS THIS IMPORTANT?
-1. Daily Stats: Reset at 12:00 AM IST. If you live in New York, this might be 1:30 PM your time.
-2. Streaks: You must log a session within the 24-hour IST window to keep your streak.
-3. Graphs: The weekly graph shows days aligned to IST. 
-   -> If you study at 11:55 PM IST and finish at 12:20 AM IST, the session counts for the day it *started* (usually) or the XP is awarded when it *ends*. (In Marathon Server, XP is awarded at the STOP moment, so it counts for the day you finished).
+HOW TO USE ADMIN DASHBOARD:
+─────────────────────────────────────────────────────────────────────────────
+1. Log in as admin user
+2. Navigate to /admin
+3. Select user from list or search
+4. Click "Edit" to modify user details
+5. Make changes in the form
+6. Click "Update User" to save
+7. Changes apply immediately
 
-═══════════════════════════════════════════════════════════════════════════
-15. TROUBLESHOOTING
-═══════════════════════════════════════════════════════════════════════════
+CREATING A SQUAD (Admin):
+─────────────────────────────────────────────────────────────────────────────
+1. Navigate to Admin Dashboard
+2. Click "Create Squad" button
+3. Enter squad details:
+   • Name (unique)
+   • Description
+   • Slogan
+   • Banner URL (optional)
+4. Click "Create"
+5. Squad appears in squads list
 
-Q: My XP shows negative?
-A: You likely accepted a mission and failed to complete it. Check your Mission History.
+ASSIGNING USERS TO SQUADS:
+─────────────────────────────────────────────────────────────────────────────
+1. Edit user in admin dashboard
+2. Select squad from dropdown
+3. Click "Update User"
+4. User now appears in squad member list
 
-Q: The graph dates look wrong?
-A: Remember, they are IST dates. It might be "Tomorrow" in India already compared to your local time.
+═══════════════════════════════════════════════════════════════════════════════
+5. XP & PROGRESSION SYSTEM
+═══════════════════════════════════════════════════════════════════════════════
 
-Q: I didn't get a verification email?
-A: Check Spam. If using a strict organization email, try a Gmail/Outlook address.
+XP EARNING METHODS:
+─────────────────────────────────────────────────────────────────────────────
+1. STUDY SESSIONS:
+   • Base rate: ~1 XP per minute
+   • Minimum 25 minutes required
+   • Automatically awarded on session completion
 
-Q: I studied for 20 minutes but got 0 XP?
-A: Working as intended. Minimum session length is 25 minutes.
+2. MISSIONS:
+   • Easy missions: 50-100 XP
+   • Medium missions: 100-200 XP
+   • Hard missions: 200-500 XP
+   • Bonus XP for streaks
 
-Q: Can I pause a session?
-A: No. The timer runs continuously. Pause is for the weak. (Technical reason: simpler verification logic).
+3. ADMIN BONUSES:
+   • Special achievements
+   • Event participation
+   • Community contributions
 
-Q: My profile says "Locked" to my friend?
-A: You enabled "Lock Profile" in Settings. Disable it if you want them to see your stats.
+XP CALCULATIONS:
+─────────────────────────────────────────────────────────────────────────────
+• Session XP = duration_in_minutes × 1
+• Mission XP = predefined reward amount
+• Total XP = sum of all transactions
 
-═══════════════════════════════════════════════════════════════════════════
-                    Train Hard. Stay Consistent.
-                  Welcome to Marathon Server.
-═══════════════════════════════════════════════════════════════════════════
+LEADERBOARD RANKINGS:
+─────────────────────────────────────────────────────────────────────────────
+• All-time: Total XP since account creation
+• Monthly: XP earned in current calendar month
+• Weekly: XP earned in current week (Monday-Sunday)
+
+STREAK SYSTEM:
+─────────────────────────────────────────────────────────────────────────────
+• Streak = consecutive days with at least one valid session
+• Valid session = 25+ minutes
+• Streak breaks if you miss a day
+• Streak Freezes can protect one missed day
+• Coin rewards for milestone streaks (7, 30, 100 days)
+
+═══════════════════════════════════════════════════════════════════════════════
+6. TIPS & BEST PRACTICES
+═══════════════════════════════════════════════════════════════════════════════
+
+MAXIMIZING XP GAINS:
+─────────────────────────────────────────────────────────────────────────────
+1. Complete daily missions every day
+2. Maintain your streak for bonus coins
+3. Join an active squad for team motivation
+4. Study during mission-specific times (early morning, late night)
+5. Aim for longer sessions (2+ hours) for marathon missions
+6. Check missions page daily for new objectives
+
+BUILDING CONSISTENCY:
+─────────────────────────────────────────────────────────────────────────────
+1. Set a daily study schedule using the planner
+2. Use the to-do list for task management
+3. Start with smaller sessions (25-30 min) and build up
+4. Track your progress on the dashboard
+5. Compete with squad members for motivation
+6. Use streak freezes strategically for planned breaks
+
+SQUAD SUCCESS:
+─────────────────────────────────────────────────────────────────────────────
+1. Communicate with squad members (via Discord)
+2. Coordinate study times for group motivation
+3. Share tips and strategies
+4. Support struggling members
+5. Celebrate squad achievements
+
+COSMETIC STRATEGY:
+─────────────────────────────────────────────────────────────────────────────
+1. Save coins for limited-time items
+2. Prioritize streak freezes early on
+3. Equip cosmetics that match your style
+4. Animated items are more expensive but eye-catching
+5. Mission pardons are useful for difficult missions
+
+═══════════════════════════════════════════════════════════════════════════════
+7. FAQ & TROUBLESHOOTING
+═══════════════════════════════════════════════════════════════════════════════
+
+Q: Why didn't I get XP for my session?
+A: Sessions must be at least 25 minutes long. Shorter sessions won't count.
+
+Q: How do I leave a squad?
+A: Contact an admin to be reassigned or removed from your current squad.
+
+Q: Can I delete my account?
+A: Contact an admin to request account deletion.
+
+Q: What happens if I miss a day on my streak?
+A: Your streak resets to 0. Use a Streak Freeze to prevent this.
+
+Q: How do I use a Streak Freeze?
+A: Streak Freezes are automatically applied when you miss a day (if you own one).
+
+Q: Why can't I complete a mission?
+A: Ensure you meet all criteria (time of day, day of week, session length, etc.).
+
+Q: How do I report a bug?
+A: Contact the admin team via Discord or email.
+
+Q: Can I have multiple accounts?
+A: No, multiple accounts are against the rules and may result in a ban.
+
+Q: How are squad rankings calculated?
+A: Total XP of all squad members combined, updated in real-time.
+
+Q: What is the anti-cheat system?
+A: Sessions with suspicious patterns are flagged for admin review.
+
+Q: How do I become an admin?
+A: Admins are appointed by the platform owner. Contact them for consideration.
+
+Q: Can I change my username?
+A: Yes, update it in Settings. Must be unique.
+
+Q: What image formats are supported for profile pictures?
+A: JPG, PNG, and GIF files are supported.
+
+Q: How do I view the database?
+A: Admins can use Prisma Studio: `npx prisma studio`
+
+Q: Where is my data stored?
+A: Data is stored in a PostgreSQL database (see README for setup).
+
+Q: Is my password secure?
+A: Yes, passwords are hashed using bcrypt before storage.
+
+Q: Can I export my data?
+A: Contact an admin to request a data export.
+
+Q: How do I reset my password?
+A: Use the "Forgot Password" link on the login page.
+
+Q: What happens to my XP if I'm banned?
+A: Your XP is preserved but you cannot earn more while banned.
+
+Q: Can I transfer XP to another user?
+A: No, XP transfers are not allowed.
+
+Q: How often do leaderboards update?
+A: Leaderboards update in real-time as XP is earned.
+
+Q: What timezone is used for missions?
+A: Server timezone (check with admin for specific timezone).
+
+Q: Can I suggest new missions?
+A: Yes! Contact admins with your mission ideas.
+
+Q: How do I join a squad?
+A: Browse squads and request to join. Admin will assign you.
+
+Q: Are there mobile apps?
+A: Currently web-only. Mobile apps may be developed in the future.
+
+Q: How do I contact support?
+A: Reach out via Discord or email (check About page for details).
+
+═══════════════════════════════════════════════════════════════════════════════
+                              END OF USER GUIDE
+                    Thank you for using Marathon Server!
+                        Train Your Consistency. 🏃‍♂️
+═══════════════════════════════════════════════════════════════════════════════
+
+TECHNICAL INFORMATION (For Developers/Admins)
+─────────────────────────────────────────────────────────────────────────────
+
+TECH STACK:
+• Frontend: Next.js 16, React 19, TypeScript
+• Styling: Tailwind CSS v4
+• Database: PostgreSQL with Prisma ORM
+• Authentication: JWT-based auth
+• API: Next.js API routes
+
+KEY DIRECTORIES:
+• /app: Next.js app router pages
+• /components: Reusable React components
+• /lib: Utility functions and API client
+• /prisma: Database schema and migrations
+• /public: Static assets
+
+DATABASE SCHEMA:
+• User: Account information, stats, cosmetics
+• Squad: Team information
+• Session: Study session records
+• Mission: Mission definitions
+• MissionProgress: User mission tracking
+• XPTransaction: XP history log
+• ShopItem: Cosmetic items
+• UserItem: User inventory
+• CoinTransaction: Coin history
+• Event: Calendar events
+• Task: To-do list items
+• AuditLog: Admin action log
+
+API ENDPOINTS:
+• /api/auth/signup: Create account
+• /api/auth/login: Authenticate user
+• /api/users/me: Get current user
+• /api/sessions: Manage study sessions
+• /api/missions: Mission CRUD operations
+• /api/leaderboard: Fetch rankings
+• /api/squads: Squad management
+• /api/shop: Shop items and purchases
+• /api/events: Calendar events
+• /api/tasks: To-do list tasks
+• /api/admin/*: Admin-only endpoints
+
+ENVIRONMENT VARIABLES:
+• DATABASE_URL: PostgreSQL connection string
+• JWT_SECRET: Secret key for JWT signing (min 32 chars)
+
+DEPLOYMENT:
+• Recommended: Vercel with Vercel Postgres
+• Alternative: Any Node.js hosting + PostgreSQL database
+• See README.md for detailed deployment instructions
+
+DEVELOPMENT COMMANDS:
+• npm run dev: Start development server
+• npm run build: Build for production
+• npx prisma studio: Open database GUI
+• npx prisma migrate dev: Create new migration
+• npx prisma db seed: Seed database with initial data
+
+═══════════════════════════════════════════════════════════════════════════════

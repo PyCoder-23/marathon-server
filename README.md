@@ -1,131 +1,247 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🏃 Marathon Server
 
-## Database Setup
+A professional study community platform built with Next.js, featuring XP systems, squad competitions, missions, and comprehensive analytics.
 
-This project uses **PostgreSQL** as the database. You'll need to set up a PostgreSQL database before running the application.
+## 🚀 Features
 
-### Option 1: Vercel Postgres (Recommended for Vercel Deployments)
+- **Study Session Tracking** - Track study time with built-in timer
+- **XP & Leveling System** - Earn XP for completed study sessions
+- **Squad System** - Join teams and compete on leaderboards
+- **Mission System** - Complete daily, weekly, and long-term challenges
+- **Leaderboards** - Weekly, monthly, and all-time rankings
+- **Streak Tracking** - Maintain study streaks with freeze system
+- **Shop & Cosmetics** - Unlock frames, nameplates, and badges
+- **Admin Panel** - Comprehensive user and content management
+- **Hall of Fame** - Celebrate top performers
 
-1. **Create a Vercel Postgres database:**
+## 🛠️ Tech Stack
 
-   - Go to your Vercel project dashboard
-   - Navigate to the "Storage" tab
-   - Click "Create Database" and select "Postgres"
-   - Follow the setup wizard
+- **Framework:** Next.js 15 (App Router)
+- **Language:** TypeScript
+- **Database:** PostgreSQL with Prisma ORM
+- **Authentication:** JWT with bcrypt
+- **Styling:** Tailwind CSS
+- **Deployment:** Vercel-ready
 
-2. **Get your connection string:**
-   - Vercel will automatically add the `POSTGRES_URL` environment variable
-   - For local development, copy the connection string from Vercel dashboard
-   - Add it to your `.env` file as `DATABASE_URL`
+## 📦 Installation
 
-### Option 2: Other PostgreSQL Providers
+### Prerequisites
 
-You can use any PostgreSQL provider such as:
+- Node.js 18+ and npm
+- PostgreSQL database
 
-- [Neon](https://neon.tech) (Serverless PostgreSQL)
-- [Supabase](https://supabase.com) (PostgreSQL with additional features)
-- [Railway](https://railway.app) (PostgreSQL hosting)
-- [AWS RDS](https://aws.amazon.com/rds/postgresql/)
-- Any other PostgreSQL database
+### Setup
 
-**Connection String Format:**
+1. **Clone the repository**
+   ```bash
+   git clone <your-repo-url>
+   cd marathon-server-main
+   ```
 
-```
-DATABASE_URL="postgresql://username:password@host:port/database?sslmode=require"
-```
-
-### Setting Up the Database
-
-1. **Install dependencies:**
-
+2. **Install dependencies**
    ```bash
    npm install
    ```
 
-2. **Set up your environment variables:**
+3. **Set up environment variables**
+   
    Create a `.env` file in the root directory:
-
    ```env
-   DATABASE_URL="your-postgresql-connection-string"
-   JWT_SECRET="your-secret-key-min-32-chars-long"
+   DATABASE_URL="postgresql://user:password@host:port/database"
+   JWT_SECRET="your-super-secret-jwt-key-change-this"
+   NEXT_PUBLIC_API_URL="http://localhost:3000"
    ```
 
-3. **Run database migrations:**
-
+4. **Set up the database**
    ```bash
-   npx prisma migrate deploy
-   ```
-
-   Or for development (creates a new migration):
-
-   ```bash
-   npx prisma migrate dev
-   ```
-
-4. **Generate Prisma Client:**
-
-   ```bash
+   # Generate Prisma client
    npx prisma generate
+   
+   # Run migrations
+   npx prisma migrate deploy
+   
+   # Seed initial data (squads, missions, shop items)
+   npx tsx prisma/seed.ts
+   
+   # Create admin user
+   npx tsx prisma/seed_admin.ts
    ```
 
-   (This runs automatically on `npm install` via the postinstall script)
-
-5. **Seed the database (optional):**
+5. **Run the development server**
    ```bash
-   npx prisma db seed
+   npm run dev
    ```
 
-## Getting Started
+   Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-First, set up your database (see above), then run the development server:
+## 🗄️ Database Management
 
+### View Database with Prisma Studio
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npx prisma studio
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Create a Migration
+```bash
+npx prisma migrate dev --name your_migration_name
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Reset Database (⚠️ Deletes all data)
+```bash
+npx prisma migrate reset
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 👤 Default Admin Account
 
-## Learn More
+After running `seed_admin.ts`:
+- **Email:** admin@test.com
+- **Password:** admin123
+- **Roles:** Admin, Management
 
-To learn more about Next.js, take a look at the following resources:
+⚠️ **Change the password immediately in production!**
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 📁 Project Structure
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```
+marathon-server-main/
+├── app/                    # Next.js app directory
+│   ├── api/               # API routes
+│   ├── dashboard/         # Dashboard page
+│   ├── leaderboard/       # Leaderboard page
+│   ├── missions/          # Missions page
+│   ├── profile/           # Profile pages
+│   └── ...
+├── components/            # React components
+├── lib/                   # Utility functions & helpers
+│   ├── db.ts             # Prisma client
+│   ├── cache.ts          # Response caching
+│   ├── api-helpers.ts    # Auth & response helpers
+│   └── ...
+├── prisma/               # Database schema & migrations
+│   ├── schema.prisma     # Database schema
+│   ├── seed.ts           # Initial data seeder
+│   └── migrations/       # Migration files
+└── public/               # Static assets
+```
 
-## Deploy on Vercel
+## 🔑 Key API Endpoints
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Authentication
+- `POST /api/auth/signup` - Create new account
+- `POST /api/auth/login` - Login
 
-### Before Deploying
+### Sessions
+- `POST /api/sessions/start` - Start study session
+- `POST /api/sessions/stop` - Stop session & earn XP
 
-1. **Set up PostgreSQL database** (see Database Setup section above)
-2. **Add environment variables in Vercel:**
+### User Data
+- `GET /api/users/me` - Get current user
+- `GET /api/users/stats` - Get dashboard stats
+- `GET /api/users/profile/[username]` - Get user profile
 
-   - `DATABASE_URL` - Your PostgreSQL connection string
-   - `JWT_SECRET` - A secure secret key (min 32 characters)
+### Leaderboards & Squads
+- `GET /api/leaderboard?period=weekly` - Get leaderboard
+- `GET /api/squads` - Get all squads
 
-3. **For Vercel Postgres:**
+### Missions
+- `GET /api/missions` - Get available missions
+- `POST /api/missions/start` - Start a mission
+- `POST /api/missions/complete` - Complete a mission
 
-   - Create a Postgres database in your Vercel project
-   - The `POSTGRES_URL` will be automatically available
-   - Use `POSTGRES_URL` as your `DATABASE_URL` in Vercel
+### Admin (Requires Admin Role)
+- `GET /api/admin/users/list` - List all users
+- `POST /api/admin/users/update-xp` - Modify user XP
+- `POST /api/admin/users/ban` - Ban/unban users
 
-4. **Run migrations:**
-   - Migrations will run automatically during build if you add to build script
-   - Or run manually: `npx prisma migrate deploy`
+## ⚡ Performance Optimizations
 
-For detailed migration instructions, see [DATABASE_MIGRATION.md](./DATABASE_MIGRATION.md).
+This application includes several performance optimizations:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **Response Caching** - Frequently accessed data is cached (leaderboards, squads, stats)
+- **Database Indexes** - Critical indexes on Session, MissionProgress, XPTransaction
+- **Parallel Queries** - Multiple database queries run simultaneously
+- **Aggregation** - Database-level aggregation instead of in-memory processing
+- **Selective Fields** - Only fetch required fields from database
+
+### Cache Configuration
+
+Caches are automatically managed with TTL:
+- **Leaderboard:** 2 minutes
+- **Squads:** 2 minutes  
+- **User Stats:** 30 seconds
+
+Caches are invalidated when:
+- User completes a session
+- Missions are completed
+- Admin makes changes
+
+## 🚢 Deployment
+
+### Deploy to Vercel
+
+1. Push your code to GitHub
+2. Import project in Vercel
+3. Add environment variables
+4. Deploy!
+
+### Environment Variables for Production
+
+```env
+DATABASE_URL="your-production-database-url"
+JWT_SECRET="your-production-jwt-secret"
+NEXT_PUBLIC_API_URL="https://your-domain.com"
+```
+
+## 📊 Monitoring
+
+### Check Cache Statistics
+
+The cache system provides statistics:
+```typescript
+import { cache } from '@/lib/cache';
+console.log(cache.getStats());
+```
+
+### Database Query Performance
+
+Monitor slow queries in your database logs. All critical queries should complete in <100ms with proper indexes.
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📝 License
+
+This project is licensed under the MIT License.
+
+## 🐛 Known Issues & Solutions
+
+### High Memory Usage
+- Ensure Prisma query logging is disabled in production
+- Check that all database indexes are applied
+- Monitor cache size with `cache.getStats()`
+
+### Slow Queries
+- Run `npx prisma migrate deploy` to ensure indexes are applied
+- Check database connection pooling settings
+- Review query patterns in slow endpoints
+
+### Session Timer Issues
+- Timer resets immediately on stop (optimistic UI update)
+- If API call fails, timer state is restored
+- Minimum 25-minute sessions required for XP
+
+## 📞 Support
+
+For issues or questions:
+1. Check the code comments for implementation details
+2. Review the Prisma schema for data structure
+3. Check API route files for endpoint logic
+
+---
+
+**Built with ❤️ for focused learners**

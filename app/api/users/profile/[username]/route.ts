@@ -91,82 +91,62 @@ export async function GET(req: Request, { params }: { params: Promise<{ username
         // 4. Hall of Fame Count
         const hallOfFameWins = targetUser._count.monthlyWins + targetUser._count.weeklyWins;
 
-        // 5. Graph Data (Last 7 Days) - REUSED LOGIC
-        // 5. Graph Data (Last 7 Days) - Optimized
+        // 5. Graph Data (Last 7 days) - Optimized with parallel aggregation
         const weeklyActivity = [];
         const now = new Date();
         const istOffset = 5.5 * 60 * 60 * 1000;
         const istNow = new Date(now.getTime() + istOffset);
 
-        // Calculate the range for the last 7 days
-        // We go back 6 days from today, so range is [today-6, today]
         const istYear = istNow.getUTCFullYear();
         const istMonth = istNow.getUTCMonth();
         const istDate = istNow.getUTCDate();
 
-        // Start of the 7-day window (00:00 IST of 6 days ago)
-        const startOfWindowIST = new Date(Date.UTC(istYear, istMonth, istDate - 6, 0, 0, 0));
-        const endOfWindowIST = new Date(Date.UTC(istYear, istMonth, istDate + 1, 0, 0, 0)); // Until tomorrow 00:00
-
-        const queryStart = new Date(startOfWindowIST.getTime() - istOffset);
-        const queryEnd = new Date(endOfWindowIST.getTime() - istOffset);
-
-        // Fetch all data in one go
-        const [allSessions, allXp] = await Promise.all([
-            prisma.session.findMany({
-                where: {
-                    userId: targetUser.id,
-                    startTs: { gte: queryStart, lt: queryEnd },
-                    completed: true,
-                },
-                select: { startTs: true, durationMin: true }
-            }),
-            prisma.xPTransaction.findMany({
-                where: {
-                    userId: targetUser.id,
-                    createdAt: { gte: queryStart, lt: queryEnd },
-                },
-                select: { createdAt: true, amount: true }
-            })
-        ]);
-
-        // Group by Date String (YYYY-MM-DD)
-        const sessionMap = new Map<string, typeof allSessions>();
-        const xpMap = new Map<string, typeof allXp>();
-
-        for (const s of allSessions) {
-            // Convert back to IST date string
-            const sDateIST = new Date(s.startTs.getTime() + istOffset);
-            const dateStr = sDateIST.toISOString().split('T')[0];
-            if (!sessionMap.has(dateStr)) sessionMap.set(dateStr, []);
-            sessionMap.get(dateStr)!.push(s);
-        }
-
-        for (const x of allXp) {
-            const xDateIST = new Date(x.createdAt.getTime() + istOffset);
-            const dateStr = xDateIST.toISOString().split('T')[0];
-            if (!xpMap.has(dateStr)) xpMap.set(dateStr, []);
-            xpMap.get(dateStr)!.push(x);
-        }
-
-        // Reconstruct the 7 days array
+        // ✅ Build all day queries to run in parallel
+        const dayQueries = [];
         for (let i = 6; i >= 0; i--) {
-            const d = new Date(Date.UTC(istYear, istMonth, istDate - i, 0, 0, 0));
-            const dateStr = d.toISOString().split('T')[0];
+            const dayStart = new Date(Date.UTC(istYear, istMonth, istDate - i, 0, 0, 0));
+            const dayEnd = new Date(Date.UTC(istYear, istMonth, istDate - i + 1, 0, 0, 0));
 
-            const daySessions = sessionMap.get(dateStr) || [];
-            const dayXpTrans = xpMap.get(dateStr) || [];
+            const queryStart = new Date(dayStart.getTime() - istOffset);
+            const queryEnd = new Date(dayEnd.getTime() - istOffset);
+            const dateStr = dayStart.toISOString().split('T')[0];
 
-            const dayMinutes = daySessions.reduce((sum, s) => sum + s.durationMin, 0);
-            const dayXpAmount = dayXpTrans.reduce((sum, t) => sum + t.amount, 0);
-
-            weeklyActivity.push({
-                date: dateStr,
-                hours: dayMinutes / 60,
-                xp: dayXpAmount,
-                pomodoros: daySessions.length,
+            dayQueries.push({
+                dateStr,
+                queries: Promise.all([
+                    prisma.session.aggregate({
+                        where: {
+                            userId: targetUser.id,
+                            startTs: { gte: queryStart, lt: queryEnd },
+                            completed: true,
+                        },
+                        _sum: { durationMin: true },
+                        _count: true
+                    }),
+                    prisma.xPTransaction.aggregate({
+                        where: {
+                            userId: targetUser.id,
+                            createdAt: { gte: queryStart, lt: queryEnd },
+                        },
+                        _sum: { amount: true }
+                    })
+                ])
             });
         }
+
+        // ✅ Execute all day queries in parallel
+        const dayResults = await Promise.all(dayQueries.map(dq => dq.queries));
+
+        // ✅ Build weekly activity from parallel results
+        weeklyActivity.push(...dayQueries.map((dq, idx) => {
+            const [sessionStats, xpStats] = dayResults[idx];
+            return {
+                date: dq.dateStr,
+                hours: (sessionStats._sum.durationMin || 0) / 60,
+                xp: xpStats._sum.amount || 0,
+                pomodoros: sessionStats._count || 0,
+            };
+        }));
 
         return NextResponse.json({
             profile: baseProfile,

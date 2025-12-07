@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { requireAuth, errorResponse, successResponse } from "@/lib/api-helpers";
+import { cache } from "@/lib/cache";
+
+const MIN_DURATION = 25; // Minimum session duration in minutes to earn XP
 
 export async function POST(req: Request) {
     try {
@@ -87,53 +90,59 @@ export async function POST(req: Request) {
 
         // 3. Check and update streak using IST timezone
         const { getISTDayStart } = await import("@/lib/timezone-utils");
-        const user = await prisma.user.findUnique({
-            where: { id: payload.userId },
-            include: {
-                sessions: {
-                    where: {
-                        completed: true,
-                        durationMin: { gte: MIN_DURATION } // Only count valid sessions for streak
-                    },
-                    orderBy: { startTs: 'desc' },
-                    take: 30, // Get more sessions to check streak properly
+        const todayIST = getISTDayStart();
+        const yesterdayIST = new Date(todayIST);
+        yesterdayIST.setDate(yesterdayIST.getDate() - 1);
+
+        // ✅ Use count queries instead of loading sessions
+        const [studiedYesterday, sessionsToday] = await Promise.all([
+            prisma.session.count({
+                where: {
+                    userId: payload.userId,
+                    completed: true,
+                    durationMin: { gte: MIN_DURATION },
+                    startTs: {
+                        gte: yesterdayIST,
+                        lt: todayIST
+                    }
                 }
-            }
-        });
+            }),
+            prisma.session.count({
+                where: {
+                    userId: payload.userId,
+                    completed: true,
+                    durationMin: { gte: MIN_DURATION },
+                    startTs: { gte: todayIST }
+                }
+            })
+        ]);
 
-        if (user) {
-            const todayIST = getISTDayStart();
-            const yesterdayIST = new Date(todayIST);
-            yesterdayIST.setDate(yesterdayIST.getDate() - 1);
-
-            // Check if user studied yesterday (IST)
-            const studiedYesterday = user.sessions.some((s: any) => {
-                const sessionDate = getISTDayStart(s.startTs);
-                return sessionDate.getTime() === yesterdayIST.getTime();
+        if (sessionsToday === 1) { // Only update on first session of the day
+            const user = await prisma.user.findUnique({
+                where: { id: payload.userId },
+                select: { streakDays: true }
             });
 
-            // Check if this is the first session today (IST)
-            const sessionsToday = user.sessions.filter((s: any) => {
-                const sessionDate = getISTDayStart(s.startTs);
-                return sessionDate.getTime() === todayIST.getTime();
-            });
-
-            if (sessionsToday.length === 1) { // Only update on first session of the day
-                const newStreak = studiedYesterday ? user.streakDays + 1 : 1;
+            if (user) {
+                const newStreak = studiedYesterday > 0 ? user.streakDays + 1 : 1;
                 await prisma.user.update({
                     where: { id: payload.userId },
                     data: { streakDays: newStreak },
                 });
 
-                // 4. Check for Streak Milestone Rewards
-                const { checkAndAwardStreakMilestone } = await import("@/lib/coin-manager");
-                await checkAndAwardStreakMilestone(payload.userId, newStreak);
+                // ❌ REMOVED: Automatic coin rewards for streak milestones
+                // Streaks are still tracked, but coins must be awarded manually by admin
             }
         }
 
         // 5. Check mission progress
         const { checkAllActiveMissions } = await import("@/lib/mission-checker");
         const completedMissions = await checkAllActiveMissions(payload.userId);
+
+        // ✅ Invalidate caches after session stop
+        cache.deletePattern('stats');
+        cache.deletePattern('leaderboard');
+        cache.deletePattern('squads');
 
         return successResponse({
             session: updatedSession,

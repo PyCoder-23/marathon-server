@@ -1,22 +1,25 @@
 /**
- * Tracks when mission resets were last run for each user
+ * Database-backed mission reset throttling
  * Prevents excessive resets on every page load
  */
 
-const lastResetTimes = new Map<string, Date>();
+import { prisma } from "./db";
 
 /**
  * Check if enough time has passed since last reset
  * Only reset once per hour to prevent excessive penalties
  */
-export function shouldRunReset(userId: string): boolean {
-    const lastReset = lastResetTimes.get(userId);
+export async function shouldRunReset(userId: string): Promise<boolean> {
+    const user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { lastMissionCheck: true }
+    });
 
-    if (!lastReset) {
+    if (!user || !user.lastMissionCheck) {
         return true; // Never run before
     }
 
-    const hoursSinceLastReset = (Date.now() - lastReset.getTime()) / (1000 * 60 * 60);
+    const hoursSinceLastReset = (Date.now() - user.lastMissionCheck.getTime()) / (1000 * 60 * 60);
 
     // Only run reset if it's been at least 1 hour since last reset
     return hoursSinceLastReset >= 1;
@@ -25,23 +28,9 @@ export function shouldRunReset(userId: string): boolean {
 /**
  * Mark that a reset was just run for this user
  */
-export function markResetRun(userId: string): void {
-    lastResetTimes.set(userId, new Date());
+export async function markResetRun(userId: string): Promise<void> {
+    await prisma.user.update({
+        where: { id: userId },
+        data: { lastMissionCheck: new Date() }
+    });
 }
-
-/**
- * Clear old entries to prevent memory leak
- * Run this periodically
- */
-export function cleanupOldEntries(): void {
-    const oneDayAgo = Date.now() - (24 * 60 * 60 * 1000);
-
-    for (const [userId, timestamp] of lastResetTimes.entries()) {
-        if (timestamp.getTime() < oneDayAgo) {
-            lastResetTimes.delete(userId);
-        }
-    }
-}
-
-// Clean up old entries every hour
-setInterval(cleanupOldEntries, 60 * 60 * 1000);

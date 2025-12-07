@@ -45,6 +45,13 @@ export default function AdminDashboard() {
     const [editCoins, setEditCoins] = useState(0);
     const [editSquadId, setEditSquadId] = useState<string>("");
 
+    // Hall of Fame State
+    const [hofType, setHofType] = useState<string>("weekly_user");
+    const [hofUserId, setHofUserId] = useState<string>("");
+    const [hofSquadId, setHofSquadId] = useState<string>("");
+    const [hofPeriod, setHofPeriod] = useState<string>("");
+    const [hofXp, setHofXp] = useState<number>(0);
+
     useEffect(() => {
         fetchSquads();
     }, []);
@@ -122,6 +129,41 @@ export default function AdminDashboard() {
             fetchUsers();
         } catch (error) {
             toast({ title: "Error", description: "Failed to update user.", variant: "destructive" });
+        }
+    }
+
+    async function handleAddHallOfFameWinner() {
+        try {
+            const body: any = {
+                type: hofType,
+                period: hofPeriod,
+                totalXp: hofXp
+            };
+
+            if (hofType.includes("user")) {
+                if (!hofUserId) {
+                    toast({ title: "Error", description: "Please select a user.", variant: "destructive" });
+                    return;
+                }
+                body.userId = hofUserId;
+            } else {
+                if (!hofSquadId) {
+                    toast({ title: "Error", description: "Please select a squad.", variant: "destructive" });
+                    return;
+                }
+                body.squadId = hofSquadId;
+            }
+
+            await api.post("/api/admin/hall-of-fame/add-winner", body);
+            toast({ title: "Success", description: "Winner added to Hall of Fame!" });
+
+            // Reset form
+            setHofUserId("");
+            setHofSquadId("");
+            setHofPeriod("");
+            setHofXp(0);
+        } catch (error: any) {
+            toast({ title: "Error", description: error.message || "Failed to add winner.", variant: "destructive" });
         }
     }
 
@@ -315,6 +357,92 @@ export default function AdminDashboard() {
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
+
+            {/* Hall of Fame Management */}
+            <Card className="border-white/10 bg-black/40">
+                <CardHeader>
+                    <CardTitle>Hall of Fame Management</CardTitle>
+                    <p className="text-sm text-muted">Manually add winners to Hall of Fame</p>
+                </CardHeader>
+                <CardContent>
+                    <div className="grid gap-4">
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label className="text-sm text-muted mb-2 block">Winner Type</label>
+                                <Select value={hofType} onValueChange={setHofType}>
+                                    <SelectTrigger>
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="weekly_user">Weekly User</SelectItem>
+                                        <SelectItem value="monthly_user">Monthly User</SelectItem>
+                                        <SelectItem value="weekly_squad">Weekly Squad</SelectItem>
+                                        <SelectItem value="monthly_squad">Monthly Squad</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div>
+                                <label className="text-sm text-muted mb-2 block">
+                                    Period {hofType.includes("weekly") ? "(e.g., 2024-50)" : "(e.g., 2024-12)"}
+                                </label>
+                                <Input
+                                    placeholder={hofType.includes("weekly") ? "2024-50" : "2024-12"}
+                                    value={hofPeriod}
+                                    onChange={(e) => setHofPeriod(e.target.value)}
+                                />
+                            </div>
+                        </div>
+
+                        {hofType.includes("user") ? (
+                            <div>
+                                <label className="text-sm text-muted mb-2 block">Select User</label>
+                                <Select value={hofUserId} onValueChange={setHofUserId}>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Choose a user" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {users.map((user) => (
+                                            <SelectItem key={user.id} value={user.id}>
+                                                {user.username} ({user.totalXp} XP)
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        ) : (
+                            <div>
+                                <label className="text-sm text-muted mb-2 block">Select Squad</label>
+                                <Select value={hofSquadId} onValueChange={setHofSquadId}>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Choose a squad" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {squads.map((squad) => (
+                                            <SelectItem key={squad.id} value={squad.id}>
+                                                {squad.name}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        )}
+
+                        <div>
+                            <label className="text-sm text-muted mb-2 block">Total XP for Period</label>
+                            <Input
+                                type="number"
+                                placeholder="Enter XP amount"
+                                value={hofXp || ""}
+                                onChange={(e) => setHofXp(parseInt(e.target.value) || 0)}
+                            />
+                        </div>
+
+                        <Button onClick={handleAddHallOfFameWinner} className="w-full">
+                            Add to Hall of Fame
+                        </Button>
+                    </div>
+                </CardContent>
+            </Card>
         </div>
     );
 }

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { requireAuth, errorResponse, successResponse } from "@/lib/api-helpers";
 import { getISTWeekStart, getISTMonthStart } from "@/lib/timezone-utils";
+import { cache, cacheKey, CacheTTL } from "@/lib/cache";
 
 export async function GET(req: Request) {
     try {
@@ -9,8 +10,15 @@ export async function GET(req: Request) {
         const { searchParams } = new URL(req.url);
         const period = searchParams.get("period") || "weekly"; // weekly, monthly, all-time
         const page = parseInt(searchParams.get("page") || "1");
-        const limit = 50;
+        const limit = parseInt(searchParams.get("limit") || "50");
         const skip = (page - 1) * limit;
+
+        // ✅ Check cache first
+        const key = cacheKey('leaderboard', period, page, limit);
+        const cached = cache.get(key);
+        if (cached) {
+            return successResponse(cached);
+        }
 
         // Determine date range based on period using IST timezone
         let dateFilter = {};
@@ -50,10 +58,7 @@ export async function GET(req: Request) {
             // Aggregate XP from transactions for the period
             const xpAggregates = await prisma.xPTransaction.groupBy({
                 by: ['userId'],
-                where: {
-                    ...dateFilter,
-                    amount: { gt: 0 } // Only count earnings
-                },
+                where: dateFilter, // ✅ Include ALL transactions (positive and negative for admin adjustments)
                 _sum: {
                     amount: true,
                 },
@@ -83,9 +88,12 @@ export async function GET(req: Request) {
                 } as any
             });
 
+            // ✅ Use Map for O(1) lookup instead of O(n) find
+            const userMap = new Map(users.map((u: any) => [u.id, u]));
+
             // Merge data
             rankedUsers = xpAggregates.map((agg: any) => {
-                const user: any = users.find((u: any) => u.id === agg.userId);
+                const user = userMap.get(agg.userId);
                 return {
                     id: agg.userId,
                     username: user?.username || "Unknown",
@@ -106,7 +114,12 @@ export async function GET(req: Request) {
             isCurrentUser: user.id === payload.userId,
         }));
 
-        return successResponse({ leaderboard });
+        const result = { leaderboard };
+
+        // ✅ Cache for 2 minutes
+        cache.set(key, result, CacheTTL.MEDIUM);
+
+        return successResponse(result);
     } catch (error: any) {
         if (error.message === "Unauthorized") {
             return errorResponse("Unauthorized", 401);

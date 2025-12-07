@@ -1,104 +1,115 @@
 import { prisma } from "@/lib/db";
 import { getISTDayStart, getISTWeekStart } from "@/lib/timezone-utils";
 
-export async function checkMissionCompletion(userId: string, missionId: string) {
-    const mission = await prisma.mission.findUnique({
-        where: { id: missionId },
-    });
-
-    if (!mission) return false;
-
-    // Get user stats
-    const user = await prisma.user.findUnique({
-        where: { id: userId },
-        include: {
-            sessions: {
-                where: { completed: true }
+export async function checkMissionCompletion(userId: string, missionId: string): Promise<boolean> {
+    // ✅ Fetch mission and user in parallel
+    const [mission, user] = await Promise.all([
+        prisma.mission.findUnique({ where: { id: missionId } }),
+        prisma.user.findUnique({
+            where: { id: userId },
+            select: {
+                id: true,
+                totalXp: true,
+                totalMinutes: true,
+                streakDays: true,
             }
-        }
-    });
+        })
+    ]);
 
-    if (!user) return false;
-
-    // Check criteria based on mission type/requirements
-    // This is a simplified logic engine. In a real app, you might parse a JSON criteria object.
-
-    // Example criteria parsing (assuming criteria is a JSON string or simple description for now)
-    // For this prototype, we'll implement hardcoded checks based on mission ID or simple text matching
-    // In production, use a structured JSON field for 'criteria'
+    if (!mission || !user) return false;
 
     const criteria = mission.criteria.toLowerCase();
-    let completed = false;
+    const MIN_DURATION = 25;
 
-    // Filter for valid sessions (>= 25 mins)
-    const validSessions = user.sessions.filter((s: any) => s.durationMin >= 25);
+    // ✅ Cache date calculations (expensive operations)
+    const todayIST = mission.type === "DAILY" ? getISTDayStart() : null;
+    const weekStartIST = mission.type === "WEEKLY" ? getISTWeekStart() : null;
 
+    // ✅ Handle "study for X minutes" missions
     if (criteria.includes("study for") && criteria.includes("minutes")) {
-        // e.g. "Study for 60 minutes"
         const minutesMatch = criteria.match(/(\d+) minutes/);
         const requiredMinutes = minutesMatch ? parseInt(minutesMatch[1]) : 0;
 
-        if (mission.type === "DAILY") {
-            // Use IST day start (12:00 AM IST)
-            const todayIST = getISTDayStart();
-            const todayMinutes = validSessions
-                .filter((s: any) => s.startTs >= todayIST)
-                .reduce((acc: number, s: any) => acc + s.durationMin, 0);
+        if (mission.type === "DAILY" && todayIST) {
+            const result = await prisma.session.aggregate({
+                where: {
+                    userId,
+                    completed: true,
+                    durationMin: { gte: MIN_DURATION },
+                    startTs: { gte: todayIST }
+                },
+                _sum: { durationMin: true }
+            });
+            return (result._sum.durationMin || 0) >= requiredMinutes;
+        }
 
-            if (todayMinutes >= requiredMinutes) completed = true;
-        } else if (mission.type === "WEEKLY") {
-            // Use IST week start (Monday 12:00 AM IST)
-            const weekStartIST = getISTWeekStart();
-            const weekMinutes = validSessions
-                .filter((s: any) => s.startTs >= weekStartIST)
-                .reduce((acc: number, s: any) => acc + s.durationMin, 0);
+        if (mission.type === "WEEKLY" && weekStartIST) {
+            const result = await prisma.session.aggregate({
+                where: {
+                    userId,
+                    completed: true,
+                    durationMin: { gte: MIN_DURATION },
+                    startTs: { gte: weekStartIST }
+                },
+                _sum: { durationMin: true }
+            });
+            return (result._sum.durationMin || 0) >= requiredMinutes;
+        }
 
-            if (weekMinutes >= requiredMinutes) completed = true;
-        } else if (mission.type === "LONG_TERM") {
-            // Total accumulated time (all time)
-            const totalMinutes = validSessions
-                .reduce((acc: number, s: any) => acc + s.durationMin, 0);
-
-            if (totalMinutes >= requiredMinutes) completed = true;
+        if (mission.type === "LONG_TERM") {
+            return user.totalMinutes >= requiredMinutes;
         }
     }
 
+    // ✅ Handle "complete X sessions" missions
     if (criteria.includes("complete") && criteria.includes("session")) {
-        // e.g. "Complete 3 sessions"
         const countMatch = criteria.match(/(\d+) session/);
         const requiredCount = countMatch ? parseInt(countMatch[1]) : 1;
 
-        if (mission.type === "DAILY") {
-            // Use IST day start (12:00 AM IST)
-            const todayIST = getISTDayStart();
+        if (mission.type === "DAILY" && todayIST) {
+            const count = await prisma.session.count({
+                where: {
+                    userId,
+                    completed: true,
+                    durationMin: { gte: MIN_DURATION },
+                    startTs: { gte: todayIST }
+                }
+            });
+            return count >= requiredCount;
+        }
 
-            // Normal daily count
-            const todaySessions = validSessions.filter((s: any) => s.startTs >= todayIST).length;
-            if (todaySessions >= requiredCount) completed = true;
+        if (mission.type === "WEEKLY" && weekStartIST) {
+            const count = await prisma.session.count({
+                where: {
+                    userId,
+                    completed: true,
+                    durationMin: { gte: MIN_DURATION },
+                    startTs: { gte: weekStartIST }
+                }
+            });
+            return count >= requiredCount;
+        }
 
-        } else if (mission.type === "WEEKLY") {
-            // Use IST week start (Monday 12:00 AM IST)
-            const weekStartIST = getISTWeekStart();
-
-            const weekSessions = validSessions.filter((s: any) => s.startTs >= weekStartIST).length;
-            if (weekSessions >= requiredCount) completed = true;
-
-        } else if (mission.type === "LONG_TERM") {
-            // Total sessions ever
-            const totalSessions = validSessions.length;
-            if (totalSessions >= requiredCount) completed = true;
+        if (mission.type === "LONG_TERM") {
+            const count = await prisma.session.count({
+                where: {
+                    userId,
+                    completed: true,
+                    durationMin: { gte: MIN_DURATION }
+                }
+            });
+            return count >= requiredCount;
         }
     }
 
+    // ✅ Handle streak missions
     if (criteria.includes("streak")) {
-        // e.g. "7 day streak" or "30 day streak"
         const streakMatch = criteria.match(/(\d+) day streak/);
         const requiredStreak = streakMatch ? parseInt(streakMatch[1]) : 0;
-
-        if (user.streakDays >= requiredStreak) completed = true;
+        return user.streakDays >= requiredStreak;
     }
 
-    return completed;
+    return false;
 }
 
 export async function checkAllActiveMissions(userId: string) {
@@ -113,35 +124,42 @@ export async function checkAllActiveMissions(userId: string) {
         }
     });
 
+    if (progress.length === 0) return [];
+
+    // ✅ Check all missions in parallel instead of sequentially
+    const completionChecks = await Promise.all(
+        progress.map(p => checkMissionCompletion(userId, p.missionId))
+    );
+
     const completedMissions = [];
 
-    for (const p of progress) {
-        const isComplete = await checkMissionCompletion(userId, p.missionId);
-        if (isComplete) {
-            if (isComplete) {
-                // Atomic update to prevent double XP awarding
-                // We update where id matches AND completed is false
-                const updateResult = await prisma.missionProgress.updateMany({
-                    where: {
-                        id: p.id,
-                        completed: false
-                    },
-                    data: {
-                        completed: true,
-                        completedAt: new Date()
-                    }
-                });
+    // ✅ Process completed missions
+    for (let i = 0; i < progress.length; i++) {
+        const p = progress[i];
+        const isComplete = completionChecks[i];
 
-                // Only award XP if we actually updated the row (i.e., it wasn't already completed)
-                if (updateResult.count > 0) {
-                    // Award XP
-                    await prisma.user.update({
+        if (isComplete) {
+            // Atomic update to prevent double XP awarding
+            const updateResult = await prisma.missionProgress.updateMany({
+                where: {
+                    id: p.id,
+                    completed: false
+                },
+                data: {
+                    completed: true,
+                    completedAt: new Date()
+                }
+            });
+
+            // Only award XP if we actually updated the row
+            if (updateResult.count > 0) {
+                // ✅ Use transaction for atomic XP update and logging
+                await prisma.$transaction([
+                    prisma.user.update({
                         where: { id: userId },
                         data: { totalXp: { increment: p.mission.xpReward } }
-                    });
-
-                    // Log transaction
-                    await prisma.xPTransaction.create({
+                    }),
+                    prisma.xPTransaction.create({
                         data: {
                             userId,
                             amount: p.mission.xpReward,
@@ -149,10 +167,10 @@ export async function checkAllActiveMissions(userId: string) {
                             referenceId: p.id,
                             note: `Completed mission: ${p.mission.title}`
                         }
-                    });
+                    })
+                ]);
 
-                    completedMissions.push(p.mission);
-                }
+                completedMissions.push(p.mission);
             }
         }
     }

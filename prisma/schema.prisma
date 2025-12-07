@@ -6,7 +6,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
@@ -129,6 +129,12 @@ model Session {
   subjectTag  String?
   needsReview Boolean  @default(false) // Anti-cheat flag
   createdAt   DateTime @default(now())
+
+  @@index([userId])
+  @@index([completed])
+  @@index([userId, completed])
+  @@index([startTs])
+  @@index([userId, startTs])
 }
 
 model Mission {
@@ -158,6 +164,9 @@ model MissionProgress {
   mission     Mission   @relation(fields: [missionId], references: [id])
 
   @@unique([userId, missionId])
+  @@index([userId])
+  @@index([completed])
+  @@index([userId, completed])
 }
 
 model XPTransaction {
@@ -170,6 +179,7 @@ model XPTransaction {
   createdAt   DateTime @default(now())
   note        String?
 
+  @@index([userId, createdAt])
   @@index([createdAt])
   @@index([userId])
 }

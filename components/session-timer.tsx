@@ -83,10 +83,14 @@ export function SessionTimer({ onComplete }: SessionTimerProps) {
             }
         }
 
+        // ✅ Reset timer immediately to prevent showing old time
+        setIsRunning(false);
+        setSeconds(0);
+        const currentSessionId = sessionId;
+        setSessionId(null);
+
         try {
-            const data = await api.post("/api/sessions/stop", { sessionId });
-            setIsRunning(false);
-            setSessionId(null);
+            const data = await api.post("/api/sessions/stop", { sessionId: currentSessionId });
             setXpEarned(data.xpEarned);
             setSubjectTag("");
 
@@ -102,6 +106,9 @@ export function SessionTimer({ onComplete }: SessionTimerProps) {
             setTimeout(() => setXpEarned(null), 5000);
         } catch (error: any) {
             alert(error.message || "Failed to stop session");
+            // ✅ On error, restore session state
+            setSessionId(currentSessionId);
+            setIsRunning(true);
         }
     }
 

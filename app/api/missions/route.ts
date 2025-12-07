@@ -9,10 +9,10 @@ export async function GET() {
 
         // Reset expired missions, but only if enough time has passed
         // This prevents running reset on every page load
-        if (shouldRunReset(payload.userId)) {
+        if (await shouldRunReset(payload.userId)) {
             const { resetExpiredMissions } = await import("@/lib/mission-reset");
             const result = await resetExpiredMissions(payload.userId);
-            markResetRun(payload.userId);
+            await markResetRun(payload.userId);
 
             if (result.penaltyCount > 0) {
                 console.log(`⚠️ User ${payload.userId} penalized for ${result.penaltyCount} missions (-${result.totalPenalty} XP)`);
