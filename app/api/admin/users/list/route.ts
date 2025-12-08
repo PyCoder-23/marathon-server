@@ -13,8 +13,8 @@ export async function GET(req: Request) {
 
         const where = query ? {
             OR: [
-                { username: { contains: query, mode: 'insensitive' as const } },
-                { email: { contains: query, mode: 'insensitive' as const } },
+                { username: { contains: query } }, // SQLite contains is case-insensitive by default
+                { email: { contains: query } },
             ]
         } : {};
 

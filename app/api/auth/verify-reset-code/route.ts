@@ -12,14 +12,11 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Email and code required" }, { status: 400 });
         }
 
-        const user = await prisma.user.findFirst({
-            where: {
-                email: {
-                    equals: email,
-                    mode: "insensitive",
-                }
-            }
+        const allUsers = await prisma.user.findMany({
+            select: { id: true, email: true, resetCode: true, resetCodeExpires: true }
         });
+
+        const user = allUsers.find(u => u.email.toLowerCase() === email.toLowerCase());
 
         if (!user) {
             return NextResponse.json({ error: "Invalid request" }, { status: 400 });

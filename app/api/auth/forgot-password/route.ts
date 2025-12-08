@@ -11,14 +11,11 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Email is required" }, { status: 400 });
         }
 
-        const user = await prisma.user.findFirst({
-            where: {
-                email: {
-                    equals: email,
-                    mode: "insensitive",
-                }
-            }
+        const allUsers = await prisma.user.findMany({
+            select: { id: true, email: true }
         });
+
+        const user = allUsers.find(u => u.email.toLowerCase() === email.toLowerCase());
 
         if (!user) {
             // Security: Don't reveal if user exists

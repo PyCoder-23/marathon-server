@@ -11,16 +11,22 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Missing credentials" }, { status: 400 });
         }
 
-        // Find user
-        // Find user (Case Insensitive)
-        const user = await prisma.user.findFirst({
-            where: {
-                OR: [
-                    { email: { equals: identifier, mode: "insensitive" } },
-                    { username: { equals: identifier, mode: "insensitive" } },
-                ],
-            },
+        // Find user (SQLite doesn't support case-insensitive mode, so we fetch and compare in JS)
+        const allUsers = await prisma.user.findMany({
+            select: {
+                id: true,
+                username: true,
+                email: true,
+                passwordHash: true,
+                isAdmin: true,
+                bannedUntil: true,
+            }
         });
+
+        const user = allUsers.find(u =>
+            u.email.toLowerCase() === identifier.toLowerCase() ||
+            u.username.toLowerCase() === identifier.toLowerCase()
+        );
 
         if (!user) {
             return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });

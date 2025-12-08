@@ -38,16 +38,17 @@ export async function POST(req: Request) {
             return errorResponse("Username must be at least 3 characters", 400);
         }
 
-        // 5. Check uniqueness if changing username/email
+        // 5. Check uniqueness if changing username/email (fetch all and compare in JS)
         if (isUsernameChanging || isEmailChanging) {
-            const existing = await prisma.user.findFirst({
-                where: {
-                    OR: [
-                        isUsernameChanging ? { username: { equals: username, mode: 'insensitive' } } : {},
-                        isEmailChanging ? { email: { equals: email, mode: 'insensitive' } } : {},
-                    ],
-                    NOT: { id: payload.userId }
-                }
+            const allUsers = await prisma.user.findMany({
+                where: { NOT: { id: payload.userId } },
+                select: { id: true, username: true, email: true }
+            });
+
+            const existing = allUsers.find(u => {
+                if (isUsernameChanging && u.username.toLowerCase() === username?.toLowerCase()) return true;
+                if (isEmailChanging && u.email.toLowerCase() === email?.toLowerCase()) return true;
+                return false;
             });
 
             if (existing) {
