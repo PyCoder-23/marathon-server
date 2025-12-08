@@ -6,14 +6,6 @@ export async function GET() {
     try {
         await requireAuth();
 
-        // TODO: Re-enable when Prisma client is regenerated with new models
-        // For now, return empty arrays
-        const monthlySquadWinners: any[] = [];
-        const weeklySquadWinners: any[] = [];
-        const monthlyUserWinners: any[] = [];
-        const weeklyUserWinners: any[] = [];
-
-        /* 
         // Fetch all monthly squad winners
         const monthlySquadWinners = await prisma.monthlyWinner.findMany({
             include: {
@@ -75,7 +67,6 @@ export async function GET() {
                 { totalXp: 'desc' }
             ]
         });
-        */
 
         // Group by period and assign ranks
         const groupAndRank = (winners: any[], periodKey: string, nameKey: string, imageKey?: string) => {
