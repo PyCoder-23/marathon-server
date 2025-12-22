@@ -13,11 +13,13 @@ export async function POST(req: Request) {
         const now = new Date();
         const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
 
-        // Delete all entries from previous months
+        const startOfCurrentMonth = `${currentMonth}-01`;
+
+        // Delete all entries from previous months (date < start of this month)
         const result = await prisma.journalEntry.deleteMany({
             where: {
-                month: {
-                    lt: currentMonth
+                date: {
+                    lt: startOfCurrentMonth
                 }
             }
         });

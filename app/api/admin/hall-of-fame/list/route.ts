@@ -16,25 +16,72 @@ export async function GET(req: Request) {
             return errorResponse("Unauthorized - Admin only", 403);
         }
 
-        // Fetch all Hall of Fame entries with user/squad details
-        const entries = await prisma.hallOfFameWinner.findMany({
-            include: {
-                user: {
-                    select: {
-                        username: true,
-                        image: true
-                    }
-                },
-                squad: {
-                    select: {
-                        name: true
-                    }
-                }
-            },
-            orderBy: {
-                createdAt: 'desc'
-            }
-        });
+        // Fetch all 4 types of winners
+        const [userMonthly, userWeekly, squadMonthly, squadWeekly] = await Promise.all([
+            prisma.userMonthlyWinner.findMany({
+                include: { user: { select: { username: true, image: true } } },
+                orderBy: { createdAt: 'desc' },
+                take: 50
+            }),
+            prisma.userWeeklyWinner.findMany({
+                include: { user: { select: { username: true, image: true } } },
+                orderBy: { createdAt: 'desc' },
+                take: 50
+            }),
+            prisma.monthlyWinner.findMany({
+                include: { squad: { select: { name: true } } },
+                orderBy: { createdAt: 'desc' },
+                take: 50
+            }),
+            prisma.weeklyWinner.findMany({
+                include: { squad: { select: { name: true } } },
+                orderBy: { createdAt: 'desc' },
+                take: 50
+            })
+        ]);
+
+        // Unite them
+        const entries = [
+            ...userMonthly.map(e => ({
+                id: e.id,
+                type: 'monthly_user',
+                period: e.month,
+                totalXp: e.totalXp,
+                name: e.user.username,
+                image: e.user.image,
+                createdAt: e.createdAt,
+            })),
+            ...userWeekly.map(e => ({
+                id: e.id,
+                type: 'weekly_user',
+                period: e.week,
+                totalXp: e.totalXp,
+                name: e.user.username,
+                image: e.user.image,
+                createdAt: e.createdAt,
+            })),
+            ...squadMonthly.map(e => ({
+                id: e.id,
+                type: 'monthly_squad',
+                period: e.month,
+                totalXp: e.totalXp,
+                name: e.squad.name,
+                image: null,
+                createdAt: e.createdAt,
+            })),
+            ...squadWeekly.map(e => ({
+                id: e.id,
+                type: 'weekly_squad',
+                period: e.week,
+                totalXp: e.totalXp,
+                name: e.squad.name,
+                image: null,
+                createdAt: e.createdAt,
+            }))
+        ];
+
+        // Sort combined
+        entries.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
         return successResponse({ entries });
 

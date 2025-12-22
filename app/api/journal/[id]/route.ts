@@ -3,10 +3,10 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { requireAuth, errorResponse, successResponse } from "@/lib/api-helpers";
 
-export async function PUT(req: Request, { params }: { params: { id: string } }) {
+export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
     try {
         const payload = await requireAuth();
-        const { id } = params;
+        const { id } = await params;
         const body = await req.json();
 
         // Verify ownership
@@ -34,10 +34,10 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
     }
 }
 
-export async function DELETE(req: Request, { params }: { params: { id: string } }) {
+export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
     try {
         const payload = await requireAuth();
-        const { id } = params;
+        const { id } = await params;
 
         // Verify ownership
         const existingEntry = await prisma.journalEntry.findUnique({

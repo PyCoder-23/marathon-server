@@ -16,25 +16,47 @@ export async function POST(req: Request) {
             return errorResponse("Unauthorized - Admin only", 403);
         }
 
-        const { entryId } = await req.json();
+        const { entryId, type } = await req.json();
 
         if (!entryId) {
             return errorResponse("Entry ID required", 400);
         }
 
-        // Check if entry exists
-        const entry = await prisma.hallOfFameWinner.findUnique({
-            where: { id: entryId }
-        });
+        let deleted = false;
 
-        if (!entry) {
-            return errorResponse("Entry does not exist", 404);
+        // If type provided, target specific table
+        if (type) {
+            const modelMap: Record<string, any> = {
+                'monthly_user': prisma.userMonthlyWinner,
+                'weekly_user': prisma.userWeeklyWinner,
+                'monthly_squad': prisma.monthlyWinner,
+                'weekly_squad': prisma.weeklyWinner
+            };
+
+            const conversationModel = modelMap[type];
+            if (conversationModel) {
+                try {
+                    await conversationModel.delete({ where: { id: entryId } });
+                    deleted = true;
+                } catch (e) {
+                    // ignore not found
+                }
+            }
+        } else {
+            // Try all tables
+            const deletions = await Promise.allSettled([
+                prisma.userMonthlyWinner.delete({ where: { id: entryId } }),
+                prisma.userWeeklyWinner.delete({ where: { id: entryId } }),
+                prisma.monthlyWinner.delete({ where: { id: entryId } }),
+                prisma.weeklyWinner.delete({ where: { id: entryId } })
+            ]);
+
+            deleted = deletions.some(r => r.status === 'fulfilled');
         }
 
-        // Delete the entry
-        await prisma.hallOfFameWinner.delete({
-            where: { id: entryId }
-        });
+        if (!deleted) {
+            return errorResponse("Entry not found or could not be deleted", 404);
+        }
 
         return successResponse({
             message: "Entry removed from Hall of Fame",
