@@ -8,6 +8,7 @@ import { Coins, Sparkles, User, ShoppingBag, ShieldCheck } from "lucide-react";
 import { api } from "@/lib/api-client";
 import { useAuth } from "@/lib/auth-context";
 import { useToast } from "@/components/ui/toast-context";
+import { cn } from "@/lib/utils";
 import Image from "next/image";
 
 interface ShopItem {
@@ -109,7 +110,7 @@ export default function ShopPage() {
     const frames = items.filter(i => i.type === "FRAME");
     const nameplates = items.filter(i => i.type === "NAMEPLATE");
     const banners = items.filter(i => i.type === "BANNER");
-    const consumables = items.filter(i => i.type === "FREEZE");
+    const consumables = items.filter(i => i.type === "FREEZE" || i.type === "PARDON");
 
     if (loading) {
         return <div className="p-10 text-center">Loading Marketplace...</div>;
@@ -230,21 +231,50 @@ function ShopCard({ item, user, onBuy, onEquip, purchasing, isConsumable = false
         (item.type === 'NAMEPLATE' && user?.equippedNameplate === item.cssClass);
 
     return (
-        <Card className={`bg-black/40 border-white/5 hover:border-purple-500/50 transition-all group overflow-hidden ${isOwned ? 'border-purple-500/30' : ''}`}>
-            <div className="h-32 flex items-center justify-center bg-gradient-to-br from-white/5 to-transparent relative p-4">
+        <Card className={cn(
+            "bg-black/40 border-white/5 hover:border-purple-500/50 transition-all group relative overflow-visible",
+            isOwned && "border-purple-500/30 shadow-[0_0_20px_rgba(168,85,247,0.1)]",
+            isEquipped && "ring-1 ring-purple-500/50"
+        )}>
+            {/* Thematic Glow Background */}
+            <div className={cn(
+                "absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity blur-3xl rounded-full z-0 pointer-events-none",
+                item.type === 'FRAME' && "bg-blue-500",
+                item.type === 'NAMEPLATE' && "bg-pink-500",
+                item.type === 'FREEZE' && "bg-cyan-500",
+                item.type === 'PARDON' && "bg-yellow-500"
+            )} />
+
+            <div className="h-48 flex items-center justify-center bg-gradient-to-br from-white/5 to-transparent relative p-8 z-10">
                 {/* Preview Logic */}
                 {item.type === 'FRAME' && (
-                    <div className={`relative w-20 h-20 rounded-full border-2 border-white/20 flex items-center justify-center ${item.cssClass || ''}`}>
-                        <div className="w-16 h-16 rounded-full bg-zinc-800" />
+                    <div className={cn("relative w-28 h-28 rounded-full flex items-center justify-center", item.cssClass)}>
+                        <div className="w-20 h-20 rounded-full bg-zinc-900 border border-white/10" />
                     </div>
                 )}
                 {item.type === 'NAMEPLATE' && (
-                    <div className={`text-lg font-bold px-3 py-1 ${item.cssClass || ''}`}>
+                    <div className={cn("text-2xl font-black px-6 py-3", item.cssClass)}>
                         {user?.username || 'Username'}
                     </div>
                 )}
+                {item.type === 'BANNER' && (
+                    <div className={cn("w-full h-full rounded-lg border border-white/10 overflow-hidden relative shadow-2xl", item.cssClass)}>
+                        <div className="absolute inset-0 flex items-center justify-center backdrop-blur-[2px]">
+                            <span className="text-xs text-white/60 uppercase tracking-widest font-black shadow-black drop-shadow-md">Banner Preview</span>
+                        </div>
+                    </div>
+                )}
                 {item.type === 'FREEZE' && (
-                    <ShieldCheck className="w-16 h-16 text-blue-400 opacity-80" />
+                    <div className="relative group/icon">
+                        <div className="absolute inset-0 bg-blue-500/20 blur-2xl rounded-full group-hover/icon:bg-blue-500/40 transition-colors"></div>
+                        <ShieldCheck className="w-24 h-24 text-blue-400 relative drop-shadow-[0_0_20px_rgba(96,165,250,0.6)]" />
+                    </div>
+                )}
+                {item.type === 'PARDON' && (
+                    <div className="relative group/icon">
+                        <div className="absolute inset-0 bg-yellow-500/30 blur-3xl rounded-full animate-pulse group-hover/icon:bg-yellow-500/50 transition-colors"></div>
+                        <span className="relative text-8xl drop-shadow-[0_0_25px_rgba(234,179,8,1)]">⚡</span>
+                    </div>
                 )}
             </div>
 

@@ -22,6 +22,8 @@ export async function GET(
                         totalMinutes: true,
                         streakDays: true,
                         isAdmin: true,
+                        equippedFrame: true,
+                        equippedNameplate: true,
                     },
                     orderBy: {
                         totalXp: 'desc',
@@ -39,8 +41,8 @@ export async function GET(
         }
 
         // Calculate squad stats
-        const totalXp = squad.members.reduce((sum, member) => sum + member.totalXp, 0);
-        const totalMinutes = squad.members.reduce((sum, member) => sum + member.totalMinutes, 0);
+        const totalXp = squad.members.reduce((sum, member) => sum + (member.totalXp || 0), 0);
+        const totalMinutes = squad.members.reduce((sum, member) => sum + (member.totalMinutes || 0), 0);
 
         // Get global rank (simplified for now, ideally cached)
         const allSquads = await prisma.squad.findMany({
@@ -53,7 +55,7 @@ export async function GET(
 
         const squadScores = allSquads.map(s => ({
             id: s.id,
-            score: s.members.reduce((sum, m) => sum + m.totalXp, 0)
+            score: s.members.reduce((sum, m: any) => sum + (m.totalXp || 0), 0)
         })).sort((a, b) => b.score - a.score);
 
         const rank = squadScores.findIndex(s => s.id === id) + 1;

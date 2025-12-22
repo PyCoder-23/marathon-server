@@ -6,16 +6,24 @@ import { requireAuth, errorResponse, successResponse } from "@/lib/api-helpers";
 export async function POST(req: Request) {
     try {
         const payload = await requireAuth();
-        const { missionId } = await req.json();
+        const body = await req.json();
+        const { missionId, progressId } = body;
 
-        if (!missionId) return errorResponse("Mission ID required", 400);
+        if (!missionId && !progressId) {
+            return errorResponse("Mission ID or Progress ID required", 400);
+        }
 
-        const user = await prisma.user.findUnique({ where: { id: payload.userId } });
+        const user = await prisma.user.findUnique({
+            where: { id: payload.userId }
+        });
+
         if (!user) return errorResponse("User not found", 404);
 
-        // Find active progress
+        // Find progress entry
         const progress = await prisma.missionProgress.findFirst({
-            where: { userId: user.id, missionId: missionId, completed: false }
+            where: progressId
+                ? { id: progressId, userId: user.id, completed: false }
+                : { missionId, userId: user.id, completed: false }
         });
 
         if (!progress) return errorResponse("Active mission not found", 404);
@@ -56,7 +64,11 @@ export async function POST(req: Request) {
         return successResponse({ message: "Withdrawn successfully", method });
 
     } catch (error: any) {
-        console.error(error);
-        return errorResponse("Internal Error", 500);
+        console.error("Withdraw mission error:", error);
+        // Ensure strictly JSON response even for 500
+        return NextResponse.json(
+            { success: false, error: "Internal Server Error" },
+            { status: 500 }
+        );
     }
 }

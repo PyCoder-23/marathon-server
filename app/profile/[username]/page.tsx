@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Lock, Trophy, Flame, Clock, Users, BarChart3, Medal, Crown } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useParams } from "next/navigation";
+import { cn } from "@/lib/utils";
 
 interface ProfileData {
     profile: {
@@ -134,7 +135,7 @@ export default function ProfilePage() {
                         <CardContent className="pt-12 relative z-10 flex flex-col items-center text-center">
 
                             {/* PFP with Frame */}
-                            <div className={`w-36 h-36 flex items-center justify-center mb-4 relative ${profile.equippedFrame || ''}`}>
+                            <div className={cn("w-40 h-40 flex items-center justify-center mb-4 relative", profile.equippedFrame)}>
                                 <div className="w-32 h-32 rounded-full border-4 border-black/50 bg-black shadow-lg overflow-hidden">
                                     {profile.image ? (
                                         <img src={profile.image} alt={profile.username} className="w-full h-full object-cover" />
@@ -144,7 +145,6 @@ export default function ProfilePage() {
                                         </div>
                                     )}
                                 </div>
-                                {/* Online indicator could go here */}
                             </div>
 
                             <h1 className={`text-3xl font-bold text-white mb-1 ${profile.equippedNameplate || ''}`}>
@@ -250,7 +250,7 @@ export default function ProfilePage() {
                                             <div className="absolute w-full border-t border-white/20 border-dashed" style={{ top: `${(100 - ((0 - minY) / yRange) * 100)}%` }} />
                                         )}
 
-                                        {weeklyStats.length > 0 && (
+                                        {weeklyStats.length > 1 && (
                                             <svg className="absolute inset-0 w-full h-full overflow-visible" viewBox="0 0 100 100" preserveAspectRatio="none">
                                                 <defs>
                                                     <linearGradient id="profileLineGradient" x1="0" y1="0" x2="0" y2="1">
@@ -283,6 +283,12 @@ export default function ProfilePage() {
                                                     vectorEffect="non-scaling-stroke"
                                                 />
                                             </svg>
+                                        )}
+
+                                        {weeklyStats.length === 1 && (
+                                            <div className="absolute left-0 bottom-0 w-full h-full flex items-center justify-center opacity-20">
+                                                <div className="w-[2px] h-full bg-primary/20" style={{ left: '50%' }} />
+                                            </div>
                                         )}
 
                                         {/* Points */}

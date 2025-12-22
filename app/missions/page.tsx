@@ -19,6 +19,7 @@ import { CheckCircle2, Star, Timer, Trophy, Target, AlertTriangle, Play } from "
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api-client";
 import { useAuth } from "@/lib/auth-context";
+import { useToast } from "@/components/ui/toast-context";
 
 interface Mission {
     id: string;
@@ -35,6 +36,7 @@ export default function MissionsPage() {
     const [missions, setMissions] = useState<Mission[]>([]);
     const [loading, setLoading] = useState(true);
     const { user, refreshUser } = useAuth();
+    const { toast } = useToast();
 
     useEffect(() => {
         fetchMissions();
@@ -57,7 +59,11 @@ export default function MissionsPage() {
             await api.post("/api/missions/start", { missionId });
             await fetchMissions();
         } catch (error: any) {
-            alert(error.message || "Failed to start mission");
+            toast({
+                title: "Failed to start mission",
+                description: error.message || "Please try again",
+                variant: "destructive"
+            });
         } finally {
             setLoading(false);
         }
@@ -70,30 +76,182 @@ export default function MissionsPage() {
             if (data.completed) {
                 await fetchMissions();
                 await refreshUser();
-                alert(`🎉 Mission Complete! +${data.xpAwarded} XP`);
+                toast({
+                    title: "🎉 Mission Complete!",
+                    description: `You earned +${data.xpAwarded} XP`,
+                    variant: "success"
+                });
             } else {
-                alert("❌ Mission criteria not yet met. Keep training!");
+                toast({
+                    title: "Not Yet Complete",
+                    description: "Mission criteria not yet met. Keep training!",
+                    variant: "destructive"
+                });
             }
         } catch (error: any) {
-            alert(error.message || "Failed to complete mission");
+            toast({
+                title: "Failed to complete mission",
+                description: error.message || "Please try again",
+                variant: "destructive"
+            });
         } finally {
             setLoading(false);
         }
     }
 
-    async function handleWithdraw(missionId: string) {
+    async function handleAbandonMission(progressId: string) {
+        // Check if user has Mission Escape Cards
+        if (!user || (user.missionPardons || 0) === 0) {
+            toast({
+                title: "No Mission Escape Cards",
+                description: "Purchase Mission Escape Cards from the shop to abandon missions!",
+                variant: "destructive"
+            });
+            return;
+        }
+
         try {
             setLoading(true);
-            const res = await api.post("/api/missions/withdraw", { missionId });
+            const res = await api.post("/api/missions/withdraw", { progressId });
+
+            // Show celebration animation
+            showEscapeAnimation();
+
+            // Wait for animation
+            await new Promise(resolve => setTimeout(resolve, 3500));
+
             await fetchMissions();
             await refreshUser();
-            const method = res.method === "PARDON" ? "Used 1 Mission Pardon" : "Paid 50 Coins";
-            alert(`Withdrawn successfully (${method})`);
+
+            toast({
+                title: "🎉 Mission Dropped Successfully!",
+                description: "Used 1 Mission Escape Card",
+                variant: "success"
+            });
         } catch (error: any) {
-            alert(error.message || "Failed to withdraw");
+            toast({
+                title: "Failed to abandon mission",
+                description: error.message || "Please try again",
+                variant: "destructive"
+            });
         } finally {
             setLoading(false);
         }
+    }
+
+    function showEscapeAnimation() {
+        const overlay = document.createElement('div');
+        overlay.className = 'fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-md';
+        overlay.style.animation = 'fadeIn 0.4s ease-out forwards';
+
+        const container = document.createElement('div');
+        container.className = 'relative flex flex-col items-center justify-center';
+        container.innerHTML = `
+            <div class="relative flex flex-col items-center">
+                <!-- Lock Animation Container -->
+                <div class="lock-container mb-8 relative" style="width: 150px; height: 150px; display: flex; items-center; justify-center;">
+                    <div id="lock-emoji" class="text-8xl select-none" style="animation: lockClosed 0.8s ease-in-out infinite alternate;">🔒</div>
+                </div>
+                
+                <!-- Success message -->
+                <div class="text-center opacity-0 translate-y-4" id="escape-message" style="transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);">
+                    <h2 class="text-5xl font-black text-primary mb-3 tracking-tighter">MISSION ESCAPED</h2>
+                    <p class="text-xl text-white/60 font-medium">PENALTY NEGATED ⚡</p>
+                </div>
+            </div>
+        `;
+
+        overlay.appendChild(container);
+        document.body.appendChild(overlay);
+
+        // Add CSS animations
+        const style = document.createElement('style');
+        style.id = 'escape-animation-style';
+        style.textContent = `
+            @keyframes fadeIn {
+                from { opacity: 0; }
+                to { opacity: 1; }
+            }
+            @keyframes fadeOut {
+                from { opacity: 1; }
+                to { opacity: 0; }
+            }
+            @keyframes lockClosed {
+                from { transform: scale(1) rotate(-5deg); }
+                to { transform: scale(1.05) rotate(5deg); }
+            }
+            @keyframes lockOpenPop {
+                0% { transform: scale(1); }
+                50% { transform: scale(1.4); }
+                100% { transform: scale(1); }
+            }
+            .firework-particle {
+                position: absolute;
+                width: 4px;
+                height: 4px;
+                border-radius: 50%;
+                pointer-events: none;
+            }
+        `;
+        document.head.appendChild(style);
+
+        const lockEmoji = document.getElementById('lock-emoji');
+        const message = document.getElementById('escape-message');
+
+        // Animation Sequence
+        setTimeout(() => {
+            if (lockEmoji) {
+                // Unlock!
+                lockEmoji.innerText = '🔓';
+                lockEmoji.style.animation = 'lockOpenPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards';
+
+                // Show message
+                if (message) {
+                    message.classList.remove('opacity-0', 'translate-y-4');
+                    message.classList.add('opacity-100', 'translate-y-0');
+                }
+
+                // Burst effect
+                createBurst(lockEmoji);
+            }
+        }, 1200);
+
+        function createBurst(parent: HTMLElement) {
+            const colors = ['#00ff95', '#ffffff', '#fbbf24'];
+            for (let i = 0; i < 30; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'firework-particle';
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                particle.style.backgroundColor = color;
+                particle.style.boxShadow = `0 0 10px ${color}`;
+
+                const angle = Math.random() * Math.PI * 2;
+                const velocity = 5 + Math.random() * 10;
+                const tx = Math.cos(angle) * 150;
+                const ty = Math.sin(angle) * 150;
+
+                parent.appendChild(particle);
+
+                particle.animate([
+                    { transform: 'translate(0, 0) scale(1)', opacity: 1 },
+                    { transform: `translate(${tx}px, ${ty}px) scale(0)`, opacity: 0 }
+                ], {
+                    duration: 1000 + Math.random() * 500,
+                    easing: 'cubic-bezier(0, .9, .57, 1)',
+                    fill: 'forwards'
+                });
+            }
+        }
+
+        // Cleanup
+        setTimeout(() => {
+            overlay.style.animation = 'fadeOut 0.4s ease-out forwards';
+            setTimeout(() => {
+                if (document.body.contains(overlay)) document.body.removeChild(overlay);
+                const styleEl = document.getElementById('escape-animation-style');
+                if (styleEl) document.head.removeChild(styleEl);
+            }, 400);
+        }, 3500);
     }
 
     const dailyMissions = missions.filter(m => m.type === "DAILY");
@@ -135,7 +293,7 @@ export default function MissionsPage() {
                                 user={user}
                                 onStart={() => handleStartMission(mission.id)}
                                 onComplete={() => handleCompleteMission(mission.id)}
-                                onWithdraw={() => handleWithdraw(mission.id)}
+                                onWithdraw={() => handleAbandonMission(mission.progressId || mission.id)}
                             />
                         ))}
                     </div>
@@ -150,7 +308,7 @@ export default function MissionsPage() {
                                 user={user}
                                 onStart={() => handleStartMission(mission.id)}
                                 onComplete={() => handleCompleteMission(mission.id)}
-                                onWithdraw={() => handleWithdraw(mission.id)}
+                                onWithdraw={() => handleAbandonMission(mission.progressId || mission.id)}
                             />
                         ))}
                     </div>
@@ -165,7 +323,7 @@ export default function MissionsPage() {
                                 user={user}
                                 onStart={() => handleStartMission(mission.id)}
                                 onComplete={() => handleCompleteMission(mission.id)}
-                                onWithdraw={() => handleWithdraw(mission.id)}
+                                onWithdraw={() => handleAbandonMission(mission.progressId || mission.id)}
                             />
                         ))}
                     </div>
@@ -180,7 +338,7 @@ export default function MissionsPage() {
                                 user={user}
                                 onStart={() => handleStartMission(mission.id)}
                                 onComplete={() => handleCompleteMission(mission.id)}
-                                onWithdraw={() => handleWithdraw(mission.id)}
+                                onWithdraw={() => handleAbandonMission(mission.progressId || mission.id)}
                             />
                         ))}
                     </div>
@@ -248,65 +406,53 @@ function MissionCard({
                 )}
                 {mission.status === "IN_PROGRESS" && (
                     <>
-                        <Button
-                            variant="secondary"
-                            className="flex-1 bg-yellow-500/20 text-yellow-500 hover:bg-yellow-500/30 border border-yellow-500/50"
-                            onClick={onComplete}
-                        >
-                            Check Progress
+                        <Button onClick={onComplete} size="sm" className="bg-primary hover:bg-primary/90 text-black">
+                            <CheckCircle2 className="w-4 h-4 mr-2" />
+                            Complete
                         </Button>
 
                         <AlertDialog>
                             <AlertDialogTrigger asChild>
-                                <Button variant="outline" size="icon" className="border-red-500/30 text-red-500 hover:bg-red-500/10">
-                                    <AlertTriangle className="w-4 h-4" />
+                                <Button
+                                    variant="destructive"
+                                    size="sm"
+                                    disabled={!user || (user.missionPardons || 0) === 0}
+                                >
+                                    {(user?.missionPardons || 0) > 0 ? "Use Card ⚡" : "No Cards"}
                                 </Button>
                             </AlertDialogTrigger>
-                            <AlertDialogContent className="bg-black border-white/10 text-white">
+                            <AlertDialogContent className="bg-card border-border">
                                 <AlertDialogHeader>
-                                    <AlertDialogTitle>Withdraw from Mission?</AlertDialogTitle>
+                                    <AlertDialogTitle>Abandon Mission?</AlertDialogTitle>
                                     <AlertDialogDescription>
-                                        This will cancel the mission without an XP penalty.
+                                        This will use 1 Mission Escape Card to abandon this mission without penalty.
+                                        You currently have {user?.missionPardons || 0} card(s).
                                     </AlertDialogDescription>
                                 </AlertDialogHeader>
-
-                                <div className="py-4 space-y-2 text-sm">
-                                    <div className="flex justify-between items-center">
-                                        <span className="text-muted">Mission Pardons (Owned):</span>
-                                        <span className={(user?.missionPardons || 0) > 0 ? "text-green-400 font-bold" : "text-white"}>
-                                            {user?.missionPardons || 0}
-                                        </span>
-                                    </div>
-                                    <div className="flex justify-between items-center">
-                                        <span className="text-muted">Or Pay Coins:</span>
-                                        <span className="text-yellow-500 font-bold">50 C</span>
-                                    </div>
-                                    <div className="text-xs text-muted pt-2 text-right">
-                                        Your Balance: <span className="text-yellow-500">{user?.coins || 0} C</span>
-                                    </div>
-                                </div>
 
                                 <AlertDialogFooter>
                                     <AlertDialogCancel className="border-white/10 hover:bg-white/5 hover:text-white">Cancel</AlertDialogCancel>
                                     <AlertDialogAction
                                         className="bg-red-600 hover:bg-red-700 text-white border-0"
                                         onClick={onWithdraw}
-                                        disabled={!user || ((user.missionPardons || 0) === 0 && (user.coins || 0) < 50)}
+                                        disabled={!user || (user.missionPardons || 0) === 0}
                                     >
-                                        {(user?.missionPardons || 0) > 0 ? "Use Pardon" : "Pay 50 Coins"}
+                                        Use Card ⚡
                                     </AlertDialogAction>
                                 </AlertDialogFooter>
                             </AlertDialogContent>
                         </AlertDialog>
                     </>
                 )}
-                {mission.status === "COMPLETED" && (
-                    <Button variant="ghost" className="w-full text-green-400 cursor-default hover:text-green-400 hover:bg-transparent">
-                        <CheckCircle2 className="w-4 h-4 mr-2" />
-                        Completed
-                    </Button>
-                )}
-            </CardFooter>
-        </Card>
+                {
+                    mission.status === "COMPLETED" && (
+                        <Button variant="ghost" className="w-full text-green-400 cursor-default hover:text-green-400 hover:bg-transparent">
+                            <CheckCircle2 className="w-4 h-4 mr-2" />
+                            Completed
+                        </Button>
+                    )
+                }
+            </CardFooter >
+        </Card >
     );
 }

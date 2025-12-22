@@ -19,6 +19,7 @@ import {
 const navItems = [
     { name: "Dashboard", href: "/dashboard" },
     { name: "Missions", href: "/missions" },
+    { name: "Journal", href: "/journal" },
     { name: "Planner", href: "/planner" },
     { name: "Squads", href: "/squads" },
     { name: "Leaderboard", href: "/leaderboard" },
@@ -65,13 +66,15 @@ export function Navbar() {
                         <>
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                    <Button variant="ghost" className="flex items-center gap-2 pl-2 pr-4 hover:bg-white/5">
-                                        <div className={`w-8 h-8 rounded-full bg-primary/20 border border-primary/50 flex items-center justify-center overflow-hidden ${user.equippedFrame || ''}`}>
-                                            {user.image ? (
-                                                <img src={user.image} alt={user.username} className="w-full h-full object-cover" />
-                                            ) : (
-                                                <User className="w-4 h-4 text-primary" />
-                                            )}
+                                    <Button variant="ghost" className="flex items-center gap-2 pl-2 pr-4 hover:bg-white/5 h-auto py-2">
+                                        <div className={cn("w-12 h-12 rounded-full flex items-center justify-center relative shrink-0 overflow-visible", user.equippedFrame)}>
+                                            <div className="w-8 h-8 rounded-full bg-primary/20 border border-primary/50 flex items-center justify-center overflow-hidden bg-black">
+                                                {user.image ? (
+                                                    <img src={user.image} alt={user.username} className="w-full h-full object-cover" />
+                                                ) : (
+                                                    <User className="w-4 h-4 text-primary" />
+                                                )}
+                                            </div>
                                         </div>
                                         <div className="flex flex-col items-start text-xs">
                                             <span className={`font-medium ${user.equippedNameplate || 'text-white'}`}>{user.username}</span>

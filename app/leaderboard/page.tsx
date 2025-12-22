@@ -79,12 +79,14 @@ export default function LeaderboardPage() {
                                 {topThree[1] && (
                                     <div className="flex flex-col items-center order-2 md:order-1 w-full md:w-1/3">
                                         <div className="mb-4 text-center">
-                                            <div className={`w-20 h-20 rounded-full bg-white/10 border-2 border-gray-400 flex items-center justify-center text-2xl font-bold text-gray-400 mb-2 mx-auto overflow-hidden ${topThree[1].equippedFrame || ''}`}>
-                                                {topThree[1].image ? (
-                                                    <img src={topThree[1].image} alt={topThree[1].username} className="w-full h-full object-cover" />
-                                                ) : (
-                                                    topThree[1].username.charAt(0)
-                                                )}
+                                            <div className={cn("w-32 h-32 rounded-full flex items-center justify-center relative mx-auto mb-2", topThree[1].equippedFrame)}>
+                                                <div className="w-24 h-24 rounded-full bg-white/10 border-2 border-gray-400 flex items-center justify-center text-2xl font-bold text-gray-400 overflow-hidden bg-black">
+                                                    {topThree[1].image ? (
+                                                        <img src={topThree[1].image} alt={topThree[1].username} className="w-full h-full object-cover" />
+                                                    ) : (
+                                                        topThree[1].username.charAt(0)
+                                                    )}
+                                                </div>
                                             </div>
                                             <p className={`font-bold text-white truncate max-w-[150px] ${topThree[1].equippedNameplate || ''}`}>{topThree[1].username}</p>
                                             <p className="text-sm text-primary font-mono">{topThree[1].totalXp.toLocaleString()} XP</p>
@@ -101,12 +103,14 @@ export default function LeaderboardPage() {
                                     <div className="flex flex-col items-center order-1 md:order-2 w-full md:w-1/3 z-10">
                                         <div className="mb-4 text-center">
                                             <Crown className="w-8 h-8 text-yellow-500 mx-auto mb-2 animate-bounce" />
-                                            <div className={`w-24 h-24 rounded-full bg-yellow-500/20 border-2 border-yellow-500 flex items-center justify-center text-3xl font-bold text-yellow-500 mb-2 mx-auto shadow-[0_0_20px_rgba(234,179,8,0.3)] overflow-hidden ${topThree[0].equippedFrame || ''}`}>
-                                                {topThree[0].image ? (
-                                                    <img src={topThree[0].image} alt={topThree[0].username} className="w-full h-full object-cover" />
-                                                ) : (
-                                                    topThree[0].username.charAt(0)
-                                                )}
+                                            <div className={cn("w-36 h-36 rounded-full flex items-center justify-center relative mx-auto mb-2", topThree[0].equippedFrame)}>
+                                                <div className="w-28 h-28 rounded-full bg-yellow-500/20 border-2 border-yellow-500 flex items-center justify-center text-3xl font-bold text-yellow-500 shadow-[0_0_20px_rgba(234,179,8,0.3)] overflow-hidden bg-black">
+                                                    {topThree[0].image ? (
+                                                        <img src={topThree[0].image} alt={topThree[0].username} className="w-full h-full object-cover" />
+                                                    ) : (
+                                                        topThree[0].username.charAt(0)
+                                                    )}
+                                                </div>
                                             </div>
                                             <p className={`font-bold text-white text-lg truncate max-w-[150px] ${topThree[0].equippedNameplate || ''}`}>{topThree[0].username}</p>
                                             <p className="text-sm text-primary font-mono">{topThree[0].totalXp.toLocaleString()} XP</p>
@@ -122,12 +126,14 @@ export default function LeaderboardPage() {
                                 {topThree[2] && (
                                     <div className="flex flex-col items-center order-3 w-full md:w-1/3">
                                         <div className="mb-4 text-center">
-                                            <div className={`w-20 h-20 rounded-full bg-orange-900/20 border-2 border-orange-700 flex items-center justify-center text-2xl font-bold text-orange-700 mb-2 mx-auto overflow-hidden ${topThree[2].equippedFrame || ''}`}>
-                                                {topThree[2].image ? (
-                                                    <img src={topThree[2].image} alt={topThree[2].username} className="w-full h-full object-cover" />
-                                                ) : (
-                                                    topThree[2].username.charAt(0)
-                                                )}
+                                            <div className={cn("w-32 h-32 rounded-full flex items-center justify-center relative mx-auto mb-2", topThree[2].equippedFrame)}>
+                                                <div className="w-24 h-24 rounded-full bg-orange-900/20 border-2 border-orange-700 flex items-center justify-center text-2xl font-bold text-orange-700 overflow-hidden bg-black">
+                                                    {topThree[2].image ? (
+                                                        <img src={topThree[2].image} alt={topThree[2].username} className="w-full h-full object-cover" />
+                                                    ) : (
+                                                        topThree[2].username.charAt(0)
+                                                    )}
+                                                </div>
                                             </div>
                                             <p className={`font-bold text-white truncate max-w-[150px] ${topThree[2].equippedNameplate || ''}`}>{topThree[2].username}</p>
                                             <p className="text-sm text-primary font-mono">{topThree[2].totalXp.toLocaleString()} XP</p>
@@ -156,12 +162,14 @@ export default function LeaderboardPage() {
                                             <div className="w-8 h-8 flex items-center justify-center font-mono text-muted">
                                                 #{user.rank}
                                             </div>
-                                            <div className={`w-10 h-10 rounded-full bg-white/10 border border-white/20 flex items-center justify-center overflow-hidden ${user.equippedFrame || ''}`}>
-                                                {user.image ? (
-                                                    <img src={user.image} alt={user.username} className="w-full h-full object-cover" />
-                                                ) : (
-                                                    <span className="text-sm font-bold text-white">{user.username.charAt(0)}</span>
-                                                )}
+                                            <div className={cn("w-16 h-16 rounded-full flex items-center justify-center relative shrink-0", user.equippedFrame)}>
+                                                <div className="w-12 h-12 rounded-full bg-white/10 border border-white/10 flex items-center justify-center overflow-hidden bg-black">
+                                                    {user.image ? (
+                                                        <img src={user.image} alt={user.username} className="w-full h-full object-cover" />
+                                                    ) : (
+                                                        <span className="text-sm font-bold text-white">{user.username.charAt(0)}</span>
+                                                    )}
+                                                </div>
                                             </div>
                                             <div>
                                                 <div className="flex items-center gap-2">

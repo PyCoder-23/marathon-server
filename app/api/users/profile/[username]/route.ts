@@ -9,9 +9,15 @@ export async function GET(req: Request, { params }: { params: Promise<{ username
         const viewerId = payload.userId;
         const { username } = await params;
 
-        // 1. Find the target user (Case Insensitive - fetch all and compare in JS)
-        const decodedName = decodedUsername(username);
-        const allUsers = await prisma.user.findMany({
+        // 1. Find the target user efficiently
+        const decodedName = decodeURIComponent(username);
+        const targetUser = await prisma.user.findFirst({
+            where: {
+                username: {
+                    equals: decodedName,
+                    // mode: 'insensitive' // Optional: depends on DB support, findFirst is better than findMany
+                }
+            },
             include: {
                 squad: true,
                 _count: {
@@ -22,8 +28,6 @@ export async function GET(req: Request, { params }: { params: Promise<{ username
                 }
             }
         });
-
-        const targetUser = allUsers.find(u => u.username.toLowerCase() === decodedName.toLowerCase());
 
         if (!targetUser) {
             return NextResponse.json({ error: "User not found" }, { status: 404 });

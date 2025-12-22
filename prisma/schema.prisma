@@ -6,7 +6,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -65,6 +65,7 @@ model User {
   tasks               Task[]
   coinTransactions    CoinTransaction[]
   inventory           UserItem[]
+  journalEntries      JournalEntry[]
 }
 
 model ShopItem {
@@ -267,4 +268,34 @@ model Task {
   updatedAt DateTime @updatedAt
 
   @@index([userId])
+}
+
+model JournalEntry {
+  id               String   @id @default(cuid())
+  userId           String
+  user             User     @relation(fields: [userId], references: [id])
+  type             String   // "HABIT" | "GRATITUDE" | "HEALTH"
+  date             String   // "YYYY-MM-DD"
+  
+  // Habit fields
+  habitName        String?
+  habitCompleted   Boolean? @default(false)
+  habitNotes       String?
+  
+  // Gratitude fields
+  gratitudeTitle   String?
+  gratitudeContent String?
+  gratitudeMood    String?
+  
+  // Health fields
+  healthCategory   String?  // "mental" | "physical" | "food"
+  healthTitle      String?
+  healthContent    String?
+  healthRating     Int?     @default(0)
+  
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([userId, date])
+  @@index([type])
 }

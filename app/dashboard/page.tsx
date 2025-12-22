@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@/lib/auth-context";
 import { api } from "@/lib/api-client";
 import { SessionTimer } from "@/components/session-timer";
+import { cn } from "@/lib/utils";
 
 interface Stats {
     today: {
@@ -116,9 +117,22 @@ export default function DashboardPage() {
         <div className="container mx-auto p-6 space-y-8">
             {/* Header */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                <div>
-                    <h1 className="text-3xl font-bold text-white tracking-tight">Command Center</h1>
-                    <p className="text-muted">Welcome back, {user?.username}. Your training awaits.</p>
+                <div className="flex items-center gap-4">
+                    <div className={cn("w-20 h-20 rounded-full flex items-center justify-center relative shrink-0", user?.equippedFrame)}>
+                        <div className="w-16 h-16 rounded-full overflow-hidden bg-black border border-white/10">
+                            {user?.image ? (
+                                <img src={user.image} alt={user.username} className="w-full h-full object-cover" />
+                            ) : (
+                                <div className="w-full h-full flex items-center justify-center text-2xl font-bold text-primary">{user?.username.charAt(0).toUpperCase()}</div>
+                            )}
+                        </div>
+                    </div>
+                    <div>
+                        <h1 className={cn("text-3xl font-bold text-white tracking-tight", user?.equippedNameplate)}>
+                            Welcome back, {user?.username}
+                        </h1>
+                        <p className="text-muted">Your training awaits. Rank up your squad!</p>
+                    </div>
                 </div>
             </div>
 
@@ -222,7 +236,7 @@ export default function DashboardPage() {
                                     )}
 
                                     {/* Line Graph */}
-                                    {weeklyStats.length > 0 && (
+                                    {weeklyStats.length > 1 ? (
                                         <>
                                             <svg className="absolute inset-0 w-full h-full overflow-visible" viewBox="0 0 100 100" preserveAspectRatio="none">
                                                 <defs>
@@ -233,14 +247,14 @@ export default function DashboardPage() {
                                                 </defs>
                                                 <path
                                                     d={`
-                                                        M 0,100
-                                                        ${weeklyStats.map((day: any, i: number) => {
+                                                         M 0,100
+                                                         ${weeklyStats.map((day: any, i: number) => {
                                                         const x = (i / (weeklyStats.length - 1)) * 100;
                                                         const y = 100 - (((day.xp || 0) - minY) / yRange) * 100;
                                                         return `L ${x},${y}`;
                                                     }).join(' ')}
-                                                        L 100,100 Z
-                                                    `}
+                                                         L 100,100 Z
+                                                     `}
                                                     fill="url(#lineGradient)"
                                                     fillOpacity="0.2"
                                                 />
@@ -257,7 +271,7 @@ export default function DashboardPage() {
                                                 />
                                             </svg>
 
-                                            {/* Points & Hover Zones */}
+                                            {/* Bar for single data point or just points */}
                                             <div className="absolute inset-0">
                                                 {weeklyStats.map((day: any, i: number) => {
                                                     const xp = day.xp || 0;
@@ -266,16 +280,11 @@ export default function DashboardPage() {
 
                                                     return (
                                                         <div key={i} className="absolute top-0 bottom-0 w-12 -translate-x-1/2 group z-10" style={{ left: `${x}%` }}>
-                                                            {/* Vertical Guide Line */}
                                                             <div className="absolute top-0 bottom-0 left-1/2 w-px bg-primary/50 opacity-0 group-hover:opacity-100 transition-opacity" />
-
-                                                            {/* Permanent Point */}
                                                             <div
                                                                 className={`absolute left-1/2 w-3 h-3 -ml-1.5 rounded-full border-2 z-20 ${xp < 0 ? 'bg-red-500 border-red-500' : 'bg-black border-primary'}`}
                                                                 style={{ top: `calc(${y}% - 6px)` }}
                                                             />
-
-                                                            {/* Tooltip */}
                                                             <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-black text-xs px-2 py-1 rounded border border-white/10 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-30 pointer-events-none">
                                                                 <div className={`font-bold ${xp < 0 ? 'text-red-500' : 'text-primary'}`}>{xp} XP</div>
                                                                 <div className="text-muted">{new Date(day.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</div>
@@ -285,7 +294,17 @@ export default function DashboardPage() {
                                                 })}
                                             </div>
                                         </>
-                                    )}
+                                    ) : weeklyStats.length === 1 ? (
+                                        <div className="absolute inset-0 flex items-center justify-center">
+                                            <div className="relative group">
+                                                <div className="w-4 h-4 rounded-full bg-primary animate-pulse" />
+                                                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-black text-xs px-2 py-1 rounded border border-white/10 opacity-100 whitespace-nowrap">
+                                                    <div className="font-bold text-primary">{weeklyStats[0].xp} XP</div>
+                                                    <div className="text-muted">Today</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ) : null}
                                 </div>
                             </div>
 

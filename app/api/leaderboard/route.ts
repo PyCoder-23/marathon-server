@@ -46,6 +46,8 @@ export async function GET(req: Request) {
                     image: true,
                     totalXp: true,
                     totalMinutes: true,
+                    equippedFrame: true,
+                    equippedNameplate: true,
                     squad: {
                         select: { name: true }
                     }

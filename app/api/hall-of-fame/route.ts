@@ -43,6 +43,8 @@ export async function GET() {
                     select: {
                         username: true,
                         image: true,
+                        equippedFrame: true,
+                        equippedNameplate: true
                     }
                 }
             },
@@ -59,6 +61,8 @@ export async function GET() {
                     select: {
                         username: true,
                         image: true,
+                        equippedFrame: true,
+                        equippedNameplate: true
                     }
                 }
             },
@@ -83,11 +87,14 @@ export async function GET() {
                     .sort((a: any, b: any) => b.totalXp - a.totalXp)
                     .slice(0, 3) // Top 3 per period
                     .forEach((winner: any, index: number) => {
+                        const entity = winner[nameKey];
                         result.push({
                             id: winner.id,
                             period: formatPeriod(period, periodKey),
-                            name: winner[nameKey]?.name || winner[nameKey]?.username || 'Unknown',
-                            image: imageKey && winner[nameKey]?.[imageKey] ? winner[nameKey][imageKey] : null,
+                            name: entity?.name || entity?.username || 'Unknown',
+                            image: imageKey && entity?.[imageKey] ? entity[imageKey] : null,
+                            equippedFrame: entity?.equippedFrame,
+                            equippedNameplate: entity?.equippedNameplate,
                             totalXp: winner.totalXp,
                             rank: index + 1,
                         });

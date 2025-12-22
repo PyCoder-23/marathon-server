@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Users, Trophy, Timer, ArrowLeft, Shield } from "lucide-react";
+import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -18,6 +19,8 @@ interface SquadMember {
     totalMinutes: number;
     streakDays: number;
     isAdmin: boolean;
+    equippedFrame?: string;
+    equippedNameplate?: string;
 }
 
 interface SquadDetails {
@@ -157,16 +160,18 @@ export default function SquadDetailPage() {
                                     <div className="w-6 text-center text-sm font-mono text-muted">
                                         #{index + 1}
                                     </div>
-                                    <div className="w-10 h-10 rounded-full bg-white/10 border border-white/20 flex items-center justify-center overflow-hidden">
-                                        {member.image ? (
-                                            <img src={member.image} alt={member.username} className="w-full h-full object-cover" />
-                                        ) : (
-                                            <span className="text-sm font-bold text-white">{member.username.charAt(0).toUpperCase()}</span>
-                                        )}
+                                    <div className={cn("w-14 h-14 rounded-full flex items-center justify-center relative shrink-0 overflow-visible", member.equippedFrame)}>
+                                        <div className="w-10 h-10 rounded-full overflow-hidden border border-white/10 bg-black">
+                                            {member.image ? (
+                                                <img src={member.image} alt={member.username} className="w-full h-full object-cover" />
+                                            ) : (
+                                                <span className="text-sm font-bold text-white">{member.username.charAt(0).toUpperCase()}</span>
+                                            )}
+                                        </div>
                                     </div>
                                     <div>
                                         <div className="flex items-center gap-2">
-                                            <p className="font-bold text-white">{member.username}</p>
+                                            <p className={cn("font-bold text-white", member.equippedNameplate)}>{member.username}</p>
                                             {member.isAdmin && (
                                                 <Badge variant="secondary" className="text-[10px] h-5">Admin</Badge>
                                             )}

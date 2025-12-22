@@ -23,6 +23,7 @@ export async function GET() {
                 isProfileLocked: true,
                 coins: true,
                 streakFreezes: true,
+                missionPardons: true,
                 equippedFrame: true,
                 equippedNameplate: true,
                 equippedBanner: true,

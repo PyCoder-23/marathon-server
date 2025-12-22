@@ -26,10 +26,10 @@ async function main() {
     // 2. Create Admin User
     const adminPassword = await hash("admin123", 12);
     const admin = await prisma.user.upsert({
-        where: { email: "admin@marathon.com" },
+        where: { email: "admin@marathonserver.com" },
         update: {},
         create: {
-            email: "admin@marathon.com",
+            email: "admin@marathonserver.com",
             username: "Commander",
             passwordHash: adminPassword,
             isAdmin: true,
@@ -208,21 +208,24 @@ async function main() {
     console.log("Missions seeded.");
 
     // 4. Create Shop Items
-    // Clean up existing shop items first (optional, useful for development)
-    // await prisma.shopItem.deleteMany({});
-
     const shopItems = [
         // Consumables
         { name: "Streak Freeze", description: "Preserve one missed day without losing your streak.", type: "FREEZE", price: 15, assetUrl: "/icons/freeze.svg", cssClass: "item-freeze" },
         { name: "Mission Pardon", description: "Withdraw from a mission without penalty.", type: "PARDON", price: 50, assetUrl: "/icons/pardon.svg", cssClass: "item-pardon" },
 
-        // Exotic Nameplates
-        { name: "Aurora Borealis", description: "Shifting northern lights effect.", type: "NAMEPLATE", price: 800, cssClass: "name-aurora", isAnimated: true },
-        { name: "Fire God", description: "Raging inferno text.", type: "NAMEPLATE", price: 1000, cssClass: "name-fire-god", isAnimated: true },
-        { name: "Quantum Realm", description: "Sub-atomic particle shift.", type: "NAMEPLATE", price: 600, cssClass: "name-quantum", isAnimated: true },
-
-
         // PFP Frames
+        { name: "Shadow Frame", description: "Dark, void, and mysterious aura.", type: "FRAME", price: 900, cssClass: "frame-shadow" },
+        { name: "Diamond Frame", description: "Sharp, crystalline sparkle.", type: "FRAME", price: 1000, cssClass: "frame-diamond" },
+        { name: "Ice Frame", description: "Cold cyan frost border.", type: "FRAME", price: 1100, cssClass: "frame-ice" },
+        { name: "Neon Glow", description: "Vibrant cyber neon aura.", type: "FRAME", price: 1200, cssClass: "frame-neon-glow" },
+        { name: "Lightning Frame", description: "Fast electric flicker.", type: "FRAME", price: 1250, cssClass: "frame-lightning" },
+        { name: "Spirit Energy", description: "Soft green floating aura.", type: "FRAME", price: 1300, cssClass: "frame-spirit" },
+        { name: "Chakra Flow", description: "Rotating energy rings.", type: "FRAME", price: 1400, cssClass: "frame-chakra" },
+        { name: "Diamond Pulse", description: "Premium rhythmic pulse.", type: "FRAME", price: 1500, cssClass: "frame-diamond-pulse" },
+        { name: "Sharingan Frame", description: "Red, ominous rotating power.", type: "FRAME", price: 1600, cssClass: "frame-sharingan" },
+        { name: "Saiyan Power", description: "Golden aggressive energy.", type: "FRAME", price: 1700, cssClass: "frame-saiyan" },
+
+        // Additional Frames (Legacy/Standard)
         { name: "Neon Blue Frame", description: "Minimalist neon blue border.", type: "FRAME", price: 100, cssClass: "frame-neon-blue" },
         { name: "Neon Pink Frame", description: "Vibrant pink neon border.", type: "FRAME", price: 100, cssClass: "frame-neon-pink" },
         { name: "Neon Green Frame", description: "Toxic green neon border.", type: "FRAME", price: 100, cssClass: "frame-neon-green" },
@@ -233,12 +236,27 @@ async function main() {
         { name: "Cosmic Void", description: "Deep space particle effect.", type: "FRAME", price: 300, cssClass: "frame-cosmic", isAnimated: true },
 
         // Nameplates
-        { name: "Neon Glow", description: "Subtle glowing username.", type: "NAMEPLATE", price: 150, cssClass: "name-neon-glow" },
-        { name: "Gradient Shimmer", description: "Shifting gradient text.", type: "NAMEPLATE", price: 200, cssClass: "name-gradient-shimmer", isAnimated: true },
-        { name: "Cosmic Pulse", description: "Pulsing starfield effect.", type: "NAMEPLATE", price: 250, cssClass: "name-cosmic-pulse", isAnimated: true },
-        { name: "Cyberpunk Glitch", description: "Tech glitch text effect.", type: "NAMEPLATE", price: 300, cssClass: "name-cyber-glitch", isAnimated: true },
-        { name: "Gold Shine", description: "Premium golden reflection.", type: "NAMEPLATE", price: 400, cssClass: "name-gold-shine", isAnimated: true },
-        { name: "Pastel Underline", description: "Soft animated underline.", type: "NAMEPLATE", price: 150, cssClass: "name-pastel-line", isAnimated: true },
+        { name: "Clean Black", description: "Sharp black text style.", type: "NAMEPLATE", price: 100, cssClass: "name-clean-black" },
+        { name: "Clean White", description: "Pure white bold text.", type: "NAMEPLATE", price: 100, cssClass: "name-clean-white" },
+        { name: "Minimal Gray", description: "Subtle professional look.", type: "NAMEPLATE", price: 120, cssClass: "name-minimal-gray" },
+        { name: "Bronze Text", description: "Classic metallic bronze.", type: "NAMEPLATE", price: 150, cssClass: "name-bronze" },
+        { name: "Silver Text", description: "Elegant silver texture.", type: "NAMEPLATE", price: 200, cssClass: "name-silver" },
+        { name: "Rainbow Text", description: "Flowing color spectrum.", type: "NAMEPLATE", price: 800, cssClass: "name-rainbow" },
+        { name: "Chakra Text", description: "Spiritual energy flow.", type: "NAMEPLATE", price: 800, cssClass: "name-chakra-text" },
+        { name: "Mono Gradient", description: "Sleek monochrome shift.", type: "NAMEPLATE", price: 400, cssClass: "name-mono" },
+        { name: "Demon Slayer", description: "Breathing technique aura.", type: "NAMEPLATE", price: 800, cssClass: "name-demon" },
+        { name: "Sharingan Text", description: "Legendary eye power.", type: "NAMEPLATE", price: 900, cssClass: "name-sharingan-text" },
+        { name: "Super Saiyan", description: "Golden warrior flash.", type: "NAMEPLATE", price: 950, cssClass: "name-super-saiyan" },
+        { name: "Aurora Text", description: "Northern lights shimmer.", type: "NAMEPLATE", price: 1000, cssClass: "name-aurora" },
+        { name: "Hologram Text", description: "Digital shimmering glint.", type: "NAMEPLATE", price: 1200, cssClass: "name-hologram" },
+
+        // Additional Nameplates (Legacy)
+        { name: "Neon Glow", description: "Glow in the dark text.", type: "NAMEPLATE", price: 150, cssClass: "name-neon-glow" },
+        { name: "Gradient Shimmer", description: "Soft shifting gradient.", type: "NAMEPLATE", price: 200, cssClass: "name-gradient-shimmer", isAnimated: true },
+        { name: "Cosmic Pulse", description: "Star field vibration.", type: "NAMEPLATE", price: 250, cssClass: "name-cosmic-pulse", isAnimated: true },
+        { name: "Fire God", description: "Raging inferno text.", type: "NAMEPLATE", price: 1000, cssClass: "name-fire-god", isAnimated: true },
+        { name: "Quantum Realm", description: "Sub-atomic particle shift.", type: "NAMEPLATE", price: 600, cssClass: "name-quantum", isAnimated: true },
+        { name: "Pastel Underline", description: "Soft animated line.", type: "NAMEPLATE", price: 150, cssClass: "name-pastel-line", isAnimated: true },
 
         // Banners
         { name: "Midnight City", description: "Cyberpunk city skyline.", type: "BANNER", price: 200, assetUrl: "/banners/city.jpg", cssClass: "banner-city" },
@@ -246,12 +264,10 @@ async function main() {
     ];
 
     for (const item of shopItems) {
-        // Upsert based on name (ShopItem doesn't have unique name yet, but we'll findFirst)
         const exists = await prisma.shopItem.findFirst({ where: { name: item.name } });
         if (!exists) {
             await prisma.shopItem.create({ data: item });
         } else {
-            // Update price/desc if needed
             await prisma.shopItem.update({
                 where: { id: exists.id },
                 data: item

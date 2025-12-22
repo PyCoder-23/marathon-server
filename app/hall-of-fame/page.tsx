@@ -14,6 +14,8 @@ interface Winner {
     image?: string | null;
     totalXp: number;
     rank: number;
+    equippedFrame?: string;
+    equippedNameplate?: string;
 }
 
 export default function HallOfFamePage() {
@@ -70,18 +72,21 @@ export default function HallOfFamePage() {
                         {getRankIcon(winner.rank)}
                         <span className="font-mono text-sm text-muted">#{winner.rank}</span>
                     </div>
-                    {showImage && winner.image && (
-                        <div className="w-10 h-10 rounded-full overflow-hidden border border-white/20">
-                            <img src={winner.image} alt={winner.name} className="w-full h-full object-cover" />
-                        </div>
-                    )}
-                    {showImage && !winner.image && (
-                        <div className="w-10 h-10 rounded-full bg-white/10 border border-white/20 flex items-center justify-center">
-                            <span className="text-sm font-bold text-white">{winner.name.charAt(0)}</span>
+                    {showImage && (
+                        <div className={cn("w-16 h-16 rounded-full flex items-center justify-center relative shrink-0 overflow-visible", winner.equippedFrame)}>
+                            <div className="w-12 h-12 rounded-full overflow-hidden border border-white/10 bg-black">
+                                {winner.image ? (
+                                    <img src={winner.image} alt={winner.name} className="w-full h-full object-cover" />
+                                ) : (
+                                    <div className="w-full h-full bg-white/5 flex items-center justify-center">
+                                        <span className="text-sm font-bold text-white">{winner.name.charAt(0)}</span>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     )}
                     <div>
-                        <p className="font-bold text-white">{winner.name}</p>
+                        <p className={cn("font-bold text-white", winner.equippedNameplate)}>{winner.name}</p>
                         <p className="text-xs text-muted">{winner.period}</p>
                     </div>
                 </div>
