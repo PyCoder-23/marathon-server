@@ -156,20 +156,29 @@ model Mission {
 }
 
 model MissionProgress {
-  id          String    @id @default(cuid())
-  userId      String
-  missionId   String
-  startedAt   DateTime  @default(now())
-  completed   Boolean   @default(false)
-  completedAt DateTime?
-  progress    Int       @default(0)
-  user        User      @relation(fields: [userId], references: [id])
-  mission     Mission   @relation(fields: [missionId], references: [id])
+  id                String    @id @default(cuid())
+  userId            String
+  missionId         String
+  startedAt         DateTime  @default(now())
+  completed         Boolean   @default(false)
+  completedAt       DateTime?
+  progress          Int       @default(0)
+  
+  // New Snapshot Fields
+  startTotalMinutes Int       @default(0)
+  startSessionCount Int       @default(0)
+  startStreak       Int       @default(0)
+  
+  // Status Tracking (ACTIVE, COMPLETED, FAILED)
+  status            String    @default("ACTIVE") 
 
-  @@unique([userId, missionId])
+  user              User      @relation(fields: [userId], references: [id])
+  mission           Mission   @relation(fields: [missionId], references: [id])
+
   @@index([userId])
   @@index([completed])
   @@index([userId, completed])
+  @@index([status]) // Good for filtering active vs failed
 }
 
 model XPTransaction {

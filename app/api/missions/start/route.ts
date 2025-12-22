@@ -12,24 +12,49 @@ export async function POST(req: Request) {
             return errorResponse("Mission ID is required", 400);
         }
 
-        // Use upsert to prevent race conditions from spam-clicking
-        // If mission already exists, just return it; otherwise create it
-        const progress = await prisma.missionProgress.upsert({
+        // 1. Check if an ACTIVE mission of this ID already exists for the user
+        // Cast to any to bypass stale Prisma types in editor
+        const existingActive = await (prisma.missionProgress as any).findFirst({
             where: {
-                userId_missionId: {
-                    userId: payload.userId,
-                    missionId,
-                }
-            },
-            update: {
-                // If it exists, don't change anything
-                // This prevents resetting progress if user spam-clicks
-            },
-            create: {
                 userId: payload.userId,
                 missionId,
-                progress: 0,
+                status: "ACTIVE"
+            }
+        });
+
+        if (existingActive) {
+            return errorResponse("Mission is already active", 400);
+        }
+
+        // 2. Fetch current user stats for Snapshot
+        const user = await prisma.user.findUnique({
+            where: { id: payload.userId },
+            select: {
+                totalMinutes: true,
+                streakDays: true,
+            }
+        });
+
+        // Count valid sessions for snapshot
+        const sessionCount = await prisma.session.count({
+            where: {
+                userId: payload.userId,
+                durationMin: { gte: 25 },
+                completed: true
+            }
+        });
+
+        // 3. Create NEW MissionProgress with Status=ACTIVE and Snapshots
+        const progress = await (prisma.missionProgress as any).create({
+            data: {
+                userId: payload.userId,
+                missionId,
+                status: "ACTIVE",
                 completed: false,
+                progress: 0,
+                startTotalMinutes: user?.totalMinutes || 0,
+                startStreak: user?.streakDays || 0,
+                startSessionCount: sessionCount
             }
         });
 

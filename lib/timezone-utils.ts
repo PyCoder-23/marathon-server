@@ -1,25 +1,37 @@
 /**
  * Timezone utilities for IST (Indian Standard Time) operations
  * IST is UTC+5:30
+ * 
+ * STRATEGY:
+ * We use a "Fake UTC" approach. We shift the underlying timestamp by +5.5 hours.
+ * The resulting Date object, when inspecting its UTC components (.getUTCHours),
+ * actually reflects the IST time.
+ * 
+ * Example: Real Time 12:00 UTC (17:30 IST).
+ * Shifted: 17:30 UTC.
+ * .getUTCHours() -> 17. (Matches IST hour).
+ * 
+ * We perform manipuations (setUTCHours(0)) on this shifted date.
+ * Then we shift back (-5.5h) to get the real UTC timestamp for the DB.
  */
 
+const IST_OFFSET_MS = 5.5 * 60 * 60 * 1000;
+
 /**
- * Helper to convert "Fake IST-as-UTC" date from getISTDate() back to Real UTC for DB Query
- * 00:00 IST = Prev Day 18:30 UTC (-5.5 hours)
+ * Returns a Date object where the UTC components match IST time.
+ * E.g., if it is 12:30 UTC (6:00 PM IST), this returns a Date that looks like 6:00 PM UTC.
+ * This is "IST Time stored in UTC container".
  */
-export function toDBTime(istDate: Date): Date {
-    return new Date(istDate.getTime() - (5.5 * 60 * 60 * 1000));
+export function getISTDate(date: Date = new Date()): Date {
+    const utcTime = date.getTime();
+    return new Date(utcTime + IST_OFFSET_MS);
 }
 
 /**
- * Get current date/time in IST - Returns "Fake UTC" object where time is shifted to match IST
- * NOTE: Use this ONLY for display/logic, NOT for saving to DB unless you convert back!
+ * Converts an "IST Context" date (shifted UTC) back to real UTC timestamp for database storage.
  */
-export function getISTDate(date: Date = new Date()): Date {
-    // Convert to IST by adding 5 hours and 30 minutes
-    const utc = date.getTime() + (date.getTimezoneOffset() * 60000);
-    const istOffset = 5.5 * 60 * 60 * 1000; // 5 hours 30 minutes in milliseconds
-    return new Date(utc + istOffset);
+export function toDBTime(istDate: Date): Date {
+    return new Date(istDate.getTime() - IST_OFFSET_MS);
 }
 
 /**
@@ -27,7 +39,7 @@ export function getISTDate(date: Date = new Date()): Date {
  */
 export function getISTDayStart(date: Date = new Date()): Date {
     const istDate = getISTDate(date);
-    istDate.setHours(0, 0, 0, 0);
+    istDate.setUTCHours(0, 0, 0, 0);
     return toDBTime(istDate);
 }
 
@@ -36,7 +48,7 @@ export function getISTDayStart(date: Date = new Date()): Date {
  */
 export function getISTDayEnd(date: Date = new Date()): Date {
     const istDate = getISTDate(date);
-    istDate.setHours(23, 59, 59, 999);
+    istDate.setUTCHours(23, 59, 59, 999);
     return toDBTime(istDate);
 }
 
@@ -45,10 +57,11 @@ export function getISTDayEnd(date: Date = new Date()): Date {
  */
 export function getISTWeekStart(date: Date = new Date()): Date {
     const istDate = getISTDate(date);
-    const day = istDate.getDay();
-    const diff = day === 0 ? -6 : 1 - day; // Adjust when day is Sunday (0) or other days
-    istDate.setDate(istDate.getDate() + diff);
-    istDate.setHours(0, 0, 0, 0);
+    const day = istDate.getUTCDay(); // 0 (Sun) to 6 (Sat)
+    const diff = day === 0 ? -6 : 1 - day; // Adjust to Monday
+
+    istDate.setUTCDate(istDate.getUTCDate() + diff);
+    istDate.setUTCHours(0, 0, 0, 0);
     return toDBTime(istDate);
 }
 
@@ -56,18 +69,13 @@ export function getISTWeekStart(date: Date = new Date()): Date {
  * Get end of current week (Sunday 11:59:59.999 PM IST) (Returned as Real UTC timestamp for DB)
  */
 export function getISTWeekEnd(date: Date = new Date()): Date {
-    // We can't use getISTWeekStart above directly because it returns a DB time now.
-    // We need to work with the fake IST date first.
+    // We get Monday Start shifted
     const istDate = getISTDate(date);
-    const day = istDate.getDay();
+    const day = istDate.getUTCDay();
     const diff = day === 0 ? -6 : 1 - day;
 
-    // Week Start IST
-    istDate.setDate(istDate.getDate() + diff);
-
-    // Week End IST (Start + 6 days)
-    istDate.setDate(istDate.getDate() + 6);
-    istDate.setHours(23, 59, 59, 999);
+    istDate.setUTCDate(istDate.getUTCDate() + diff + 6); // Monday + 6 = Sunday
+    istDate.setUTCHours(23, 59, 59, 999);
 
     return toDBTime(istDate);
 }
@@ -77,8 +85,8 @@ export function getISTWeekEnd(date: Date = new Date()): Date {
  */
 export function getISTMonthStart(date: Date = new Date()): Date {
     const istDate = getISTDate(date);
-    istDate.setDate(1);
-    istDate.setHours(0, 0, 0, 0);
+    istDate.setUTCDate(1);
+    istDate.setUTCHours(0, 0, 0, 0);
     return toDBTime(istDate);
 }
 
@@ -87,9 +95,9 @@ export function getISTMonthStart(date: Date = new Date()): Date {
  */
 export function getISTMonthEnd(date: Date = new Date()): Date {
     const istDate = getISTDate(date);
-    istDate.setMonth(istDate.getMonth() + 1);
-    istDate.setDate(0); // Last day of previous month
-    istDate.setHours(23, 59, 59, 999);
+    istDate.setUTCMonth(istDate.getUTCMonth() + 1);
+    istDate.setUTCDate(0); // Last day of previous (current) month
+    istDate.setUTCHours(23, 59, 59, 999);
     return toDBTime(istDate);
 }
 
@@ -98,9 +106,9 @@ export function getISTMonthEnd(date: Date = new Date()): Date {
  */
 export function getISTPreviousMonthStart(date: Date = new Date()): Date {
     const istDate = getISTDate(date);
-    istDate.setMonth(istDate.getMonth() - 1);
-    istDate.setDate(1);
-    istDate.setHours(0, 0, 0, 0);
+    istDate.setUTCMonth(istDate.getUTCMonth() - 1);
+    istDate.setUTCDate(1);
+    istDate.setUTCHours(0, 0, 0, 0);
     return toDBTime(istDate);
 }
 
@@ -109,8 +117,8 @@ export function getISTPreviousMonthStart(date: Date = new Date()): Date {
  */
 export function getISTPreviousMonthEnd(date: Date = new Date()): Date {
     const istDate = getISTDate(date);
-    istDate.setDate(0); // Last day of previous month
-    istDate.setHours(23, 59, 59, 999);
+    istDate.setUTCDate(0); // 0th of current month = End of prev month
+    istDate.setUTCHours(23, 59, 59, 999);
     return toDBTime(istDate);
 }
 
@@ -119,10 +127,22 @@ export function getISTPreviousMonthEnd(date: Date = new Date()): Date {
  */
 export function formatMonthKey(date: Date = new Date()): string {
     const istDate = getISTDate(date);
-    const year = istDate.getFullYear();
-    const month = String(istDate.getMonth() + 1).padStart(2, '0');
+    const year = istDate.getUTCFullYear();
+    const month = String(istDate.getUTCMonth() + 1).padStart(2, '0');
     return `${year}-${month}`;
 }
+
+/**
+ * Format IST Date YYYY-MM-DD
+ */
+export function formatISTDate(date: Date = new Date()): string {
+    const istDate = getISTDate(date);
+    const year = istDate.getUTCFullYear();
+    const month = String(istDate.getUTCMonth() + 1).padStart(2, '0');
+    const day = String(istDate.getUTCDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
 
 /**
  * Check if a date is within the current IST day
