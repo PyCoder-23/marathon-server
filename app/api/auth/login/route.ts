@@ -11,7 +11,10 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Missing credentials" }, { status: 400 });
         }
 
-        // Find user (SQLite doesn't support case-insensitive mode, so we fetch and compare in JS)
+        console.log(`[LOGIN] Attempting login for identifier: ${identifier}`);
+
+        // Find user
+        console.log("[LOGIN] Fetching user from DB...");
         const allUsers = await prisma.user.findMany({
             select: {
                 id: true,
@@ -22,6 +25,7 @@ export async function POST(req: Request) {
                 bannedUntil: true,
             }
         });
+        console.log(`[LOGIN] Fetched ${allUsers.length} users.`);
 
         const user = allUsers.find(u =>
             u.email.toLowerCase() === identifier.toLowerCase() ||
@@ -29,22 +33,30 @@ export async function POST(req: Request) {
         );
 
         if (!user) {
+            console.log("[LOGIN] User not found.");
             return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
         }
+        console.log(`[LOGIN] User found: ${user.id}`);
 
         // Verify password
+        console.log("[LOGIN] Verifying password...");
         const isValid = await verifyPassword(password, user.passwordHash);
         if (!isValid) {
+            console.log("[LOGIN] Invalid password.");
             return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
         }
+        console.log("[LOGIN] Password verified.");
 
         // Check ban status
         if (user.bannedUntil && user.bannedUntil > new Date()) {
+            console.log("[LOGIN] User is banned.");
             return NextResponse.json({ error: "Account suspended until " + user.bannedUntil.toISOString() }, { status: 403 });
         }
 
         // Generate Token
+        console.log("[LOGIN] Signing token...");
         const token = await signToken({ userId: user.id, isAdmin: user.isAdmin });
+        console.log("[LOGIN] Token signed.");
 
         // Return Response
         const response = NextResponse.json({
@@ -64,10 +76,11 @@ export async function POST(req: Request) {
             maxAge: 60 * 60 * 24 * 7, // 7 days
         });
 
+        console.log("[LOGIN] Login successful.");
         return response;
 
     } catch (error) {
-        console.error("Login error:", error);
+        console.error("Login critical error:", error);
         return NextResponse.json({ error: "Internal server error", details: error instanceof Error ? error.message : String(error) }, { status: 500 });
     }
 }
