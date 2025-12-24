@@ -32,27 +32,30 @@ interface Squad {
 }
 
 export default function DashboardPage() {
-    const { user } = useAuth();
+    const { user, loading: authLoading } = useAuth();
     const [stats, setStats] = useState<Stats | null>(null);
     const [squad, setSquad] = useState<Squad | null>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        fetchData();
-    }, []);
+        if (!authLoading && user) {
+            fetchData();
+        }
+    }, [authLoading, user]);
 
     async function fetchData() {
         try {
-            const [statsData, userData] = await Promise.all([
-                api.get("/api/users/stats"),
-                api.get("/api/users/me"),
-            ]);
+            const promises = [api.get("/api/users/stats")];
+            
+            if (user?.squadId) {
+                promises.push(api.get(`/api/squads/${user.squadId}`));
+            }
 
-            setStats(statsData);
-
-            if (userData.user.squadId) {
-                const squadData = await api.get(`/api/squads/${userData.user.squadId}`);
-                setSquad(squadData.squad);
+            const results = await Promise.all(promises);
+            setStats(results[0]);
+            
+            if (results[1]) {
+                setSquad(results[1].squad);
             }
         } catch (error) {
             console.error("Failed to fetch dashboard data:", error);

@@ -16,10 +16,7 @@ export async function GET() {
             return NextResponse.json(cached);
         }
 
-        // Get current date boundaries in IST (now returns correct DB/UTC time)
-        const todayStart = getISTDayStart();
-        const todayEnd = getISTDayEnd();
-
+        // ✅ Build date range for the last 7 days
         const now = new Date();
         const istOffset = 5.5 * 60 * 60 * 1000;
         const istTime = new Date(now.getTime() + istOffset);
@@ -28,65 +25,35 @@ export async function GET() {
         const istMonth = istTime.getUTCMonth();
         const istDate = istTime.getUTCDate();
 
-        // ✅ Build all queries for 7 days to run in parallel
-        const dayQueries = [];
-        for (let i = 6; i >= 0; i--) {
-            const targetDate = new Date(Date.UTC(istYear, istMonth, istDate - i, 0, 0, 0));
-            const yyyy = targetDate.getUTCFullYear();
-            const mm = String(targetDate.getUTCMonth() + 1).padStart(2, '0');
-            const dd = String(targetDate.getUTCDate()).padStart(2, '0');
-            const dateStr = `${yyyy}-${mm}-${dd}`;
+        // Start of range (6 days ago)
+        const startTargetDate = new Date(Date.UTC(istYear, istMonth, istDate - 6, 0, 0, 0));
+        const rangeStart = new Date(startTargetDate.getTime() - istOffset);
 
-            const queryStart = new Date(targetDate.getTime() - istOffset);
-            const queryEnd = new Date(queryStart.getTime() + 24 * 60 * 60 * 1000);
+        // End of range (Today end)
+        const endTargetDate = new Date(Date.UTC(istYear, istMonth, istDate, 0, 0, 0));
+        const rangeEnd = new Date(endTargetDate.getTime() - istOffset + 24 * 60 * 60 * 1000);
 
-            dayQueries.push({
-                dateStr,
-                queries: Promise.all([
-                    prisma.session.aggregate({
-                        where: {
-                            userId,
-                            startTs: { gte: queryStart, lt: queryEnd },
-                            completed: true,
-                        },
-                        _sum: { durationMin: true }
-                    }),
-                    prisma.xPTransaction.aggregate({
-                        where: {
-                            userId,
-                            createdAt: { gte: queryStart, lt: queryEnd },
-                        },
-                        _sum: { amount: true }
-                    }),
-                    prisma.session.count({
-                        where: {
-                            userId,
-                            startTs: { gte: queryStart, lt: queryEnd },
-                            completed: true,
-                            durationMin: { gte: 25 }
-                        }
-                    })
-                ])
-            });
-        }
-
-        // ✅ Execute all queries in parallel
-        const [todaySessionStats, todayPomodoroCount, user] = await Promise.all([
-            prisma.session.aggregate({
+        // ✅ Execute optimized queries (3 queries instead of 24+)
+        const [sessions, xpTransactions, user] = await Promise.all([
+            prisma.session.findMany({
                 where: {
                     userId,
-                    startTs: { gte: todayStart, lt: todayEnd },
+                    startTs: { gte: rangeStart, lt: rangeEnd },
                     completed: true,
                 },
-                _sum: { durationMin: true },
-                _count: true
+                select: {
+                    startTs: true,
+                    durationMin: true,
+                }
             }),
-            prisma.session.count({
+            prisma.xPTransaction.findMany({
                 where: {
                     userId,
-                    startTs: { gte: todayStart, lt: todayEnd },
-                    completed: true,
-                    durationMin: { gte: 25 }
+                    createdAt: { gte: rangeStart, lt: rangeEnd },
+                },
+                select: {
+                    createdAt: true,
+                    amount: true,
                 }
             }),
             prisma.user.findUnique({
@@ -95,30 +62,47 @@ export async function GET() {
             })
         ]);
 
-        // ✅ Execute all day queries in parallel
-        const dayResults = await Promise.all(dayQueries.map(dq => dq.queries));
+        // ✅ Process data in memory
+        const weeklyActivity = [];
+        let todayStats = { hours: 0, pomodoros: 0, minutes: 0 };
 
-        const todayMinutes = todaySessionStats._sum.durationMin || 0;
-        const todayHours = todayMinutes / 60;
-        const todayPomodoros = todayPomodoroCount;
+        for (let i = 6; i >= 0; i--) {
+            const targetDate = new Date(Date.UTC(istYear, istMonth, istDate - i, 0, 0, 0));
+            const yyyy = targetDate.getUTCFullYear();
+            const mm = String(targetDate.getUTCMonth() + 1).padStart(2, '0');
+            const dd = String(targetDate.getUTCDate()).padStart(2, '0');
+            const dateStr = `${yyyy}-${mm}-${dd}`;
 
-        // ✅ Build weekly activity from parallel results
-        const weeklyActivity = dayQueries.map((dq, idx) => {
-            const [sessionStats, xpStats, pomodoroCount] = dayResults[idx];
-            return {
-                date: dq.dateStr,
-                hours: (sessionStats._sum.durationMin || 0) / 60,
-                xp: xpStats._sum.amount || 0,
-                pomodoros: pomodoroCount,
-            };
-        });
+            const dayStart = new Date(targetDate.getTime() - istOffset);
+            const dayEnd = new Date(dayStart.getTime() + 24 * 60 * 60 * 1000);
+
+            // Filter for this day
+            const daySessions = sessions.filter(s => s.startTs >= dayStart && s.startTs < dayEnd);
+            const dayXp = xpTransactions.filter(t => t.createdAt >= dayStart && t.createdAt < dayEnd);
+
+            const durationMin = daySessions.reduce((sum, s) => sum + s.durationMin, 0);
+            const xp = dayXp.reduce((sum, t) => sum + t.amount, 0);
+            const pomodoros = daySessions.filter(s => s.durationMin >= 25).length;
+
+            weeklyActivity.push({
+                date: dateStr,
+                hours: durationMin / 60,
+                xp,
+                pomodoros,
+            });
+
+            // If it's today (i=0), set todayStats
+            if (i === 0) {
+                todayStats = {
+                    hours: durationMin / 60,
+                    pomodoros,
+                    minutes: durationMin,
+                };
+            }
+        }
 
         const result = {
-            today: {
-                hours: todayHours,
-                pomodoros: todayPomodoros,
-                minutes: todayMinutes,
-            },
+            today: todayStats,
             weekly: weeklyActivity,
             streak: user?.streakDays || 0,
         };
